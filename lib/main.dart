@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sweatsync/screens/home_screen.dart';
+import 'package:sweatsync/screens/login_screen.dart';
 import 'package:sweatsync/screens/onboarding_screen.dart';
 import 'package:sweatsync/theme/app_theme.dart';
 
@@ -18,7 +18,7 @@ class SweatSync extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: "SweatSync - a manager",
       theme: AppTheme.darkTheme(),
-      home: onBoarding ? const OnboardingScreen() : const HomeScreen(),
+      home: onBoarding ? const OnboardingScreen() : LoginScreen(),
     );
   }
 }

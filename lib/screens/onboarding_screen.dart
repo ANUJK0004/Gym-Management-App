@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sweatsync/screens/home_screen.dart';
+import 'package:sweatsync/screens/login_screen.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -31,7 +31,7 @@ class OnboardingScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
                 );
               },
               child: Text("Get Started"),
