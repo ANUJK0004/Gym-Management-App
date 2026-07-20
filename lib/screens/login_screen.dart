@@ -16,45 +16,51 @@ class LoginScreen extends StatelessWidget {
         child: Form(
           key: _key,
           child: Column(
+            crossAxisAlignment:CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: "Email",
-                  hintText: "Enter your email",
-                  prefixIcon: Icon(Icons.email),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28,vertical: 16),
+                child: TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: "Email",
+                    hintText: "Enter your email",
+                    prefixIcon: Icon(Icons.email),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter your email";
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter your email";
-                  }
-                  return null;
-                },
               ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _passwordController,
-                keyboardType: TextInputType.visiblePassword,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: "Password",
-                  hintText: "Enter your password",
-                  prefixIcon: Icon(Icons.lock),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28,vertical: 16),
+                child: TextFormField(
+                  controller: _passwordController,
+                  keyboardType: TextInputType.visiblePassword,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: "Password",
+                    hintText: "Enter your password",
+                    prefixIcon: Icon(Icons.lock),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter your password";
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter your password";
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   if (_key.currentState!.validate()) {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeScreen()),
                     );
@@ -62,21 +68,24 @@ class LoginScreen extends StatelessWidget {
                 },
                 child: const Text("Login"),
               ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  const Text("Don't have an account?"),
-                  const SizedBox(height: 10),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => RegisterScreen()),
-                      );
-                    },
-                    child: const Text("Register"),
-                  ),
-                ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24,vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Don't have an account?"),
+                    const SizedBox(height: 10),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => RegisterScreen()),
+                        );
+                      },
+                      child: const Text("Register"),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

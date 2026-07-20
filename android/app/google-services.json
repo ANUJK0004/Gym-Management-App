@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1793612831",
+    "project_id": "sweatsync-82733",
+    "storage_bucket": "sweatsync-82733.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1793612831:android:3ac60fdef76d895ce1492a",
+        "android_client_info": {
+          "package_name": "com.example.sweatsync"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsyEoESr080GHUdFKcNQ7DtGNepjRXD-Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
