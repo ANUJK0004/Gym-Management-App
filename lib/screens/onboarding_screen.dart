@@ -11,7 +11,7 @@ class OnboardingScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/images/onboarding.png",
+            Image.asset("images/onboarding.png",
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height * 0.4,
               fit: BoxFit.fitHeight,
@@ -27,14 +27,17 @@ class OnboardingScreen extends StatelessWidget {
             Text("Starts Here",style: Theme.of(context).textTheme.headlineSmall,),
             const SizedBox(height: 16,),
 
-            FilledButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                );
-              },
-              child: Text("Get Started"),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
+                },
+                child: Text("Get Started"),
+              ),
             ),
           ],
         ),
