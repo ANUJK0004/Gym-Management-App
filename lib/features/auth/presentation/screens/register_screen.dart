@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:sweatsync/app/routes/app_routes.dart';
 import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
 
 import '../../../../design_system/buttons/primary_button.dart';
@@ -38,9 +36,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       );
       return;
     }
-
-    context.go(AppRoutes.home);
-
   }
 
   @override

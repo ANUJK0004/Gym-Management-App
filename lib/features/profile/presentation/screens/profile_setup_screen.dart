@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:go_router/go_router.dart';
+import 'package:sweatsync/app/routes/app_routes.dart';
+import 'package:sweatsync/features/profile/presentation/providers/current_user_profile_provider.dart';
+import 'package:sweatsync/features/profile/presentation/providers/profile_setup_provider.dart';
 import '../widgets/basic_info_page.dart';
 import '../widgets/body_info_page.dart';
 import '../widgets/fitness_goal_page.dart';
@@ -38,6 +42,51 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
+    }
+  }
+
+  Future<void> _completeProfile() async {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+
+    if (firebaseUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User session expired. Please log in again.'),
+        ),
+      );
+
+      return;
+    }
+
+    final notifier = ref.read(profileSetupProvider.notifier);
+
+    if (!notifier.validateProfile()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please complete all profile details.')),
+      );
+
+      return;
+    }
+
+    try {
+      await notifier.completeProfile(
+        uid: firebaseUser.uid,
+        email: firebaseUser.email ?? '',
+      );
+
+      // Tell Riverpod to fetch the updated
+      // profile from Firestore.
+      ref.invalidate(currentUserProfileProvider);
+
+      if (!mounted) return;
+
+      context.go(AppRoutes.home);
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to save profile: $error')));
     }
   }
 
@@ -101,7 +150,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: _nextPage,
+                      onPressed: _currentPage == 2
+                          ? _completeProfile
+                          : _nextPage,
                       child: Text(_currentPage == 2 ? 'Complete' : 'Continue'),
                     ),
                   ),

@@ -30,4 +30,30 @@ class UserProfile {
   final String? activityLevel;
 
   final bool profileCompleted;
+
+  UserProfile copyWith({
+    String? displayName,
+    String? photoUrl,
+    DateTime? dateOfBirth,
+    String? gender,
+    double? height,
+    double? weight,
+    String? fitnessGoal,
+    String? activityLevel,
+    bool? profileCompleted,
+  }) {
+    return UserProfile(
+      uid: uid,
+      email: email,
+      displayName: displayName ?? this.displayName,
+      photoUrl: photoUrl ?? this.photoUrl,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      gender: gender ?? this.gender,
+      height: height ?? this.height,
+      weight: weight ?? this.weight,
+      fitnessGoal: fitnessGoal ?? this.fitnessGoal,
+      activityLevel: activityLevel ?? this.activityLevel,
+      profileCompleted: profileCompleted ?? this.profileCompleted,
+    );
+  }
 }

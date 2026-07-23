@@ -1,4 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
+import 'package:sweatsync/features/profile/domain/entities/user_profile.dart';
+import 'package:sweatsync/features/profile/domain/repositories/user_profile_repository.dart';
 
 class ProfileSetupState {
   const ProfileSetupState({
@@ -41,8 +44,14 @@ class ProfileSetupState {
 }
 
 class ProfileSetupNotifier extends Notifier<ProfileSetupState> {
+  late final UserProfileRepository _repository;
+
   @override
   ProfileSetupState build() {
+    _repository = ref.watch(
+          userProfileRepositoryProvider,
+        );
+
     return const ProfileSetupState();
   }
 
@@ -73,6 +82,48 @@ class ProfileSetupNotifier extends Notifier<ProfileSetupState> {
   void setActivityLevel(String value) {
     state = state.copyWith(activityLevel: value);
   }
+
+  bool validateProfile() {
+    return state.displayName
+        .trim()
+        .isNotEmpty &&
+        state.dateOfBirth != null &&
+        state.gender != null &&
+        state.height != null &&
+        state.weight != null &&
+        state.fitnessGoal != null &&
+        state.activityLevel != null;
+  }
+
+  Future<void> completeProfile({
+    required String uid,
+    required String email,
+  }) async {
+    if (!validateProfile()) {
+      throw Exception(
+        'Please complete all profile details.',
+      );
+    }
+
+    final profile = UserProfile(
+      uid: uid,
+      email: email,
+      displayName: state.displayName.trim(),
+      dateOfBirth: state.dateOfBirth,
+      gender: state.gender,
+      height: state.height,
+      weight: state.weight,
+      fitnessGoal: state.fitnessGoal,
+      activityLevel: state.activityLevel,
+      profileCompleted: true,
+    );
+
+    await _repository.updateUserProfile(
+      profile,
+    );
+  }
+
+
 }
 
 final profileSetupProvider =

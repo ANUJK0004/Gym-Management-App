@@ -45,9 +45,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
       return;
     }
-
-    context.go(AppRoutes.home);
-
   }
 
   @override
