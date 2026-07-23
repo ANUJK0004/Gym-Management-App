@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sweatsync/features/dashboard/member/presentation/screens/member_home_screen.dart';
+import 'package:sweatsync/features/profile/presentation/screens/profile_setup_screen.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
@@ -63,11 +64,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       GoRoute(
+        path: AppRoutes.profileSetup,
+        builder: (context, state) {
+          return const ProfileSetupScreen();
+        },
+      ),
+
+      GoRoute(
         path: AppRoutes.home,
         builder: (context, state) {
           return const MemberHomeScreen();
         },
       ),
+
     ],
   );
 });
