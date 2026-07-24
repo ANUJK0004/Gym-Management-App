@@ -1,12 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import 'package:sweatsync/core/presentation/screens/splash_screen.dart';
+
 import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
+import 'package:sweatsync/features/auth/presentation/screens/login_screen.dart';
+import 'package:sweatsync/features/auth/presentation/screens/register_screen.dart';
+
 import 'package:sweatsync/features/dashboard/member/presentation/screens/member_home_screen.dart';
+
 import 'package:sweatsync/features/profile/presentation/providers/current_user_profile_provider.dart';
 import 'package:sweatsync/features/profile/presentation/screens/profile_setup_screen.dart';
 
-import '../../features/auth/presentation/screens/login_screen.dart';
-import '../../features/auth/presentation/screens/register_screen.dart';
 import 'app_routes.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -15,77 +20,120 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final profileState = ref.watch(currentUserProfileProvider);
 
   return GoRouter(
-    initialLocation: AppRoutes.login,
+    initialLocation: AppRoutes.splash,
 
     redirect: (context, state) {
+      final location = state.matchedLocation;
+
       final isAuthenticated = authState.value != null;
 
-      final isGoingToLogin = state.matchedLocation == AppRoutes.login;
+      final isAuthPage =
+          location == AppRoutes.login || location == AppRoutes.register;
 
-      final isGoingToRegister = state.matchedLocation == AppRoutes.register;
+      final isProfileSetup = location == AppRoutes.profileSetup;
 
-      final isGoingToAuthPage = isGoingToLogin || isGoingToRegister;
+      final isSplash = location == AppRoutes.splash;
 
-      final isGoingToProfileSetup =
-          state.matchedLocation == AppRoutes.profileSetup;
+      // ------------------------------------------
+      // AUTH STATE IS LOADING
+      // ------------------------------------------
 
-      // Firebase Auth is still loading.
       if (authState.isLoading) {
-        return null;
-      }
-
-      // User is not authenticated.
-      if (!isAuthenticated) {
-        if (!isGoingToAuthPage) {
-          return AppRoutes.login;
+        if (!isSplash) {
+          return AppRoutes.splash;
         }
 
         return null;
       }
 
-      // Profile is loading.
+      // ------------------------------------------
+      // USER IS NOT LOGGED IN
+      // ------------------------------------------
+
+      if (!isAuthenticated) {
+        if (isAuthPage) {
+          return null;
+        }
+
+        return AppRoutes.login;
+      }
+
+      // ------------------------------------------
+      // USER IS LOGGED IN
+      // WAIT FOR PROFILE
+      // ------------------------------------------
+
       if (profileState.isLoading) {
+        if (!isSplash) {
+          return AppRoutes.splash;
+        }
+
         return null;
       }
 
-      // Profile failed to load.
+      // ------------------------------------------
+      // PROFILE FAILED
+      // ------------------------------------------
+
       if (profileState.hasError) {
-        if (!isGoingToProfileSetup) {
+        if (!isProfileSetup) {
           return AppRoutes.profileSetup;
         }
+
         return null;
       }
+
+      // ------------------------------------------
+      // PROFILE LOADED
+      // ------------------------------------------
 
       final profile = profileState.value;
 
-      // User has no Firestore profile.
+      // ------------------------------------------
+      // NO PROFILE FOUND
+      // ------------------------------------------
+
       if (profile == null) {
-        if (!isGoingToProfileSetup) {
+        if (!isProfileSetup) {
           return AppRoutes.profileSetup;
         }
 
         return null;
       }
 
-      // User has incomplete profile.
+      // ------------------------------------------
+      // PROFILE INCOMPLETE
+      // ------------------------------------------
+
       if (!profile.profileCompleted) {
-        if (!isGoingToProfileSetup) {
+        if (!isProfileSetup) {
           return AppRoutes.profileSetup;
         }
 
         return null;
       }
 
-      // User has completed profile.
-      if (profile.profileCompleted &&
-          (isGoingToAuthPage || isGoingToProfileSetup)) {
-        return AppRoutes.home;
+      // ------------------------------------------
+      // PROFILE COMPLETE
+      // ------------------------------------------
+
+      if (profile.profileCompleted) {
+        if (isSplash || isAuthPage || isProfileSetup) {
+          return AppRoutes.home;
+        }
       }
 
       return null;
     },
 
     routes: [
+      GoRoute(
+        path: AppRoutes.splash,
+        builder: (context, state) {
+          return const SplashScreen();
+        },
+      ),
+
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) {

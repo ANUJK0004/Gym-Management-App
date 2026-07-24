@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:sweatsync/design_system/inputs/app_date_picker_field.dart';
+import 'package:sweatsync/design_system/inputs/app_text_field.dart';
+import 'package:sweatsync/design_system/cards/selection_card.dart';
+
 import '../providers/profile_setup_provider.dart';
 
 class BasicInfoPage extends ConsumerStatefulWidget {
@@ -15,21 +19,17 @@ class BasicInfoPage extends ConsumerStatefulWidget {
 
 class _BasicInfoPageState
     extends ConsumerState<BasicInfoPage> {
-
-  late final TextEditingController
-  _nameController;
+  late final TextEditingController _nameController;
 
   @override
   void initState() {
     super.initState();
 
-    final profile =
-    ref.read(profileSetupProvider);
+    final profile = ref.read(profileSetupProvider);
 
-    _nameController =
-        TextEditingController(
-          text: profile.displayName,
-        );
+    _nameController = TextEditingController(
+      text: profile.displayName,
+    );
   }
 
   @override
@@ -38,47 +38,24 @@ class _BasicInfoPageState
     super.dispose();
   }
 
-  Future<void> _selectDate() async {
-    final currentDate =
-        ref.read(profileSetupProvider).dateOfBirth;
-
-    final selectedDate =
-    await showDatePicker(
-      context: context,
-      initialDate:
-      currentDate ??
-          DateTime(
-            DateTime.now().year - 18,
-          ),
-      firstDate: DateTime(1940),
-      lastDate: DateTime.now(),
-    );
-
-    if (selectedDate != null) {
-      ref
-          .read(profileSetupProvider.notifier)
-          .setDateOfBirth(
-        selectedDate,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final profile =
-    ref.watch(profileSetupProvider);
+    final profile = ref.watch(profileSetupProvider);
+    final notifier = ref.read(
+      profileSetupProvider.notifier,
+    );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 16),
 
           const Text(
-            'Let\'s get to know you',
+            'Tell us about yourself',
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -86,165 +63,84 @@ class _BasicInfoPageState
           const SizedBox(height: 8),
 
           const Text(
-            'Tell us a little about yourself '
-                'to personalize your fitness journey.',
+            'This information helps us personalize your fitness journey.',
           ),
 
           const SizedBox(height: 32),
 
-          TextField(
+          AppTextField(
             controller: _nameController,
-            onChanged: (value) {
-              ref
-                  .read(
-                profileSetupProvider
-                    .notifier,
-              )
-                  .setDisplayName(value);
+            label: 'Full Name',
+            hint: 'Enter your full name',
+            textInputAction: TextInputAction.next,
+            onChanged: notifier.setDisplayName,
+            validator: (value) {
+              if (value == null ||
+                  value.trim().isEmpty) {
+                return 'Please enter your name';
+              }
+
+              return null;
             },
-            decoration:
-            const InputDecoration(
-              labelText: 'Full Name',
-              hintText:
-              'Enter your full name',
-              prefixIcon:
-              Icon(Icons.person_outline),
-            ),
           ),
 
           const SizedBox(height: 24),
 
-          const Text(
-            'Date of Birth',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-            ),
+          AppDatePickerField(
+            label: 'Date of Birth',
+            value: profile.dateOfBirth,
+            onChanged: (date) {
+              if (date != null) {
+                notifier.setDateOfBirth(date);
+              }
+            },
           ),
 
-          const SizedBox(height: 8),
-
-          InkWell(
-            onTap: _selectDate,
-            borderRadius:
-            BorderRadius.circular(12),
-            child: InputDecorator(
-              decoration:
-              const InputDecoration(
-                prefixIcon:
-                Icon(
-                  Icons.calendar_today_outlined,
-                ),
-              ),
-              child: Text(
-                profile.dateOfBirth == null
-                    ? 'Select your date of birth'
-                    : '${profile.dateOfBirth!.day}/'
-                    '${profile.dateOfBirth!.month}/'
-                    '${profile.dateOfBirth!.year}',
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
 
           const Text(
             'Gender',
             style: TextStyle(
+              fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
           ),
 
           const SizedBox(height: 12),
 
-          Row(
-            children: [
-              Expanded(
-                child: _GenderOption(
-                  label: 'Male',
-                  icon: Icons.male,
-                  selected:
-                  profile.gender == 'male',
-                  onTap: () {
-                    ref
-                        .read(
-                      profileSetupProvider
-                          .notifier,
-                    )
-                        .setGender('male');
-                  },
-                ),
-              ),
-
-              const SizedBox(width: 12),
-
-              Expanded(
-                child: _GenderOption(
-                  label: 'Female',
-                  icon: Icons.female,
-                  selected:
-                  profile.gender ==
-                      'female',
-                  onTap: () {
-                    ref
-                        .read(
-                      profileSetupProvider
-                          .notifier,
-                    )
-                        .setGender('female');
-                  },
-                ),
-              ),
-            ],
+          SelectionCard(
+            title: 'Male',
+            icon: Icons.male,
+            selected: profile.gender == 'Male',
+            onTap: () {
+              notifier.setGender('Male');
+            },
           ),
+
+          const SizedBox(height: 12),
+
+          SelectionCard(
+            title: 'Female',
+            icon: Icons.female,
+            selected: profile.gender == 'Female',
+            onTap: () {
+              notifier.setGender('Female');
+            },
+          ),
+
+          const SizedBox(height: 12),
+
+          SelectionCard(
+            title: 'Other',
+            icon: Icons.person_outline,
+            selected: profile.gender == 'Other',
+            onTap: () {
+              notifier.setGender('Other');
+            },
+          ),
+
+          const SizedBox(height: 24),
         ],
-      ),
-    );
-  }
-}
-
-class _GenderOption extends StatelessWidget {
-  const _GenderOption({
-    required this.label,
-    required this.icon,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final IconData icon;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius:
-      BorderRadius.circular(16),
-      child: Container(
-        padding:
-        const EdgeInsets.symmetric(
-          vertical: 20,
-        ),
-        decoration: BoxDecoration(
-          borderRadius:
-          BorderRadius.circular(16),
-          border: Border.all(
-            color: selected
-                ? Theme.of(context)
-                .colorScheme
-                .primary
-                : Colors.grey.shade300,
-            width: selected ? 2 : 1,
-          ),
-        ),
-        child: Column(
-          children: [
-            Icon(icon),
-            const SizedBox(height: 8),
-            Text(label),
-          ],
-        ),
       ),
     );
   }

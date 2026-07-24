@@ -7,7 +7,7 @@ import '../../app/theme/app_text_styles.dart';
 class AppTextField extends StatelessWidget {
   const AppTextField({
     super.key,
-    this.controller,
+    required this.controller,
     this.label,
     this.hint,
     this.prefixIcon,
@@ -23,7 +23,7 @@ class AppTextField extends StatelessWidget {
     this.maxLines = 1,
   });
 
-  final TextEditingController? controller;
+  final TextEditingController controller;
   final String? label;
   final String? hint;
   final IconData? prefixIcon;

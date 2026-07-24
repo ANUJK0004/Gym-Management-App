@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:sweatsync/app/routes/app_routes.dart';
+import 'package:sweatsync/design_system/buttons/primary_button.dart';
+import 'package:sweatsync/design_system/buttons/secondary_button.dart';
+import 'package:sweatsync/design_system/common/app_scaffold.dart';
+import 'package:sweatsync/design_system/indicators/app_progress_indicator.dart';
 import 'package:sweatsync/features/profile/presentation/providers/current_user_profile_provider.dart';
 import 'package:sweatsync/features/profile/presentation/providers/profile_setup_provider.dart';
 import '../widgets/basic_info_page.dart';
@@ -20,6 +22,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   final PageController _pageController = PageController();
 
   int _currentPage = 0;
+
+  bool _isCompleting = false;
 
   @override
   void dispose() {
@@ -46,6 +50,10 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   }
 
   Future<void> _completeProfile() async {
+    if (_isCompleting) {
+      return;
+    }
+
     final firebaseUser = FirebaseAuth.instance.currentUser;
 
     if (firebaseUser == null) {
@@ -68,31 +76,42 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       return;
     }
 
+    setState(() {
+      _isCompleting = true;
+    });
+
     try {
       await notifier.completeProfile(
         uid: firebaseUser.uid,
         email: firebaseUser.email ?? '',
       );
 
-      // Tell Riverpod to fetch the updated
-      // profile from Firestore.
       ref.invalidate(currentUserProfileProvider);
 
-      if (!mounted) return;
-
-      context.go(AppRoutes.home);
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to save profile: $error')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCompleting = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final progress = (_currentPage + 1) / 3;
+
+    final isLastPage = _currentPage == 2;
+
+    return AppScaffold(
       body: SafeArea(
         child: Column(
           children: [
@@ -107,14 +126,14 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
                   const Spacer(),
 
-                  Text('${((_currentPage + 1) / 3 * 100).round()}%'),
+                  Text('${(progress * 100).round()}%'),
                 ],
               ),
             ),
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: LinearProgressIndicator(value: (_currentPage + 1) / 3),
+              child: AppProgressIndicator(value: progress),
             ),
 
             Expanded(
@@ -138,22 +157,22 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               padding: const EdgeInsets.all(24),
               child: Row(
                 children: [
-                  if (_currentPage > 0)
+                  if (_currentPage > 0) ...[
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: _previousPage,
-                        child: const Text('Back'),
+                      child: SecondaryButton(
+                        text: 'Back',
+                        onPressed: _isCompleting ? null : _previousPage,
                       ),
                     ),
 
-                  if (_currentPage > 0) const SizedBox(width: 12),
+                    const SizedBox(width: 12),
+                  ],
 
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: _currentPage == 2
-                          ? _completeProfile
-                          : _nextPage,
-                      child: Text(_currentPage == 2 ? 'Complete' : 'Continue'),
+                    child: PrimaryButton(
+                      text: isLastPage ? 'Complete' : 'Continue',
+                      isLoading: _isCompleting,
+                      onPressed: isLastPage ? _completeProfile : _nextPage,
                     ),
                   ),
                 ],
