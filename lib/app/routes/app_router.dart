@@ -7,7 +7,7 @@ import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dar
 import 'package:sweatsync/features/auth/presentation/screens/login_screen.dart';
 import 'package:sweatsync/features/auth/presentation/screens/register_screen.dart';
 
-import 'package:sweatsync/features/dashboard/member/presentation/screens/member_home_screen.dart';
+import 'package:sweatsync/features/dashboard/member/presentation/screens/member_shell.dart';
 
 import 'package:sweatsync/features/profile/presentation/providers/current_user_profile_provider.dart';
 import 'package:sweatsync/features/profile/presentation/screens/profile_setup_screen.dart';
@@ -158,7 +158,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.home,
         builder: (context, state) {
-          return const MemberHomeScreen();
+          return const MemberShell();
         },
       ),
     ],
