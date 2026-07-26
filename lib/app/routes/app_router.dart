@@ -12,6 +12,7 @@ import 'package:sweatsync/features/dashboard/member/presentation/screens/member_
 import 'package:sweatsync/features/profile/presentation/providers/current_user_profile_provider.dart';
 import 'package:sweatsync/features/profile/presentation/screens/profile_setup_screen.dart';
 
+import '../../features/membership/presentation/screens/membership_screen.dart';
 import 'app_routes.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -159,6 +160,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.home,
         builder: (context, state) {
           return const MemberShell();
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.membership,
+        builder: (context, state) {
+          return const MembershipScreen();
         },
       ),
     ],

@@ -7,4 +7,5 @@ class AppRoutes {
   static const String forgotPassword = '/forgot-password';
   static const String profileSetup = '/profile-setup';
   static const String home = '/home';
+  static const membership = '/membership';
 }

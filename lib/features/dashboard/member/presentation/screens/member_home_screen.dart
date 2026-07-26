@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sweatsync/app/routes/app_routes.dart';
 import 'package:sweatsync/features/dashboard/member/presentation/widgets/profile_summary_card.dart';
 
 import '../providers/member_dashboard_provider.dart';
@@ -103,6 +105,9 @@ class MemberHomeScreen extends ConsumerWidget {
                             expiryDate:
                             dashboard
                                 .membershipExpiryDate,
+                            onTap: () {
+                              context.push(AppRoutes.membership);
+                            },
                           ),
 
                           const SizedBox(height: 28),
@@ -160,7 +165,7 @@ class MemberHomeScreen extends ConsumerWidget {
                               // TODO
                             },
                             onMembershipPressed: () {
-                              // TODO
+                              context.push(AppRoutes.membership);
                             },
                           ),
 
