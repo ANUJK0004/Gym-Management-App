@@ -8,15 +8,6 @@ class MemberDashboard {
     this.height,
     this.weight,
 
-    required this.gymName,
-    required this.membershipStatus,
-    this.membershipExpiryDate,
-
-    required this.workoutName,
-    required this.workoutDescription,
-    required this.exerciseCount,
-    required this.workoutDuration,
-
     required this.completedWorkouts,
     required this.totalWorkouts,
 
@@ -31,15 +22,6 @@ class MemberDashboard {
   final String? activityLevel;
   final double? height;
   final double? weight;
-
-  final String gymName;
-  final String membershipStatus;
-  final DateTime? membershipExpiryDate;
-
-  final String workoutName;
-  final String workoutDescription;
-  final int exerciseCount;
-  final int workoutDuration;
 
   final int completedWorkouts;
   final int totalWorkouts;

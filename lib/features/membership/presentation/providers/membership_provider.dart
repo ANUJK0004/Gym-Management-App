@@ -48,26 +48,24 @@ FutureProvider<List<Membership>>((ref) async {
 });
 
 final activeMembershipProvider =
-Provider<Membership?>((ref) {
-  final membershipsAsync =
+FutureProvider<Membership?>((ref) async {
+  final authState =
+  ref.watch(authStateProvider);
+
+  final authUser =
+      authState.value;
+
+  if (authUser == null) {
+    return null;
+  }
+
+  final repository =
   ref.watch(
-    membershipProvider,
+    membershipRepositoryProvider,
   );
 
-  return membershipsAsync.when(
-    data: (memberships) {
-      for (final membership
-      in memberships) {
-        if (membership.isActive &&
-            !membership.isExpired) {
-          return membership;
-        }
-      }
-
-      return null;
-    },
-    loading: () => null,
-    error: (_,_) => null,
+  return repository.getActiveMembership(
+    authUser.id,
   );
 });
 

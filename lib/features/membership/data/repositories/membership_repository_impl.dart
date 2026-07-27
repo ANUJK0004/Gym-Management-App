@@ -27,4 +27,13 @@ class MembershipRepositoryImpl
       membershipId,
     );
   }
+
+  @override
+  Future<Membership?> getActiveMembership(
+      String userId,
+      ) {
+    return _dataSource.getActiveMembership(
+      userId,
+    );
+  }
 }

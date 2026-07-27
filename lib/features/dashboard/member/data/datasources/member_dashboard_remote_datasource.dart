@@ -14,8 +14,6 @@ class MemberDashboardRemoteDataSource {
       ) async {
     final results = await Future.wait([
       _getUser(uid),
-      _getMembership(uid),
-      _getWorkout(uid),
       _getWorkoutProgress(uid),
       _getBodyMetrics(uid),
     ]);
@@ -23,17 +21,11 @@ class MemberDashboardRemoteDataSource {
     final userData =
     results[0] as Map<String, dynamic>;
 
-    final membershipData =
+    final progressData =
     results[1];
 
-    final workoutData =
-    results[2];
-
-    final progressData =
-    results[3];
-
     final bodyMetricsData =
-    results[4];
+    results[2];
 
     return MemberDashboardModel.fromMap({
       // User
@@ -49,24 +41,6 @@ class MemberDashboardRemoteDataSource {
       userData['height'],
       'weight':
       userData['weight'],
-
-      // Membership
-      'gymName':
-      membershipData?['gymName'] ?? '',
-      'membershipStatus':
-      membershipData?['status'] ?? 'Inactive',
-      'membershipExpiryDate':
-      membershipData?['expiryDate'],
-
-      // Workout
-      'workoutName':
-      workoutData?['name'] ?? 'No workout',
-      'workoutDescription':
-      workoutData?['description'] ?? '',
-      'exerciseCount':
-      workoutData?['exerciseCount'] ?? 0,
-      'workoutDuration':
-      workoutData?['duration'] ?? 0,
 
       // Progress
       'completedWorkouts':
@@ -97,48 +71,6 @@ class MemberDashboardRemoteDataSource {
     }
 
     return document.data() ?? {};
-  }
-
-  Future<Map<String, dynamic>?> _getMembership(
-      String uid,
-      ) async {
-    final snapshot = await _firestore
-        .collection('memberships')
-        .where(
-      'userId',
-      isEqualTo: uid,
-    )
-        .where(
-      'status',
-      isEqualTo: 'Active',
-    )
-        .limit(1)
-        .get();
-
-    if (snapshot.docs.isEmpty) {
-      return null;
-    }
-
-    return snapshot.docs.first.data();
-  }
-
-  Future<Map<String, dynamic>?> _getWorkout(
-      String uid,
-      ) async {
-    final snapshot = await _firestore
-        .collection('workouts')
-        .where(
-      'userId',
-      isEqualTo: uid,
-    )
-        .limit(1)
-        .get();
-
-    if (snapshot.docs.isEmpty) {
-      return null;
-    }
-
-    return snapshot.docs.first.data();
   }
 
   Future<Map<String, dynamic>?> _getWorkoutProgress(

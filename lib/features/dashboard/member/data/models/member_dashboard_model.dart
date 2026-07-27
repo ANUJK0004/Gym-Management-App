@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../../domain/entities/member_dashboard.dart';
 
 class MemberDashboardModel extends MemberDashboard {
@@ -10,13 +8,6 @@ class MemberDashboardModel extends MemberDashboard {
     super.activityLevel,
     super.height,
     super.weight,
-    required super.gymName,
-    required super.membershipStatus,
-    super.membershipExpiryDate,
-    required super.workoutName,
-    required super.workoutDescription,
-    required super.exerciseCount,
-    required super.workoutDuration,
     required super.completedWorkouts,
     required super.totalWorkouts,
     required super.currentWeight,
@@ -45,34 +36,6 @@ class MemberDashboardModel extends MemberDashboard {
       weight:
       (data['weight'] as num?)?.toDouble(),
 
-      gymName:
-      data['gymName'] as String? ?? '',
-
-      membershipStatus:
-      data['membershipStatus'] as String? ??
-          'Inactive',
-
-      membershipExpiryDate:
-      _parseDate(
-        data['membershipExpiryDate'],
-      ),
-
-      workoutName:
-      data['workoutName'] as String? ??
-          'No workout',
-
-      workoutDescription:
-      data['workoutDescription'] as String? ??
-          '',
-
-      exerciseCount:
-      (data['exerciseCount'] as num?)?.toInt() ??
-          0,
-
-      workoutDuration:
-      (data['workoutDuration'] as num?)?.toInt() ??
-          0,
-
       completedWorkouts:
       (data['completedWorkouts'] as num?)?.toInt() ??
           0,
@@ -99,19 +62,6 @@ class MemberDashboardModel extends MemberDashboard {
       'activityLevel': activityLevel,
       'height': height,
       'weight': weight,
-      'gymName': gymName,
-      'membershipStatus': membershipStatus,
-      'membershipExpiryDate':
-      membershipExpiryDate != null
-          ? Timestamp.fromDate(
-        membershipExpiryDate!,
-      )
-          : null,
-      'workoutName': workoutName,
-      'workoutDescription':
-      workoutDescription,
-      'exerciseCount': exerciseCount,
-      'workoutDuration': workoutDuration,
       'completedWorkouts':
       completedWorkouts,
       'totalWorkouts':
@@ -123,17 +73,4 @@ class MemberDashboardModel extends MemberDashboard {
     };
   }
 
-  static DateTime? _parseDate(
-      dynamic value,
-      ) {
-    if (value is Timestamp) {
-      return value.toDate();
-    }
-
-    if (value is DateTime) {
-      return value;
-    }
-
-    return null;
-  }
 }

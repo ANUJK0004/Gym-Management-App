@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../workout/presentation/screens/workout_screen.dart';
 import '../widgets/dashboard_bottom_nav.dart';
 import 'member_home_screen.dart';
-import 'member_workout_screen.dart';
 import 'member_progress_screen.dart';
 import 'member_profile_screen.dart';
 
@@ -23,7 +23,7 @@ class _MemberShellState
 
   final List<Widget> _pages = const [
     MemberHomeScreen(),
-    MemberWorkoutScreen(),
+    WorkoutScreen(),
     MemberProgressScreen(),
     MemberProfileScreen(),
   ];

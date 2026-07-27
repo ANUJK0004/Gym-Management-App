@@ -8,4 +8,7 @@ abstract class MembershipRepository {
   Future<Membership?> getMembership(
       String membershipId,
       );
+  Future<Membership?> getActiveMembership(
+      String userId,
+      );
 }

@@ -51,9 +51,36 @@ class MembershipRemoteDataSource {
       document,
     );
   }
+
+  Future<MembershipModel?> getActiveMembership(
+      String userId,
+      ) async {
+    final querySnapshot =
+    await _membershipsCollection
+        .where(
+      'userId',
+      isEqualTo: userId,
+    )
+        .where(
+      'status',
+      isEqualTo: 'Active',
+    )
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isEmpty) {
+      return null;
+    }
+
+    final membership =
+    MembershipModel.fromFirestore(
+      querySnapshot.docs.first,
+    );
+
+    if (membership.isExpired) {
+      return null;
+    }
+
+    return membership;
+  }
 }
-
-
-
-
-
