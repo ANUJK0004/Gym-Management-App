@@ -13,6 +13,7 @@ import 'package:sweatsync/features/profile/presentation/providers/current_user_p
 import 'package:sweatsync/features/profile/presentation/screens/profile_setup_screen.dart';
 
 import '../../features/membership/presentation/screens/membership_screen.dart';
+import '../../features/workout/presentation/screens/workout_detail_screen.dart';
 import '../../features/workout/presentation/screens/workout_screen.dart';
 import 'app_routes.dart';
 
@@ -175,6 +176,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.workout,
         builder: (context, state) {
           return const WorkoutScreen();
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.workoutDetail,
+        builder: (context, state) {
+          final workoutId = state.extra as String;
+
+          return WorkoutDetailScreen(
+            workoutId: workoutId,
+          );
         },
       ),
     ],

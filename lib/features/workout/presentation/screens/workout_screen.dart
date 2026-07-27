@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:sweatsync/features/workout/presentation/screens/workout_session_screen.dart';
 import '../../../../app/routes/app_routes.dart';
 import '../providers/workout_provider.dart';
 import '../widgets/exercise_card.dart';
@@ -178,8 +178,14 @@ class WorkoutScreen extends ConsumerWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      // Start workout will be
-                      // implemented next.
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              WorkoutSessionScreen(
+                                workout: workout,
+                              ),
+                        ),
+                      );
                     },
                     icon: const Icon(
                       Icons.play_arrow_rounded,
