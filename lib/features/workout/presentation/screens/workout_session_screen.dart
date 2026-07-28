@@ -1,9 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../app/routes/app_routes.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../domain/entities/workout.dart';
-import '../../domain/entities/exercise.dart';
+import '../../domain/entities/workout_completion.dart';
+import '../providers/workout_provider.dart';
+import '../providers/workout_session_provider.dart';
+import '../widgets/session_exercise_tile.dart';
 
-class WorkoutSessionScreen extends StatefulWidget {
+class WorkoutSessionScreen
+    extends ConsumerStatefulWidget {
   const WorkoutSessionScreen({
     super.key,
     required this.workout,
@@ -12,434 +22,454 @@ class WorkoutSessionScreen extends StatefulWidget {
   final Workout workout;
 
   @override
-  State<WorkoutSessionScreen> createState() =>
+  ConsumerState<
+      WorkoutSessionScreen>
+  createState() =>
       _WorkoutSessionScreenState();
 }
 
 class _WorkoutSessionScreenState
-    extends State<WorkoutSessionScreen> {
+    extends ConsumerState<
+        WorkoutSessionScreen> {
+  Timer? _timer;
 
-  int _currentExerciseIndex = 0;
-
-  int _completedSets = 0;
-
-  late final List<bool> _completedExercises;
+  bool _isCompleting = false;
 
   @override
   void initState() {
     super.initState();
 
-    _completedExercises = List<bool>.filled(
-      widget.workout.exercises.length,
-      false,
-    );
-  }
-
-  Exercise? get _currentExercise {
-    if (widget.workout.exercises.isEmpty) {
-      return null;
-    }
-
-    return widget.workout.exercises[
-    _currentExerciseIndex
-    ];
-  }
-
-  int get _totalExercises =>
-      widget.workout.exercises.length;
-
-  int get _completedExerciseCount =>
-      _completedExercises
-          .where((completed) => completed)
-          .length;
-
-  double get _progress {
-    if (_totalExercises == 0) {
-      return 0;
-    }
-
-    return _completedExerciseCount /
-        _totalExercises;
-  }
-
-  void _completeCurrentExercise() {
-    setState(() {
-      _completedExercises[
-      _currentExerciseIndex] = true;
-    });
-
-    if (_currentExerciseIndex <
-        _totalExercises - 1) {
-      setState(() {
-        _currentExerciseIndex++;
-        _completedSets = 0;
-      });
-
-      return;
-    }
-
-    _showWorkoutCompleted();
-  }
-
-  void _completeSet() {
-    final exercise = _currentExercise;
-
-    if (exercise == null) {
-      return;
-    }
-
-    if (_completedSets >= exercise.sets) {
-      return;
-    }
-
-    setState(() {
-      _completedSets++;
-    });
-
-    if (_completedSets >= exercise.sets) {
-      _completeCurrentExercise();
-    }
-  }
-
-  void _showWorkoutCompleted() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text(
-            'Workout Completed!',
-          ),
-
-          content: Text(
-            'Great job! You completed '
-                '${widget.workout.name}.',
-          ),
-
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pop();
-
-                Navigator.of(context)
-                    .pop();
-              },
-              child: const Text(
-                'Done',
-              ),
-            ),
-          ],
-        );
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+          (_) {
+        ref
+            .read(
+          workoutSessionProvider(
+            widget.workout,
+          ).notifier,
+        )
+            .updateElapsedTime();
       },
     );
   }
 
   @override
-  Widget build(BuildContext context) {
-    final exercise = _currentExercise;
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(
+      BuildContext context,
+      ) {
+    final session =
+    ref.watch(
+      workoutSessionProvider(
+        widget.workout,
+      ),
+    );
+
+    final notifier =
+    ref.read(
+      workoutSessionProvider(
+        widget.workout,
+      ).notifier,
+    );
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.workout.name,
+        title: Column(
+          children: [
+            Text(
+              widget.workout.name,
+            ),
+            Text(
+              widget.workout.description,
+              style:
+              const TextStyle(
+                fontSize: 11,
+              ),
+            ),
+          ],
         ),
-      ),
-
-      body: exercise == null
-          ? _buildEmptyWorkout()
-          : _buildWorkoutSession(
-        exercise,
-      ),
-    );
-  }
-
-  Widget _buildWorkoutSession(
-      Exercise exercise,
-      ) {
-    return SafeArea(
-      child: Column(
-        children: [
-
-          // =========================
-          // PROGRESS
-          // =========================
-
-          Padding(
-            padding:
-            const EdgeInsets.fromLTRB(
-              24,
-              16,
-              24,
-              8,
-            ),
-
-            child: Column(
-              children: [
-
-                Row(
-                  mainAxisAlignment:
-                  MainAxisAlignment
-                      .spaceBetween,
-
-                  children: [
-                    Text(
-                      'Exercise '
-                          '${_currentExerciseIndex + 1}'
-                          ' of '
-                          '$_totalExercises',
-                    ),
-
-                    Text(
-                      '${(_progress * 100).round()}%',
-                    ),
-                  ],
-                ),
-
-                const SizedBox(
-                  height: 8,
-                ),
-
-                LinearProgressIndicator(
-                  value: _progress,
-                ),
-              ],
-            ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
           ),
+          onPressed: () {
+            _showExitConfirmation(
+              context,
+            );
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              session.isPaused
+                  ? Icons.play_arrow
+                  : Icons.pause,
+            ),
+            onPressed:
+            notifier.togglePause,
+          ),
+        ],
+      ),
 
-          // =========================
-          // EXERCISE CONTENT
-          // =========================
-
-          Expanded(
-            child: SingleChildScrollView(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
               padding:
-              const EdgeInsets.all(24),
-
+              const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment
-                    .start,
-
                 children: [
-
-                  Text(
-                    exercise.name,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineMedium
-                        ?.copyWith(
-                      fontWeight:
-                      FontWeight.bold,
-                    ),
-                  ),
-
-                  if (exercise.description !=
-                      null &&
-                      exercise.description!
-                          .isNotEmpty) ...[
-                    const SizedBox(
-                      height: 8,
-                    ),
-
-                    Text(
-                      exercise.description!,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium,
-                    ),
-                  ],
-
-                  const SizedBox(
-                    height: 32,
-                  ),
-
-                  // =========================
-                  // EXERCISE DETAILS
-                  // =========================
-
                   Row(
                     children: [
-
                       Expanded(
                         child:
-                        _InfoCard(
-                          label: 'Sets',
+                        _SessionStat(
+                          label:
+                          'Elapsed Time',
                           value:
-                          '${exercise.sets}',
+                          _formatDuration(
+                            session
+                                .elapsedSeconds,
+                          ),
                         ),
                       ),
-
-                      const SizedBox(
-                        width: 12,
-                      ),
-
                       Expanded(
                         child:
-                        _InfoCard(
-                          label: 'Reps',
+                        _SessionStat(
+                          label:
+                          'Exercises',
                           value:
-                          '${exercise.reps}',
-                        ),
-                      ),
-
-                      const SizedBox(
-                        width: 12,
-                      ),
-
-                      Expanded(
-                        child:
-                        _InfoCard(
-                          label: 'Rest',
-                          value:
-                          exercise
-                              .restSeconds !=
-                              null
-                              ? '${exercise.restSeconds}s'
-                              : '--',
+                          '${session.completedExercises}/${session.totalExercises}',
                         ),
                       ),
                     ],
                   ),
 
                   const SizedBox(
-                    height: 40,
+                    height: 20,
                   ),
 
-                  // =========================
-                  // SET TRACKER
-                  // =========================
-
-                  Text(
-                    'Sets',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(
-                      fontWeight:
-                      FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment:
+                    MainAxisAlignment
+                        .spaceBetween,
+                    children: [
+                      const Text(
+                        'Progress',
+                      ),
+                      Text(
+                        '${(session.progress * 100).round()}%',
+                      ),
+                    ],
                   ),
 
                   const SizedBox(
-                    height: 16,
+                    height: 8,
                   ),
 
-                  ...List.generate(
-                    exercise.sets,
-                        (index) {
-
-                      final completed =
-                          index <
-                              _completedSets;
-
-                      return Padding(
-                        padding:
-                        const EdgeInsets
-                            .only(
-                          bottom: 12,
-                        ),
-
-                        child: ListTile(
-                          shape:
-                          RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius
-                                .circular(
-                              12,
-                            ),
-                          ),
-
-                          tileColor:
-                          completed
-                              ? Colors.green
-                              .withValues(
-                            alpha: 0.15,
-                          )
-                              : Theme.of(
-                            context,
-                          )
-                              .colorScheme
-                              .surfaceContainerHighest,
-
-                          leading:
-                          CircleAvatar(
-                            child: Text(
-                              '${index + 1}',
-                            ),
-                          ),
-
-                          title: Text(
-                            'Set ${index + 1}',
-                          ),
-
-                          subtitle:
-                          Text(
-                            '${exercise.reps} reps'
-                                '${exercise.weight != null ? ' • ${exercise.weight} kg' : ''}',
-                          ),
-
-                          trailing:
-                          completed
-                              ? const Icon(
-                            Icons
-                                .check_circle,
-                            color:
-                            Colors.green,
-                          )
-                              : null,
-                        ),
-                      );
-                    },
+                  LinearProgressIndicator(
+                    value:
+                    session.progress,
+                    minHeight: 6,
                   ),
                 ],
               ),
             ),
-          ),
 
-          // =========================
-          // BOTTOM ACTION
-          // =========================
-
-          Container(
-            padding:
-            const EdgeInsets.all(20),
-
-            child: SizedBox(
-              width: double.infinity,
-
-              height: 54,
-
-              child: ElevatedButton(
-                onPressed:
-                _completeSet,
-
+            Expanded(
+              child:
+              widget.workout.exercises
+                  .isEmpty
+                  ? const Center(
                 child: Text(
-                  _completedSets <
-                      exercise.sets
-                      ? 'Complete Set'
-                      : 'Next Exercise',
+                  'No exercises added yet.',
                 ),
+              )
+                  : ListView.builder(
+                padding:
+                const EdgeInsets
+                    .symmetric(
+                  horizontal: 16,
+                ),
+                itemCount:
+                widget
+                    .workout
+                    .exercises
+                    .length,
+                itemBuilder:
+                    (context, index) {
+                  final exercise =
+                  widget
+                      .workout
+                      .exercises[index];
+
+                  return SessionExerciseTile(
+                    exercise:
+                    exercise,
+                    index:
+                    index,
+                    isActive:
+                    index ==
+                        session
+                            .currentExerciseIndex,
+                    isCompleted:
+                    session
+                        .completedExerciseIndexes
+                        .contains(
+                      index,
+                    ),
+                    onTap: () {
+                      notifier
+                          .goToExercise(
+                        index,
+                      );
+                    },
+                  );
+                },
               ),
             ),
-          ),
-        ],
+
+            Padding(
+              padding:
+              const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  if (session
+                      .currentExerciseIndex >
+                      0)
+                    Expanded(
+                      child:
+                      OutlinedButton(
+                        onPressed:
+                        notifier
+                            .goToPreviousExercise,
+                        child:
+                        const Text(
+                          'Previous',
+                        ),
+                      ),
+                    ),
+
+                  if (session
+                      .currentExerciseIndex >
+                      0)
+                    const SizedBox(
+                      width: 12,
+                    ),
+
+                  Expanded(
+                    flex: 2,
+                    child:
+                    FilledButton(
+                      onPressed:
+                      _isCompleting
+                          ? null
+                          : () {
+                        if (session
+                            .isLastExercise) {
+                          _finishWorkout(
+                            session,
+                          );
+                        } else {
+                          notifier
+                              .completeCurrentExercise();
+                        }
+                      },
+                      child:
+                      _isCompleting
+                          ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child:
+                        CircularProgressIndicator(
+                          strokeWidth:
+                          2,
+                        ),
+                      )
+                          : Text(
+                        session
+                            .isLastExercise
+                            ? 'Finish Workout'
+                            : 'Complete Exercise',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildEmptyWorkout() {
-    return const Center(
-      child: Text(
-        'No exercises available '
-            'for this workout.',
-      ),
+  Future<void> _finishWorkout(
+      WorkoutSessionState session,
+      ) async {
+    if (_isCompleting) {
+      return;
+    }
+
+    setState(() {
+      _isCompleting = true;
+    });
+
+    try {
+      final authState =
+      ref.read(authStateProvider);
+
+      final authUser =
+          authState.value;
+
+      if (authUser == null) {
+        throw Exception(
+          'User is not authenticated.',
+        );
+      }
+
+      final completion =
+      WorkoutCompletion(
+        id: '',
+        userId:
+        authUser.id,
+        workoutId:
+        widget.workout.id,
+        completedAt:
+        DateTime.now(),
+        duration:
+        session.elapsedSeconds,
+        completedExercises:
+        session.completedExercises +
+            1,
+        totalExercises:
+        session.totalExercises,
+      );
+
+      await ref.read(
+        workoutCompletionProvider(
+          completion,
+        ).future,
+      );
+
+      ref.invalidate(
+        workoutProvider,
+      );
+
+      ref.invalidate(
+        todaysWorkoutProvider,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      context.go(
+        AppRoutes.workoutCompleted,
+        extra: {
+          'workout':
+          widget.workout,
+          'duration':
+          session.elapsedSeconds,
+          'completedExercises':
+          session.completedExercises +
+              1,
+        },
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to complete workout: $error',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCompleting = false;
+        });
+      }
+    }
+  }
+
+  Future<void>
+  _showExitConfirmation(
+      BuildContext context,
+      ) async {
+    final shouldExit =
+    await showDialog<bool>(
+      context: context,
+      builder:
+          (context) {
+        return AlertDialog(
+          title: const Text(
+            'Leave Workout?',
+          ),
+          content:
+          const Text(
+            'Your current workout session will not be saved.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(
+                  context,
+                  false,
+                );
+              },
+              child:
+              const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(
+                  context,
+                  true,
+                );
+              },
+              child:
+              const Text('Leave'),
+            ),
+          ],
+        );
+      },
     );
+
+    if (shouldExit == true &&
+        context.mounted) {
+      context.pop();
+    }
+  }
+
+  String _formatDuration(
+      int seconds,
+      ) {
+    final minutes =
+        seconds ~/ 60;
+
+    final remainingSeconds =
+        seconds % 60;
+
+    return '${minutes.toString().padLeft(2, '0')}:'
+        '${remainingSeconds.toString().padLeft(2, '0')}';
   }
 }
 
-class _InfoCard extends StatelessWidget {
-  const _InfoCard({
+class _SessionStat
+    extends StatelessWidget {
+  const _SessionStat({
     required this.label,
     required this.value,
   });
@@ -451,50 +481,28 @@ class _InfoCard extends StatelessWidget {
   Widget build(
       BuildContext context,
       ) {
-    return Container(
-      padding:
-      const EdgeInsets.symmetric(
-        vertical: 16,
-        horizontal: 12,
-      ),
-
-      decoration: BoxDecoration(
-        color: Theme.of(context)
-            .colorScheme
-            .surfaceContainerHighest,
-
-        borderRadius:
-        BorderRadius.circular(
-          12,
+    return Column(
+      children: [
+        Text(
+          value,
+          style:
+          const TextStyle(
+            fontSize: 22,
+            fontWeight:
+            FontWeight.w700,
+          ),
         ),
-      ),
-
-      child: Column(
-        children: [
-
-          Text(
-            value,
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(
-              fontWeight:
-              FontWeight.bold,
-            ),
+        const SizedBox(
+          height: 4,
+        ),
+        Text(
+          label,
+          style:
+          const TextStyle(
+            fontSize: 12,
           ),
-
-          const SizedBox(
-            height: 4,
-          ),
-
-          Text(
-            label,
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall,
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

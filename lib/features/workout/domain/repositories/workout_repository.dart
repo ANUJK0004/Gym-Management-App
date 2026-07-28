@@ -1,4 +1,5 @@
 import '../entities/workout.dart';
+import '../entities/workout_completion.dart';
 
 abstract class WorkoutRepository {
   Future<List<Workout>> getUserWorkouts(
@@ -11,5 +12,9 @@ abstract class WorkoutRepository {
 
   Future<Workout?> getTodaysWorkout(
       String userId,
+      );
+
+  Future<WorkoutCompletion> completeWorkout(
+      WorkoutCompletion completion,
       );
 }

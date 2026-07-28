@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../../progress/presentation/screens/progress_screen.dart';
 import '../../../../workout/presentation/screens/workout_screen.dart';
 import '../widgets/dashboard_bottom_nav.dart';
 import 'member_home_screen.dart';
-import 'member_progress_screen.dart';
 import 'member_profile_screen.dart';
 
 class MemberShell extends StatefulWidget {
@@ -24,7 +24,7 @@ class _MemberShellState
   final List<Widget> _pages = const [
     MemberHomeScreen(),
     WorkoutScreen(),
-    MemberProgressScreen(),
+    ProgressScreen(),
     MemberProfileScreen(),
   ];
 

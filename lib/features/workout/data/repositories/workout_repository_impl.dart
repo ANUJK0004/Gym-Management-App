@@ -1,4 +1,5 @@
 import '../../domain/entities/workout.dart';
+import '../../domain/entities/workout_completion.dart';
 import '../../domain/repositories/workout_repository.dart';
 import '../datasources/workout_remote_datasource.dart';
 
@@ -34,6 +35,15 @@ class WorkoutRepositoryImpl
       ) {
     return _dataSource.getTodaysWorkout(
       userId,
+    );
+  }
+
+  @override
+  Future<WorkoutCompletion> completeWorkout(
+      WorkoutCompletion completion,
+      ) {
+    return _dataSource.completeWorkout(
+      completion,
     );
   }
 }

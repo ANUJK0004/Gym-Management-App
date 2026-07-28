@@ -13,8 +13,11 @@ import 'package:sweatsync/features/profile/presentation/providers/current_user_p
 import 'package:sweatsync/features/profile/presentation/screens/profile_setup_screen.dart';
 
 import '../../features/membership/presentation/screens/membership_screen.dart';
+import '../../features/workout/domain/entities/workout.dart';
+import '../../features/workout/presentation/screens/workout_completed_screen.dart';
 import '../../features/workout/presentation/screens/workout_detail_screen.dart';
 import '../../features/workout/presentation/screens/workout_screen.dart';
+import '../../features/workout/presentation/screens/workout_session_screen.dart';
 import 'app_routes.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -186,6 +189,50 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
           return WorkoutDetailScreen(
             workoutId: workoutId,
+          );
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.workoutSession,
+        builder: (
+            context,
+            state,
+            ) {
+          final workout =
+          state.extra as Workout;
+
+          return WorkoutSessionScreen(
+            workout: workout,
+          );
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.workoutCompleted,
+        builder: (
+            context,
+            state,
+            ) {
+          final data =
+          state.extra
+          as Map<String, dynamic>;
+
+          final workout =
+          data['workout'] as Workout;
+
+          final duration =
+          data['duration'] as int;
+
+          final completedExercises =
+          data['completedExercises']
+          as int;
+
+          return WorkoutCompletedScreen(
+            workout: workout,
+            duration: duration,
+            completedExercises:
+            completedExercises,
           );
         },
       ),

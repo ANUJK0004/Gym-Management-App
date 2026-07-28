@@ -239,7 +239,8 @@ class MemberHomeScreen extends ConsumerWidget {
                                 duration: workout.duration,
                                 onStartWorkout: () {
                                   context.push(
-                                    '${AppRoutes.workoutDetail}/${workout.id}',
+                                    AppRoutes.workoutSession,
+                                    extra: workout,
                                   );
                                 },
                               );

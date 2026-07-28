@@ -7,6 +7,7 @@ import '../../data/datasources/workout_remote_datasource.dart';
 import '../../data/repositories/workout_repository_impl.dart';
 
 import '../../domain/entities/workout.dart';
+import '../../domain/entities/workout_completion.dart';
 import '../../domain/repositories/workout_repository.dart';
 
 final workoutDataSourceProvider =
@@ -25,7 +26,6 @@ Provider<WorkoutRepository>((ref) {
   );
 });
 
-// All workouts assigned to the currently authenticated user.
 final workoutProvider =
 FutureProvider<List<Workout>>((ref) async {
   final authState =
@@ -48,7 +48,6 @@ FutureProvider<List<Workout>>((ref) async {
   );
 });
 
-// The workout assigned to the current user for today's date.
 final todaysWorkoutProvider =
 FutureProvider<Workout?>((ref) async {
   final authState =
@@ -71,9 +70,10 @@ FutureProvider<Workout?>((ref) async {
   );
 });
 
-// Fetches a single workout by its document ID.
 final workoutByIdProvider =
-FutureProvider.family<Workout?, String>(
+FutureProvider.family<
+    Workout?,
+    String>(
       (ref, workoutId) async {
     final repository =
     ref.watch(
@@ -82,6 +82,22 @@ FutureProvider.family<Workout?, String>(
 
     return repository.getWorkout(
       workoutId,
+    );
+  },
+);
+
+final workoutCompletionProvider =
+FutureProvider.family<
+    WorkoutCompletion,
+    WorkoutCompletion>(
+      (ref, completion) async {
+    final repository =
+    ref.watch(
+      workoutRepositoryProvider,
+    );
+
+    return repository.completeWorkout(
+      completion,
     );
   },
 );
