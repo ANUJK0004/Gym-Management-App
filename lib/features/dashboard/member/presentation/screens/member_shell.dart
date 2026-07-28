@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../../profile/presentation/screens/profile_screen.dart';
 import '../../../../progress/presentation/screens/progress_screen.dart';
 import '../../../../workout/presentation/screens/workout_screen.dart';
 import '../widgets/dashboard_bottom_nav.dart';
 import 'member_home_screen.dart';
-import 'member_profile_screen.dart';
 
 class MemberShell extends StatefulWidget {
   const MemberShell({
@@ -25,7 +25,7 @@ class _MemberShellState
     MemberHomeScreen(),
     WorkoutScreen(),
     ProgressScreen(),
-    MemberProfileScreen(),
+    ProfileScreen(),
   ];
 
   @override

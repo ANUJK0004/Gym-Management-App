@@ -19,4 +19,19 @@ class ProgressRepositoryImpl
       userId,
     );
   }
+
+  @override
+  Future<void> updateBodyMetrics({
+    required String userId,
+    double? weight,
+    double? bodyFat,
+    double? muscleMass,
+  }) {
+    return _dataSource.updateBodyMetrics(
+      userId: userId,
+      weight: weight,
+      bodyFat: bodyFat,
+      muscleMass: muscleMass,
+    );
+  }
 }

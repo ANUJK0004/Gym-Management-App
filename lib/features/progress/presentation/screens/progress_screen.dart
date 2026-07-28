@@ -183,7 +183,7 @@ class _ProgressHeader
 
 class _MetricsGrid
     extends StatelessWidget {
-  const _MetricsGrid({
+  const   _MetricsGrid({
     required this.progress,
   });
 

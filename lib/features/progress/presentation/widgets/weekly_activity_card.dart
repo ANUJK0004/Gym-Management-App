@@ -18,16 +18,7 @@ class WeeklyActivityCard
   @override
   Widget build(BuildContext context) {
     final weeklyActivity =
-        progress.normalizedWeeklyActivity;
-
-    final maxWorkouts =
-    weeklyActivity.fold<int>(
-      1,
-          (max, activity) =>
-      activity.workouts > max
-          ? activity.workouts
-          : max,
-    );
+        progress.weeklyActivity;
 
     return Container(
       padding:
@@ -98,12 +89,6 @@ class WeeklyActivityCard
                       index ==
                           progress.todayIndex;
 
-                  final heightFactor =
-                  activity.workouts == 0
-                      ? 0.05
-                      : activity.workouts /
-                      maxWorkouts;
-
                   return Column(
                     mainAxisAlignment:
                     MainAxisAlignment.end,
@@ -117,13 +102,7 @@ class WeeklyActivityCard
 
                           child:
                           FractionallySizedBox(
-                            heightFactor:
-                            heightFactor
-                                .clamp(
-                              0.05,
-                              1.0,
-                            ),
-
+                            heightFactor:activity.chartValue,
                             child:
                             AnimatedContainer(
                               duration:

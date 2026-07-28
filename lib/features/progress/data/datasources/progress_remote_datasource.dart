@@ -16,29 +16,23 @@ class ProgressRemoteDataSource {
         .collection('progress')
         .doc(userId);
 
-    final progressFuture =
-    progressReference.get();
-
-    final activityFuture =
-    progressReference
-        .collection('weekly_activity')
-        .limit(7)
-        .get();
-
-    final recordsFuture =
-    progressReference
-        .collection('personal_records')
-        .orderBy(
-      'date',
-      descending: true,
-    )
-        .limit(10)
-        .get();
-
     final results = await Future.wait([
-      progressFuture,
-      activityFuture,
-      recordsFuture,
+      progressReference.get(),
+
+      progressReference
+          .collection('weekly_activity')
+          .orderBy('order')
+          .limit(7)
+          .get(),
+
+      progressReference
+          .collection('personal_records')
+          .orderBy(
+        'date',
+        descending: true,
+      )
+          .limit(10)
+          .get(),
     ]);
 
     final progressDocument =
@@ -56,13 +50,23 @@ class ProgressRemoteDataSource {
     as QuerySnapshot<
         Map<String, dynamic>>;
 
+    final activityMap = <String, WeeklyActivityModel>{};
+
+    for (final document
+    in activitySnapshot.docs) {
+      final activity =
+      WeeklyActivityModel.fromFirestore(
+        document,
+      );
+
+      activityMap[activity.day] =
+          activity;
+    }
+
     final weeklyActivity =
-    activitySnapshot.docs
-        .map(
-      WeeklyActivityModel
-          .fromFirestore,
-    )
-        .toList();
+    _buildWeeklyActivity(
+      activityMap,
+    );
 
     final personalRecords =
     recordsSnapshot.docs
@@ -72,12 +76,117 @@ class ProgressRemoteDataSource {
     )
         .toList();
 
+    if (!progressDocument.exists) {
+      return ProgressModel.empty(
+        userId: userId,
+        weeklyActivity:
+        weeklyActivity,
+        personalRecords:
+        personalRecords,
+      );
+    }
+
     return ProgressModel.fromFirestore(
       progressDocument,
       weeklyActivity:
       weeklyActivity,
       personalRecords:
       personalRecords,
+    );
+  }
+
+  List<WeeklyActivityModel>
+  _buildWeeklyActivity(
+      Map<String, WeeklyActivityModel>
+      activityMap,
+      ) {
+    const days = [
+      'M',
+      'T',
+      'W',
+      'T',
+      'F',
+      'S',
+      'S',
+    ];
+
+    return List.generate(
+      7,
+          (index) {
+        final day = days[index];
+
+        return activityMap[day] ??
+            WeeklyActivityModel(
+              day: day,
+              workouts: 0,
+            );
+      },
+    );
+  }
+
+  Future<void> updateBodyMetrics({
+    required String userId,
+    double? weight,
+    double? bodyFat,
+    double? muscleMass,
+  }) async {
+    final progressReference =
+    _firestore
+        .collection('progress')
+        .doc(userId);
+
+    final snapshot =
+    await progressReference.get();
+
+    final oldData =
+        snapshot.data() ?? {};
+
+    final oldWeight =
+        (oldData['currentWeight']
+        as num?)
+            ?.toDouble() ??
+            0;
+
+    final oldBodyFat =
+        (oldData['bodyFat'] as num?)
+            ?.toDouble() ??
+            0;
+
+    final oldMuscleMass =
+        (oldData['muscleMass']
+        as num?)
+            ?.toDouble() ??
+            0;
+
+    await progressReference.set(
+      {
+        'userId': userId,
+
+        'currentWeight': ?weight,
+
+        'bodyFat': ?bodyFat,
+
+        'muscleMass': ?muscleMass,
+
+        if (weight != null)
+          'weightChange':
+          weight - oldWeight,
+
+        if (bodyFat != null)
+          'bodyFatChange':
+          bodyFat - oldBodyFat,
+
+        if (muscleMass != null)
+          'muscleMassChange':
+          muscleMass -
+              oldMuscleMass,
+
+        'updatedAt':
+        FieldValue.serverTimestamp(),
+      },
+      SetOptions(
+        merge: true,
+      ),
     );
   }
 }

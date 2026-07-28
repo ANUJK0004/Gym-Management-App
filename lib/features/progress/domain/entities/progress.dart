@@ -21,107 +21,36 @@ class Progress {
 
   final int totalWorkouts;
 
-  /// Positive = increased
-  /// Negative = decreased
   final double weightChange;
-
   final double bodyFatChange;
   final double muscleMassChange;
 
-  /// Number of workouts compared to previous period.
   final int workoutChange;
 
   final List<WeeklyActivity> weeklyActivity;
 
   final List<PersonalRecord> personalRecords;
 
-  /// Returns exactly 7 activity entries.
-  ///
-  /// Missing days are automatically filled with 0.
-  List<WeeklyActivity> get normalizedWeeklyActivity {
-    final result = List<WeeklyActivity>.generate(
-      7,
-          (index) => WeeklyActivity(
-        day: _defaultDay(index),
-        workouts: 0,
-      ),
-    );
+  int get completedWorkouts => totalWorkouts;
 
-    for (final activity in weeklyActivity) {
-      final index = _dayIndex(activity.day);
-
-      if (index != null && index >= 0 && index < 7) {
-        result[index] = activity;
-      }
-    }
-
-    return result;
-  }
+  int get monthlyWorkoutChange => workoutChange;
 
   int get todayIndex {
-    // Monday = 0
     final weekday = DateTime.now().weekday;
 
+    // Monday = 0
     return weekday - 1;
   }
 
-  static int? _dayIndex(String day) {
-    switch (day.toLowerCase()) {
-      case 'm':
-      case 'mon':
-      case 'monday':
-        return 0;
-
-      case 't':
-      case 'tu':
-      case 'tue':
-      case 'tuesday':
-        return 1;
-
-      case 'w':
-      case 'wed':
-      case 'wednesday':
-        return 2;
-
-      case 'th':
-      case 'thu':
-      case 'thur':
-      case 'thursday':
-        return 3;
-
-      case 'f':
-      case 'fri':
-      case 'friday':
-        return 4;
-
-      case 'sa':
-      case 'sat':
-      case 'saturday':
-        return 5;
-
-      case 'su':
-      case 'sun':
-      case 'sunday':
-        return 6;
-
-      default:
-        return null;
-    }
-  }
-
-  static String _defaultDay(int index) {
-    const days = [
-      'M',
-      'T',
-      'W',
-      'T',
-      'F',
-      'S',
-      'S',
-    ];
-
-    return days[index];
-  }
+  List<String> get weekDays => const [
+    'M',
+    'T',
+    'W',
+    'T',
+    'F',
+    'S',
+    'S',
+  ];
 }
 
 class WeeklyActivity {
@@ -131,9 +60,16 @@ class WeeklyActivity {
   });
 
   final String day;
-
-  /// Number of workouts completed on this day.
   final int workouts;
+
+  double get chartValue {
+    if (workouts <= 0) {
+      return 0.05;
+    }
+
+    // Maximum visual scale of 5 workouts.
+    return (workouts / 5).clamp(0.05, 1.0);
+  }
 }
 
 class PersonalRecord {

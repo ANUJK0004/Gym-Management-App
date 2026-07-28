@@ -48,3 +48,58 @@ FutureProvider<Progress>((ref) async {
     authUser.id,
   );
 });
+
+final updateBodyMetricsProvider =
+Provider<
+    Future<void> Function({
+    double? weight,
+    double? bodyFat,
+    double? muscleMass,
+    })>((ref) {
+  return ({
+    double? weight,
+    double? bodyFat,
+    double? muscleMass,
+  }) async {
+    final authState =
+    ref.read(authStateProvider);
+
+    final authUser =
+        authState.value;
+
+    if (authUser == null) {
+      throw Exception(
+        'User is not authenticated.',
+      );
+    }
+
+    final repository =
+    ref.read(
+      progressRepositoryProvider,
+    );
+
+    await repository
+        .updateBodyMetrics(
+      userId: authUser.id,
+      weight: weight,
+      bodyFat: bodyFat,
+      muscleMass: muscleMass,
+    );
+
+    ref.invalidate(
+      progressProvider,
+    );
+  };
+});
+
+class UpdateBodyMetricsParams {
+  const UpdateBodyMetricsParams({
+    required this.currentWeight,
+    required this.bodyFat,
+    required this.muscleMass,
+  });
+
+  final double currentWeight;
+  final double bodyFat;
+  final double muscleMass;
+}

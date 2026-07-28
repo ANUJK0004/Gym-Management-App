@@ -107,8 +107,9 @@ class MemberHomeScreen extends ConsumerWidget {
                               // Open notifications.
                             },
                             onProfilePressed: () {
-                              // TODO:
-                              // Navigate to profile.
+                              context.push(
+                                AppRoutes.profile,
+                              );
                             },
                           ),
 
@@ -278,8 +279,7 @@ class MemberHomeScreen extends ConsumerWidget {
                             dashboard
                                 .previousWeight,
                             onViewProgress: () {
-                              // TODO:
-                              // Navigate to progress.
+                              context.push(AppRoutes.progress);
                             },
                           ),
 

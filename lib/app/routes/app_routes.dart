@@ -12,4 +12,6 @@ class AppRoutes {
   static const String workoutDetail = '/workout-detail';
   static const String workoutSession = '/workout/session';
   static const String workoutCompleted = '/workout/completed';
+  static const String progress = '/progress';
+  static const String profile = '/profile';
 }

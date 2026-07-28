@@ -17,12 +17,44 @@ class ProgressModel extends Progress {
     super.personalRecords,
   });
 
+  factory ProgressModel.empty({
+    required String userId,
+    List<WeeklyActivity> weeklyActivity =
+    const [],
+    List<PersonalRecord> personalRecords =
+    const [],
+  }) {
+    return ProgressModel(
+      userId: userId,
+      currentWeight: 0,
+      bodyFat: 0,
+      muscleMass: 0,
+      totalWorkouts: 0,
+      weeklyActivity: weeklyActivity,
+      personalRecords: personalRecords,
+    );
+  }
+
   factory ProgressModel.fromFirestore(
-      DocumentSnapshot<Map<String, dynamic>> document, {
-        List<WeeklyActivity> weeklyActivity = const [],
-        List<PersonalRecord> personalRecords = const [],
+      DocumentSnapshot<
+          Map<String, dynamic>>
+      document, {
+        List<WeeklyActivity> weeklyActivity =
+        const [],
+        List<PersonalRecord> personalRecords =
+        const [],
       }) {
-    final data = document.data() ?? {};
+    final data = document.data();
+
+    if (data == null) {
+      return ProgressModel.empty(
+        userId: document.id,
+        weeklyActivity:
+        weeklyActivity,
+        personalRecords:
+        personalRecords,
+      );
+    }
 
     return ProgressModel(
       userId:
@@ -80,14 +112,21 @@ class ProgressModel extends Progress {
   Map<String, dynamic> toFirestore() {
     return {
       'userId': userId,
-      'currentWeight': currentWeight,
+      'currentWeight':
+      currentWeight,
       'bodyFat': bodyFat,
-      'muscleMass': muscleMass,
-      'totalWorkouts': totalWorkouts,
-      'weightChange': weightChange,
-      'bodyFatChange': bodyFatChange,
-      'muscleMassChange': muscleMassChange,
-      'workoutChange': workoutChange,
+      'muscleMass':
+      muscleMass,
+      'totalWorkouts':
+      totalWorkouts,
+      'weightChange':
+      weightChange,
+      'bodyFatChange':
+      bodyFatChange,
+      'muscleMassChange':
+      muscleMassChange,
+      'workoutChange':
+      workoutChange,
       'updatedAt':
       FieldValue.serverTimestamp(),
     };
@@ -101,8 +140,10 @@ class WeeklyActivityModel
     required super.workouts,
   });
 
-  factory WeeklyActivityModel.fromFirestore(
-      DocumentSnapshot<Map<String, dynamic>>
+  factory WeeklyActivityModel
+      .fromFirestore(
+      DocumentSnapshot<
+          Map<String, dynamic>>
       document,
       ) {
     final data =
@@ -110,7 +151,8 @@ class WeeklyActivityModel
 
     return WeeklyActivityModel(
       day:
-      data['day'] as String? ?? '',
+      data['day'] as String? ??
+          '',
       workouts:
       (data['workouts'] as num?)
           ?.toInt() ??
@@ -128,8 +170,10 @@ class PersonalRecordModel
     required super.date,
   });
 
-  factory PersonalRecordModel.fromFirestore(
-      DocumentSnapshot<Map<String, dynamic>>
+  factory PersonalRecordModel
+      .fromFirestore(
+      DocumentSnapshot<
+          Map<String, dynamic>>
       document,
       ) {
     final data =
@@ -140,17 +184,14 @@ class PersonalRecordModel
 
     return PersonalRecordModel(
       id: document.id,
-
       exerciseName:
       data['exerciseName']
       as String? ??
           '',
-
       weight:
       (data['weight'] as num?)
           ?.toDouble() ??
           0,
-
       date:
       timestamp?.toDate() ??
           DateTime.now(),
