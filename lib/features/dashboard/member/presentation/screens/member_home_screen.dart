@@ -130,8 +130,13 @@ class MemberHomeScreen extends ConsumerWidget {
                             weight:
                             dashboard.weight,
                             onEditProfile: () {
-                              // TODO:
-                              // Navigate to profile.
+                              // context.push(
+                              //   AppRoutes.editProfile,
+                              //   extra: profile,
+                              // );
+                              context.push(
+                                AppRoutes.profile,
+                              );
                             },
                           ),
 

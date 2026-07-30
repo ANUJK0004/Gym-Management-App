@@ -10,11 +10,14 @@ import 'package:sweatsync/features/auth/presentation/screens/register_screen.dar
 import 'package:sweatsync/features/dashboard/member/presentation/screens/member_shell.dart';
 
 import 'package:sweatsync/features/profile/presentation/providers/current_user_profile_provider.dart';
+import 'package:sweatsync/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:sweatsync/features/profile/presentation/screens/profile_setup_screen.dart';
 
 import '../../features/membership/presentation/screens/membership_screen.dart';
+import '../../features/profile/domain/entities/user_profile.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/progress/presentation/screens/progress_screen.dart';
+import '../../features/role_selection/presentation/screens/role_selection_screen.dart';
 import '../../features/workout/domain/entities/workout.dart';
 import '../../features/workout/presentation/screens/workout_completed_screen.dart';
 import '../../features/workout/presentation/screens/workout_detail_screen.dart';
@@ -25,7 +28,9 @@ import 'app_routes.dart';
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
 
-  final profileState = ref.watch(currentUserProfileProvider);
+  final profileState = ref.watch(
+    currentUserProfileProvider,
+  );
 
   return GoRouter(
     initialLocation: AppRoutes.splash,
@@ -33,100 +38,119 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final location = state.matchedLocation;
 
-      final isAuthenticated = authState.value != null;
+      final isAuthenticated =
+          authState.value != null;
 
       final isAuthPage =
-          location == AppRoutes.login || location == AppRoutes.register;
+          location == AppRoutes.login ||
+              location == AppRoutes.register;
 
-      final isProfileSetup = location == AppRoutes.profileSetup;
+      final isRoleSelection =
+          location == AppRoutes.roleSelection;
 
-      final isSplash = location == AppRoutes.splash;
+      final isProfileSetup =
+          location == AppRoutes.profileSetup;
+
+      final isSplash =
+          location == AppRoutes.splash;
 
       // ------------------------------------------
-      // AUTH STATE IS LOADING
+      // 1. AUTH STATE IS STILL LOADING
       // ------------------------------------------
 
       if (authState.isLoading) {
-        if (!isSplash) {
-          return AppRoutes.splash;
+        if (isSplash) {
+          return null;
         }
 
-        return null;
+        return AppRoutes.splash;
       }
 
       // ------------------------------------------
-      // USER IS NOT LOGGED IN
+      // 2. USER IS NOT LOGGED IN
       // ------------------------------------------
 
       if (!isAuthenticated) {
+        // Allow the user to stay on Role Selection.
+        if (isRoleSelection) {
+          return null;
+        }
+
+        // Allow Login and Register.
         if (isAuthPage) {
           return null;
         }
 
-        return AppRoutes.login;
+        // Any other page requires authentication.
+        return AppRoutes.roleSelection;
       }
 
       // ------------------------------------------
-      // USER IS LOGGED IN
+      // 3. USER IS LOGGED IN
       // WAIT FOR PROFILE
       // ------------------------------------------
 
       if (profileState.isLoading) {
-        if (!isSplash) {
-          return AppRoutes.splash;
+        if (isSplash) {
+          return null;
         }
 
-        return null;
+        return AppRoutes.splash;
       }
 
       // ------------------------------------------
-      // PROFILE FAILED
+      // 4. PROFILE FAILED
       // ------------------------------------------
 
       if (profileState.hasError) {
-        if (!isProfileSetup) {
-          return AppRoutes.profileSetup;
+        if (isProfileSetup) {
+          return null;
         }
 
-        return null;
+        return AppRoutes.profileSetup;
       }
 
       // ------------------------------------------
-      // PROFILE LOADED
+      // 5. PROFILE LOADED
       // ------------------------------------------
 
       final profile = profileState.value;
 
       // ------------------------------------------
-      // NO PROFILE FOUND
+      // 6. NO PROFILE FOUND
       // ------------------------------------------
 
       if (profile == null) {
-        if (!isProfileSetup) {
-          return AppRoutes.profileSetup;
+        if (isProfileSetup) {
+          return null;
         }
 
-        return null;
+        return AppRoutes.profileSetup;
       }
 
       // ------------------------------------------
-      // PROFILE INCOMPLETE
+      // 7. PROFILE IS INCOMPLETE
       // ------------------------------------------
 
       if (!profile.profileCompleted) {
-        if (!isProfileSetup) {
-          return AppRoutes.profileSetup;
+        if (isProfileSetup) {
+          return null;
         }
 
-        return null;
+        return AppRoutes.profileSetup;
       }
 
       // ------------------------------------------
-      // PROFILE COMPLETE
+      // 8. PROFILE IS COMPLETE
       // ------------------------------------------
 
       if (profile.profileCompleted) {
-        if (isSplash || isAuthPage || isProfileSetup) {
+        // A logged-in user should never go back
+        // to role selection or authentication.
+        if (isSplash ||
+            isRoleSelection ||
+            isAuthPage ||
+            isProfileSetup) {
           return AppRoutes.home;
         }
       }
@@ -135,12 +159,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
 
     routes: [
+      // ------------------------------------------
+      // SPLASH
+      // ------------------------------------------
+
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) {
           return const SplashScreen();
         },
       ),
+
+      // ------------------------------------------
+      // ROLE SELECTION
+      // ------------------------------------------
+
+      GoRoute(
+        path: AppRoutes.roleSelection,
+        builder: (context, state) {
+          return const RoleSelectionScreen();
+        },
+      ),
+
+      // ------------------------------------------
+      // AUTH
+      // ------------------------------------------
 
       GoRoute(
         path: AppRoutes.login,
@@ -156,12 +199,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
 
+      // ------------------------------------------
+      // PROFILE SETUP
+      // ------------------------------------------
+
       GoRoute(
         path: AppRoutes.profileSetup,
         builder: (context, state) {
           return const ProfileSetupScreen();
         },
       ),
+
+      // ------------------------------------------
+      // MEMBER HOME
+      // ------------------------------------------
 
       GoRoute(
         path: AppRoutes.home,
@@ -170,12 +221,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
 
+      // ------------------------------------------
+      // MEMBERSHIP
+      // ------------------------------------------
+
       GoRoute(
         path: AppRoutes.membership,
         builder: (context, state) {
           return const MembershipScreen();
         },
       ),
+
+      // ------------------------------------------
+      // WORKOUT
+      // ------------------------------------------
 
       GoRoute(
         path: AppRoutes.workout,
@@ -187,7 +246,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.workoutDetail,
         builder: (context, state) {
-          final workoutId = state.extra as String;
+          final workoutId =
+          state.extra as String;
 
           return WorkoutDetailScreen(
             workoutId: workoutId,
@@ -238,16 +298,38 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
+
+      // ------------------------------------------
+      // PROGRESS
+      // ------------------------------------------
+
       GoRoute(
         path: AppRoutes.progress,
         builder: (context, state) {
           return const ProgressScreen();
         },
       ),
+
+      // ------------------------------------------
+      // PROFILE
+      // ------------------------------------------
+
       GoRoute(
         path: AppRoutes.profile,
         builder: (context, state) {
           return const ProfileScreen();
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.editProfile,
+        builder: (context, state) {
+          final profile =
+          state.extra as UserProfile;
+
+          return EditProfileScreen(
+            profile: profile,
+          );
         },
       ),
     ],

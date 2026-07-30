@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../app/routes/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
 
+import '../../../membership/presentation/providers/membership_provider.dart';
 import '../../domain/entities/user_profile.dart';
 import '../providers/current_user_profile_provider.dart';
 import 'edit_profile_screen.dart';
@@ -22,6 +25,8 @@ class ProfileScreen extends ConsumerWidget {
       ) {
     final profileAsync =
     ref.watch(currentUserProfileProvider);
+    final membershipAsync =
+    ref.watch(activeMembershipProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -62,9 +67,18 @@ class ProfileScreen extends ConsumerWidget {
                   currentUserProfileProvider,
                 );
 
-                await ref.read(
-                  currentUserProfileProvider.future,
+                ref.invalidate(
+                  activeMembershipProvider,
                 );
+
+                await Future.wait([
+                  ref.read(
+                    currentUserProfileProvider.future,
+                  ),
+                  ref.read(
+                    activeMembershipProvider.future,
+                  ),
+                ]);
               },
 
               child: CustomScrollView(
@@ -138,7 +152,9 @@ class ProfileScreen extends ConsumerWidget {
                             height: 10,
                           ),
 
-                          const _MembershipCard(),
+                          _MembershipCard(
+                            membershipAsync: membershipAsync,
+                          ),
 
                           const SizedBox(
                             height: 28,
@@ -210,13 +226,9 @@ class _ProfileTopBar
           icon: Icons.edit_rounded,
           iconColor: AppColors.primary,
           onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) =>
-                    EditProfileScreen(
-                      profile: profile,
-                    ),
-              ),
+            context.push(
+              AppRoutes.editProfile,
+              extra: profile
             );
           },
         ),
@@ -680,28 +692,190 @@ class _FitnessProfileCard
 
 class _MembershipCard
     extends StatelessWidget {
-  const _MembershipCard();
+  const _MembershipCard({
+    required this.membershipAsync,
+  });
+
+  final AsyncValue membershipAsync;
+
+  @override
+  Widget build(BuildContext context) {
+    return membershipAsync.when(
+      loading: () {
+        return const _MembershipLoadingCard();
+      },
+
+      error: (error, stackTrace) {
+        return _MembershipErrorCard(
+          message: 'Unable to load membership',
+        );
+      },
+
+      data: (membership) {
+        if (membership == null) {
+          return const _NoMembershipCard();
+        }
+
+        return _GroupedCard(
+          children: [
+            _ProfileActionRow(
+              icon: Icons.credit_card_rounded,
+              label: 'My Plan',
+              value:
+              membership.membershipType ??
+                  'Membership',
+              onTap: () {
+                // Membership details navigation
+                // can be connected here later.
+              },
+            ),
+
+            const _Divider(),
+
+            _ProfileActionRow(
+              icon: Icons.business_rounded,
+              label: 'Gym',
+              value:
+              membership.gymName ??
+                  'Not available',
+            ),
+
+            const _Divider(),
+
+            _ProfileActionRow(
+              icon: Icons.verified_rounded,
+              label: 'Status',
+              value:
+              _formatMembershipStatus(
+                membership.status,
+              ),
+            ),
+
+            const _Divider(),
+
+            _ProfileActionRow(
+              icon:
+              Icons.calendar_month_rounded,
+              label: 'Renewal Date',
+              value:
+              _formatDate(
+                membership.expiryDate,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _MembershipLoadingCard
+    extends StatelessWidget {
+  const _MembershipLoadingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return _GroupedCard(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              ),
+
+              const SizedBox(
+                width: 12,
+              ),
+
+              Text(
+                'Loading membership...',
+                style:
+                AppTextStyles.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _NoMembershipCard
+    extends StatelessWidget {
+  const _NoMembershipCard();
 
   @override
   Widget build(BuildContext context) {
     return _GroupedCard(
       children: [
         _ProfileActionRow(
-          icon: Icons.credit_card_rounded,
+          icon: Icons.credit_card_outlined,
           label: 'My Plan',
-          value: 'Member',
+          value: 'No active membership',
         ),
 
-        _Divider(),
+        const _Divider(),
 
         _ProfileActionRow(
-          icon: Icons.calendar_month_rounded,
+          icon: Icons.calendar_month_outlined,
           label: 'Renewal Date',
           value: 'Not available',
         ),
       ],
     );
   }
+}
+
+class _MembershipErrorCard
+    extends StatelessWidget {
+  const _MembershipErrorCard({
+    required this.message,
+  });
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GroupedCard(
+      children: [
+        _ProfileActionRow(
+          icon: Icons.error_outline_rounded,
+          label: 'Membership',
+          value: message,
+        ),
+      ],
+    );
+  }
+}
+
+String _formatMembershipStatus(
+    String? value,
+    ) {
+  if (value == null ||
+      value.trim().isEmpty) {
+    return 'Not available';
+  }
+
+  return value
+      .replaceAll('_', ' ')
+      .split(' ')
+      .map(
+        (word) {
+      if (word.isEmpty) {
+        return word;
+      }
+
+      return word[0].toUpperCase() +
+          word.substring(1);
+    },
+  )
+      .join(' ');
 }
 
 // ------------------------------------------------------------
@@ -1059,4 +1233,16 @@ String _formatActivityLevel(
     },
   )
       .join(' ');
+}
+
+String _formatDate(
+    DateTime? date,
+    ) {
+  if (date == null) {
+    return 'Not available';
+  }
+
+  return '${date.day.toString().padLeft(2, '0')}/'
+      '${date.month.toString().padLeft(2, '0')}/'
+      '${date.year}';
 }
