@@ -141,26 +141,10 @@ class RoleSelectionScreen extends StatelessWidget {
       BuildContext context,
       AppRole role,
       ) {
-    if (role == AppRole.member) {
-      context.push(
-        AppRoutes.login,
-      );
-
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '${role.name.toUpperCase()} authentication is coming next.',
-        ),
-      ),
+    context.push(
+      AppRoutes.login,
+      extra: role,
     );
-
-    // We will connect this to your existing
-    // LoginScreen in the next step.
-    //
-    // For now this intentionally does nothing.
   }
 }
 

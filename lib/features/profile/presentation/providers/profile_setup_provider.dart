@@ -105,9 +105,13 @@ class ProfileSetupNotifier extends Notifier<ProfileSetupState> {
       );
     }
 
+    final existingProfile =
+    await _repository.getUserProfile(uid);
+
     final profile = UserProfile(
       uid: uid,
       email: email,
+      role: existingProfile?.role ?? 'member',
       displayName: state.displayName.trim(),
       dateOfBirth: state.dateOfBirth,
       gender: state.gender,

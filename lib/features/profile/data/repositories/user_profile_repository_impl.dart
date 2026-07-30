@@ -26,6 +26,7 @@ class UserProfileRepositoryImpl
     final model = UserProfileModel(
       uid: profile.uid,
       email: profile.email,
+      role: profile.role,
       displayName: profile.displayName,
       photoUrl: profile.photoUrl,
       dateOfBirth: profile.dateOfBirth,
@@ -47,6 +48,7 @@ class UserProfileRepositoryImpl
     final model = UserProfileModel(
       uid: profile.uid,
       email: profile.email,
+      role: profile.role,
       displayName: profile.displayName,
       photoUrl: profile.photoUrl,
       dateOfBirth: profile.dateOfBirth,

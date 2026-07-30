@@ -8,6 +8,8 @@ class AppRoutes {
   static const String forgotPassword = '/forgot-password';
   static const String profileSetup = '/profile-setup';
   static const String home = '/home';
+  static const String trainerHome = '/trainer-home';
+  static const String ownerHome = '/owner-home';
   static const String membership = '/membership';
   static const String workout = '/workout';
   static const String workoutDetail = '/workout-detail';
@@ -16,4 +18,5 @@ class AppRoutes {
   static const String progress = '/progress';
   static const String profile = '/profile';
   static const String editProfile = '/profile/edit';
+
 }

@@ -13,6 +13,9 @@ import 'package:sweatsync/features/profile/presentation/providers/current_user_p
 import 'package:sweatsync/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:sweatsync/features/profile/presentation/screens/profile_setup_screen.dart';
 
+import '../../core/enums/app_role.dart';
+import '../../features/dashboard/owner/presentation/screens/owner_shell.dart';
+import '../../features/dashboard/trainer/presentation/screens/trainer_shell.dart';
 import '../../features/membership/presentation/screens/membership_screen.dart';
 import '../../features/profile/domain/entities/user_profile.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
@@ -145,13 +148,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // ------------------------------------------
 
       if (profile.profileCompleted) {
-        // A logged-in user should never go back
-        // to role selection or authentication.
         if (isSplash ||
-            isRoleSelection ||
             isAuthPage ||
             isProfileSetup) {
-          return AppRoutes.home;
+          switch (profile.role) {
+            case 'member':
+              return AppRoutes.home;
+
+            case 'trainer':
+              return AppRoutes.trainerHome;
+
+            case 'owner':
+              return AppRoutes.ownerHome;
+
+            default:
+              return AppRoutes.home;
+          }
         }
       }
 
@@ -188,14 +200,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) {
-          return const LoginScreen();
+          final role = state.extra as AppRole;
+
+          return LoginScreen(
+            role: role,
+          );
         },
       ),
 
       GoRoute(
         path: AppRoutes.register,
         builder: (context, state) {
-          return const RegisterScreen();
+          final role = state.extra as AppRole;
+
+          return RegisterScreen(
+            role: role,
+          );
         },
       ),
 
@@ -330,6 +350,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return EditProfileScreen(
             profile: profile,
           );
+        },
+      ),
+
+
+      GoRoute(
+        path: AppRoutes.trainerHome,
+        builder: (context, state) {
+          return const TrainerShell();
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.ownerHome,
+        builder: (context, state) {
+          return const OwnerShell();
         },
       ),
     ],

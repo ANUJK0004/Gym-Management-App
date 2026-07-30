@@ -6,6 +6,7 @@ class UserProfileModel extends UserProfile {
   const UserProfileModel({
     required super.uid,
     required super.email,
+    super.role,
     super.displayName,
     super.photoUrl,
     super.dateOfBirth,
@@ -31,6 +32,7 @@ class UserProfileModel extends UserProfile {
     return UserProfileModel(
       uid: data['uid'] as String? ?? document.id,
       email: data['email'] as String? ?? '',
+      role: data['role'] as String? ?? 'member',
       displayName: data['displayName'] as String?,
       photoUrl: data['photoUrl'] as String?,
       dateOfBirth: _parseDate(data['dateOfBirth']),
@@ -48,6 +50,7 @@ class UserProfileModel extends UserProfile {
     return {
       'uid': uid,
       'email': email,
+      'role': role,
       'displayName': displayName,
       'photoUrl': photoUrl,
       'dateOfBirth': dateOfBirth != null

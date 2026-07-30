@@ -2,6 +2,7 @@ class UserProfile {
   const UserProfile({
     required this.uid,
     required this.email,
+    this.role = 'member',
     this.displayName,
     this.photoUrl,
     this.dateOfBirth,
@@ -15,6 +16,7 @@ class UserProfile {
 
   final String uid;
   final String email;
+  final String role;
 
   final String? displayName;
   final String? photoUrl;
@@ -33,6 +35,7 @@ class UserProfile {
 
   UserProfile copyWith({
     String? displayName,
+    String? role,
     String? photoUrl,
     DateTime? dateOfBirth,
     String? gender,
@@ -45,6 +48,7 @@ class UserProfile {
     return UserProfile(
       uid: uid,
       email: email,
+      role: role ?? this.role,
       displayName: displayName ?? this.displayName,
       photoUrl: photoUrl ?? this.photoUrl,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,

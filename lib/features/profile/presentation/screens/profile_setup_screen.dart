@@ -1,25 +1,107 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:sweatsync/design_system/buttons/primary_button.dart';
 import 'package:sweatsync/design_system/buttons/secondary_button.dart';
 import 'package:sweatsync/design_system/common/app_scaffold.dart';
 import 'package:sweatsync/design_system/indicators/app_progress_indicator.dart';
+
 import 'package:sweatsync/features/profile/presentation/providers/current_user_profile_provider.dart';
 import 'package:sweatsync/features/profile/presentation/providers/profile_setup_provider.dart';
+
 import '../widgets/basic_info_page.dart';
 import '../widgets/body_info_page.dart';
 import '../widgets/fitness_goal_page.dart';
 
-class ProfileSetupScreen extends ConsumerStatefulWidget {
-  const ProfileSetupScreen({super.key});
+class ProfileSetupScreen extends ConsumerWidget {
+  const ProfileSetupScreen({
+    super.key,
+  });
 
   @override
-  ConsumerState<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
+  Widget build(
+      BuildContext context,
+      WidgetRef ref,
+      ) {
+    final profileAsync =
+    ref.watch(currentUserProfileProvider);
+
+    return profileAsync.when(
+      loading: () {
+        return const AppScaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      },
+
+      error: (error, stackTrace) {
+        return AppScaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                'Unable to load profile.\n$error',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        );
+      },
+
+      data: (profile) {
+        if (profile == null) {
+          return const AppScaffold(
+            body: Center(
+              child: Text(
+                'Profile not found.',
+              ),
+            ),
+          );
+        }
+
+        switch (profile.role) {
+          case 'member':
+            return const _MemberProfileSetup();
+
+          case 'trainer':
+            return const _TrainerProfileSetup();
+
+          case 'owner':
+            return const _OwnerProfileSetup();
+
+          default:
+            return const AppScaffold(
+              body: Center(
+                child: Text(
+                  'Invalid user role.',
+                ),
+              ),
+            );
+        }
+      },
+    );
+  }
 }
 
-class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
-  final PageController _pageController = PageController();
+// ============================================================
+// MEMBER PROFILE SETUP
+// ============================================================
+
+class _MemberProfileSetup
+    extends ConsumerStatefulWidget {
+  const _MemberProfileSetup();
+
+  @override
+  ConsumerState<_MemberProfileSetup> createState() =>
+      _MemberProfileSetupState();
+}
+
+class _MemberProfileSetupState
+    extends ConsumerState<_MemberProfileSetup> {
+  final PageController _pageController =
+  PageController();
 
   int _currentPage = 0;
 
@@ -34,7 +116,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   void _nextPage() {
     if (_currentPage < 2) {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
+        duration:
+        const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
@@ -43,7 +126,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   void _previousPage() {
     if (_currentPage > 0) {
       _pageController.previousPage(
-        duration: const Duration(milliseconds: 300),
+        duration:
+        const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
@@ -54,23 +138,31 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       return;
     }
 
-    final firebaseUser = FirebaseAuth.instance.currentUser;
+    final firebaseUser =
+        FirebaseAuth.instance.currentUser;
 
     if (firebaseUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('User session expired. Please log in again.'),
+          content: Text(
+            'User session expired. Please log in again.',
+          ),
         ),
       );
 
       return;
     }
 
-    final notifier = ref.read(profileSetupProvider.notifier);
+    final notifier =
+    ref.read(profileSetupProvider.notifier);
 
     if (!notifier.validateProfile()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all profile details.')),
+        const SnackBar(
+          content: Text(
+            'Please complete all profile details.',
+          ),
+        ),
       );
 
       return;
@@ -86,16 +178,21 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         email: firebaseUser.email ?? '',
       );
 
-      ref.invalidate(currentUserProfileProvider);
-
+      ref.invalidate(
+        currentUserProfileProvider,
+      );
     } catch (error) {
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to save profile: $error')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to save profile: $error',
+          ),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -107,44 +204,68 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final progress = (_currentPage + 1) / 3;
+    final progress =
+        (_currentPage + 1) / 3;
 
-    final isLastPage = _currentPage == 2;
+    final isLastPage =
+        _currentPage == 2;
 
     return AppScaffold(
       body: SafeArea(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+              padding:
+              const EdgeInsets.fromLTRB(
+                24,
+                24,
+                24,
+                8,
+              ),
               child: Row(
                 children: [
                   Text(
                     'Step ${_currentPage + 1} of 3',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    style:
+                    const TextStyle(
+                      fontWeight:
+                      FontWeight.w600,
+                    ),
                   ),
 
                   const Spacer(),
 
-                  Text('${(progress * 100).round()}%'),
+                  Text(
+                    '${(progress * 100).round()}%',
+                  ),
                 ],
               ),
             ),
 
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: AppProgressIndicator(value: progress),
+              padding:
+              const EdgeInsets.symmetric(
+                horizontal: 24,
+              ),
+              child:
+              AppProgressIndicator(
+                value: progress,
+              ),
             ),
 
             Expanded(
               child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
+                controller:
+                _pageController,
+                physics:
+                const NeverScrollableScrollPhysics(),
+
                 onPageChanged: (index) {
                   setState(() {
                     _currentPage = index;
                   });
                 },
+
                 children: const [
                   BasicInfoPage(),
                   BodyInfoPage(),
@@ -154,31 +275,169 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             ),
 
             Padding(
-              padding: const EdgeInsets.all(24),
+              padding:
+              const EdgeInsets.all(24),
               child: Row(
                 children: [
                   if (_currentPage > 0) ...[
                     Expanded(
-                      child: SecondaryButton(
+                      child:
+                      SecondaryButton(
                         text: 'Back',
-                        onPressed: _isCompleting ? null : _previousPage,
+                        onPressed:
+                        _isCompleting
+                            ? null
+                            : _previousPage,
                       ),
                     ),
 
-                    const SizedBox(width: 12),
+                    const SizedBox(
+                      width: 12,
+                    ),
                   ],
 
                   Expanded(
-                    child: PrimaryButton(
-                      text: isLastPage ? 'Complete' : 'Continue',
-                      isLoading: _isCompleting,
-                      onPressed: isLastPage ? _completeProfile : _nextPage,
+                    child:
+                    PrimaryButton(
+                      text: isLastPage
+                          ? 'Complete'
+                          : 'Continue',
+
+                      isLoading:
+                      _isCompleting,
+
+                      onPressed:
+                      isLastPage
+                          ? _completeProfile
+                          : _nextPage,
                     ),
                   ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// TRAINER PROFILE SETUP
+// ============================================================
+
+class _TrainerProfileSetup
+    extends StatelessWidget {
+  const _TrainerProfileSetup();
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      body: SafeArea(
+        child: Padding(
+          padding:
+          const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment:
+            CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 24,
+              ),
+
+              const Text(
+                'Trainer Profile Setup',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight:
+                  FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(
+                height: 12,
+              ),
+
+              const Text(
+                'Trainer onboarding will be implemented next.',
+              ),
+
+              const Spacer(),
+
+              SizedBox(
+                width: double.infinity,
+                child: PrimaryButton(
+                  text:
+                  'Continue to Trainer Setup',
+                  onPressed: () {
+                    // TODO:
+                    // Implement Trainer Profile Setup
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// OWNER PROFILE SETUP
+// ============================================================
+
+class _OwnerProfileSetup
+    extends StatelessWidget {
+  const _OwnerProfileSetup();
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      body: SafeArea(
+        child: Padding(
+          padding:
+          const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment:
+            CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 24,
+              ),
+
+              const Text(
+                'Owner Profile Setup',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight:
+                  FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(
+                height: 12,
+              ),
+
+              const Text(
+                'Owner onboarding will be implemented next.',
+              ),
+
+              const Spacer(),
+
+              SizedBox(
+                width: double.infinity,
+                child: PrimaryButton(
+                  text:
+                  'Continue to Owner Setup',
+                  onPressed: () {
+                    // TODO:
+                    // Implement Owner Profile Setup
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
