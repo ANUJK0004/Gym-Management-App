@@ -3,6 +3,7 @@ class UserProfile {
     required this.uid,
     required this.email,
     this.role = 'member',
+    this.gymId,
     this.displayName,
     this.photoUrl,
     this.dateOfBirth,
@@ -16,7 +17,14 @@ class UserProfile {
 
   final String uid;
   final String email;
+
   final String role;
+
+  /// ID of the gym this user belongs to or owns.
+  ///
+  /// Null means the user is not currently connected
+  /// to any gym.
+  final String? gymId;
 
   final String? displayName;
   final String? photoUrl;
@@ -36,6 +44,7 @@ class UserProfile {
   UserProfile copyWith({
     String? displayName,
     String? role,
+    String? gymId,
     String? photoUrl,
     DateTime? dateOfBirth,
     String? gender,
@@ -49,6 +58,7 @@ class UserProfile {
       uid: uid,
       email: email,
       role: role ?? this.role,
+      gymId: gymId ?? this.gymId,
       displayName: displayName ?? this.displayName,
       photoUrl: photoUrl ?? this.photoUrl,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
@@ -57,7 +67,8 @@ class UserProfile {
       weight: weight ?? this.weight,
       fitnessGoal: fitnessGoal ?? this.fitnessGoal,
       activityLevel: activityLevel ?? this.activityLevel,
-      profileCompleted: profileCompleted ?? this.profileCompleted,
+      profileCompleted:
+      profileCompleted ?? this.profileCompleted,
     );
   }
 }

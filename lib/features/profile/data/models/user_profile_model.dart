@@ -7,6 +7,7 @@ class UserProfileModel extends UserProfile {
     required super.uid,
     required super.email,
     super.role,
+    super.gymId,
     super.displayName,
     super.photoUrl,
     super.dateOfBirth,
@@ -19,48 +20,71 @@ class UserProfileModel extends UserProfile {
   });
 
   factory UserProfileModel.fromFirestore(
-      DocumentSnapshot<Map<String, dynamic>> document,
-      ) {
+    DocumentSnapshot<Map<String, dynamic>> document,
+  ) {
     final data = document.data();
 
     if (data == null) {
-      throw Exception(
-        'User profile document does not exist.',
-      );
+      throw Exception('User profile document does not exist.');
     }
 
     return UserProfileModel(
       uid: data['uid'] as String? ?? document.id,
+
       email: data['email'] as String? ?? '',
+
       role: data['role'] as String? ?? 'member',
+
+      gymId: data['gymId'] as String?,
+
       displayName: data['displayName'] as String?,
+
       photoUrl: data['photoUrl'] as String?,
+
       dateOfBirth: _parseDate(data['dateOfBirth']),
+
       gender: data['gender'] as String?,
+
       height: (data['height'] as num?)?.toDouble(),
+
       weight: (data['weight'] as num?)?.toDouble(),
+
       fitnessGoal: data['fitnessGoal'] as String?,
+
       activityLevel: data['activityLevel'] as String?,
-      profileCompleted:
-      data['profileCompleted'] as bool? ?? false,
+
+      profileCompleted: data['profileCompleted'] as bool? ?? false,
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
       'uid': uid,
+
       'email': email,
+
       'role': role,
+
+      'gymId': gymId,
+
       'displayName': displayName,
+
       'photoUrl': photoUrl,
+
       'dateOfBirth': dateOfBirth != null
           ? Timestamp.fromDate(dateOfBirth!)
           : null,
+
       'gender': gender,
+
       'height': height,
+
       'weight': weight,
+
       'fitnessGoal': fitnessGoal,
+
       'activityLevel': activityLevel,
+
       'profileCompleted': profileCompleted,
     };
   }

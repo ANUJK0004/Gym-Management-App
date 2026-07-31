@@ -27,6 +27,7 @@ class UserProfileRepositoryImpl
       uid: profile.uid,
       email: profile.email,
       role: profile.role,
+      gymId: profile.gymId,
       displayName: profile.displayName,
       photoUrl: profile.photoUrl,
       dateOfBirth: profile.dateOfBirth,
@@ -35,10 +36,13 @@ class UserProfileRepositoryImpl
       weight: profile.weight,
       fitnessGoal: profile.fitnessGoal,
       activityLevel: profile.activityLevel,
-      profileCompleted: profile.profileCompleted,
+      profileCompleted:
+      profile.profileCompleted,
     );
 
-    return _dataSource.createUserProfile(model);
+    return _dataSource.createUserProfile(
+      model,
+    );
   }
 
   @override
@@ -49,6 +53,7 @@ class UserProfileRepositoryImpl
       uid: profile.uid,
       email: profile.email,
       role: profile.role,
+      gymId: profile.gymId,
       displayName: profile.displayName,
       photoUrl: profile.photoUrl,
       dateOfBirth: profile.dateOfBirth,
@@ -57,16 +62,21 @@ class UserProfileRepositoryImpl
       weight: profile.weight,
       fitnessGoal: profile.fitnessGoal,
       activityLevel: profile.activityLevel,
-      profileCompleted: profile.profileCompleted,
+      profileCompleted:
+      profile.profileCompleted,
     );
 
-    return _dataSource.updateUserProfile(model);
+    return _dataSource.updateUserProfile(
+      model,
+    );
   }
 
   @override
   Future<void> deleteUserProfile(
       String uid,
       ) {
-    return _dataSource.deleteUserProfile(uid);
+    return _dataSource.deleteUserProfile(
+      uid,
+    );
   }
 }
