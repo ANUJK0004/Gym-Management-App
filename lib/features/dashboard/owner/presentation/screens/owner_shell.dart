@@ -1,16 +1,89 @@
 import 'package:flutter/material.dart';
 
-class OwnerShell extends StatelessWidget {
+import '../../../../../app/theme/app_colors.dart';
+  import '../widgets/owner_bottom_nav.dart';
+import 'owner_home_screen.dart';
+
+class OwnerShell extends StatefulWidget {
   const OwnerShell({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
+  State<OwnerShell> createState() =>
+      _OwnerShellState();
+}
+
+class _OwnerShellState
+    extends State<OwnerShell> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = const [
+    OwnerHomeScreen(),
+
+    _OwnerPlaceholderScreen(
+      title: 'Members',
+    ),
+
+    _OwnerPlaceholderScreen(
+      title: 'Finance',
+    ),
+
+    _OwnerPlaceholderScreen(
+      title: 'Settings',
+    ),
+  ];
+
+  @override
+  Widget build(
+      BuildContext context,
+      ) {
+    return Scaffold(
+      backgroundColor:
+      AppColors.background,
+
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+
+      bottomNavigationBar:
+      OwnerBottomNav(
+        currentIndex:
+        _currentIndex,
+
+        onChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
+    );
+  }
+}
+
+class _OwnerPlaceholderScreen
+    extends StatelessWidget {
+  const _OwnerPlaceholderScreen({
+    required this.title,
+  });
+
+  final String title;
+
+  @override
+  Widget build(
+      BuildContext context,
+      ) {
+    return SafeArea(
+      child: Center(
         child: Text(
-          'Owner Dashboard',
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight:
+            FontWeight.bold,
+          ),
         ),
       ),
     );

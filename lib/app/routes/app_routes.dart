@@ -10,6 +10,7 @@ class AppRoutes {
   static const String home = '/home';
   static const String trainerHome = '/trainer-home';
   static const String ownerHome = '/owner-home';
+  static const String ownerSetup = '/owner-setup';
   static const String membership = '/membership';
   static const String workout = '/workout';
   static const String workoutDetail = '/workout-detail';

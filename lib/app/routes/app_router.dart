@@ -17,6 +17,7 @@ import '../../core/enums/app_role.dart';
 import '../../features/dashboard/owner/presentation/screens/owner_shell.dart';
 import '../../features/dashboard/trainer/presentation/screens/trainer_shell.dart';
 import '../../features/membership/presentation/screens/membership_screen.dart';
+import '../../features/owner/presentation/screens/owner_setup_screen.dart';
 import '../../features/profile/domain/entities/user_profile.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/progress/presentation/screens/progress_screen.dart';
@@ -148,25 +149,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // ------------------------------------------
 
       if (profile.profileCompleted) {
-        if (isSplash ||
-            isAuthPage ||
-            isProfileSetup) {
-          switch (profile.role) {
-            case 'member':
-              return AppRoutes.home;
+        if (profile.role == 'owner') {
+          if (profile.gymId == null) {
+            if (location != AppRoutes.ownerSetup) {
+              return AppRoutes.ownerSetup;
+            }
 
-            case 'trainer':
-              return AppRoutes.trainerHome;
+            return null;
+          }
 
-            case 'owner':
-              return AppRoutes.ownerHome;
+          if (isSplash ||
+              isAuthPage ||
+              isProfileSetup ||
+              location == AppRoutes.ownerSetup) {
+            return AppRoutes.ownerHome;
+          }
+        }
 
-            default:
-              return AppRoutes.home;
+        if (profile.role == 'member') {
+          if (isSplash ||
+              isAuthPage ||
+              isProfileSetup) {
+            return AppRoutes.home;
           }
         }
       }
-
       return null;
     },
 
@@ -224,6 +231,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // ------------------------------------------
 
       GoRoute(
+        path: AppRoutes.ownerSetup,
+        builder: (
+            context,
+            state,
+            ) {
+          return const OwnerSetupScreen();
+        },
+      ),
+
+      GoRoute(
         path: AppRoutes.profileSetup,
         builder: (context, state) {
           return const ProfileSetupScreen();
@@ -233,6 +250,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // ------------------------------------------
       // MEMBER HOME
       // ------------------------------------------
+      GoRoute(
+        path: AppRoutes.ownerHome,
+        builder: (
+            context,
+            state,
+            ) {
+          return const OwnerShell();
+        },
+      ),
 
       GoRoute(
         path: AppRoutes.home,
