@@ -43,6 +43,15 @@ class GymRepositoryImpl
   }
 
   @override
+  Future<Gym?> getGymByOwnerId(
+      String ownerId,
+      ) {
+    return _dataSource.getGymByOwnerId(
+      ownerId,
+    );
+  }
+
+  @override
   Future<void> updateGym(
       Gym gym,
       ) {

@@ -9,6 +9,10 @@ abstract class GymRepository {
       String gymId,
       );
 
+  Future<Gym?> getGymByOwnerId(
+      String ownerId,
+      );
+
   Future<void> updateGym(
       Gym gym,
       );

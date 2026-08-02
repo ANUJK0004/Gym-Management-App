@@ -16,54 +16,41 @@ class GymModel extends Gym {
   });
 
   factory GymModel.fromFirestore(
-    DocumentSnapshot<Map<String, dynamic>> document,
-  ) {
+      DocumentSnapshot<Map<String, dynamic>> document,
+      ) {
     final data = document.data();
 
     if (data == null) {
-      throw Exception('Gym document does not exist.');
+      throw Exception(
+        'Gym document does not exist.',
+      );
     }
 
     return GymModel(
-      id: data['id'] as String? ?? document.id,
-
+      id: document.id,
       ownerId: data['ownerId'] as String? ?? '',
-
       name: data['name'] as String? ?? '',
-
       description: data['description'] as String?,
-
       address: data['address'] as String?,
-
       phone: data['phone'] as String?,
-
       email: data['email'] as String?,
-
       logoUrl: data['logoUrl'] as String?,
-
       createdAt: _parseDate(data['createdAt']),
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'id': id,
-
       'ownerId': ownerId,
-
       'name': name,
-
       'description': description,
-
       'address': address,
-
       'phone': phone,
-
       'email': email,
-
       'logoUrl': logoUrl,
-
-      'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
+      'createdAt': createdAt != null
+          ? Timestamp.fromDate(createdAt!)
+          : FieldValue.serverTimestamp(),
     };
   }
 
