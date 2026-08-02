@@ -1,35 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../../app/routes/app_routes.dart';
 import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
 import '../../../../../app/theme/app_text_styles.dart';
 
-class OwnerHomeScreen
-    extends StatelessWidget {
+class OwnerHomeScreen extends StatelessWidget {
   const OwnerHomeScreen({
     super.key,
   });
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: CustomScrollView(
           slivers: [
             SliverPadding(
-              padding:
-              const EdgeInsets.fromLTRB(
+              padding: const EdgeInsets.fromLTRB(
                 14,
                 18,
                 14,
                 24,
               ),
-
               sliver: SliverList(
-                delegate:
-                SliverChildListDelegate(
+                delegate: SliverChildListDelegate(
                   [
                     const _OwnerHeader(),
 
@@ -57,7 +53,7 @@ class OwnerHomeScreen
                       height: 10,
                     ),
 
-                    const _ManagementGrid(),
+                    _ManagementGrid(),
 
                     const SizedBox(
                       height: 22,
@@ -87,39 +83,24 @@ class OwnerHomeScreen
 // HEADER
 // ------------------------------------------------------------
 
-class _OwnerHeader
-    extends StatelessWidget {
+class _OwnerHeader extends StatelessWidget {
   const _OwnerHeader();
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
           child: Column(
             crossAxisAlignment:
-            CrossAxisAlignment
-                .start,
-
+            CrossAxisAlignment.start,
             children: [
               Text(
                 'ADMIN CONSOLE',
-
-                style:
-                AppTextStyles
-                    .labelMedium
-                    .copyWith(
-                  color:
-                  AppColors
-                      .textSecondary,
-
-                  letterSpacing:
-                  0.8,
-
-                  fontWeight:
-                  FontWeight.w600,
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.textSecondary,
+                  letterSpacing: 0.8,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
 
@@ -129,13 +110,8 @@ class _OwnerHeader
 
               Text(
                 'GymSync HQ',
-
-                style:
-                AppTextStyles
-                    .headlineMedium
-                    .copyWith(
-                  fontWeight:
-                  FontWeight.w800,
+                style: AppTextStyles.headlineMedium.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
               ),
             ],
@@ -143,8 +119,7 @@ class _OwnerHeader
         ),
 
         _HeaderIconButton(
-          icon:
-          Icons.notifications_none_rounded,
+          icon: Icons.notifications_none_rounded,
         ),
 
         const SizedBox(
@@ -154,31 +129,16 @@ class _OwnerHeader
         Container(
           width: 42,
           height: 42,
-
-          decoration:
-          const BoxDecoration(
-            color:
-            AppColors.primary,
-
-            shape:
-            BoxShape.circle,
+          decoration: const BoxDecoration(
+            color: AppColors.primary,
+            shape: BoxShape.circle,
           ),
-
-          alignment:
-          Alignment.center,
-
+          alignment: Alignment.center,
           child: Text(
             'AD',
-
-            style:
-            AppTextStyles
-                .titleMedium
-                .copyWith(
-              color:
-              Colors.black,
-
-              fontWeight:
-              FontWeight.w800,
+            style: AppTextStyles.titleMedium.copyWith(
+              color: Colors.black,
+              fontWeight: FontWeight.w800,
             ),
           ),
         ),
@@ -187,8 +147,7 @@ class _OwnerHeader
   }
 }
 
-class _HeaderIconButton
-    extends StatelessWidget {
+class _HeaderIconButton extends StatelessWidget {
   const _HeaderIconButton({
     required this.icon,
   });
@@ -196,37 +155,22 @@ class _HeaderIconButton
   final IconData icon;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Container(
       width: 42,
       height: 42,
-
-      decoration:
-      BoxDecoration(
-        color:
-        AppColors.surface,
-
-        shape:
-        BoxShape.circle,
-
-        border:
-        Border.all(
-          color:
-          AppColors.border,
-
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: AppColors.border,
           width: 0.5,
         ),
       ),
-
       child: Icon(
         icon,
-
         size: 20,
-
-        color:
-        AppColors.textPrimary,
+        color: AppColors.textPrimary,
       ),
     );
   }
@@ -236,56 +180,42 @@ class _HeaderIconButton
 // STATS
 // ------------------------------------------------------------
 
-class _StatsGrid
-    extends StatelessWidget {
+class _StatsGrid extends StatelessWidget {
   const _StatsGrid();
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return GridView.count(
       crossAxisCount: 2,
-
       crossAxisSpacing: 10,
-
       mainAxisSpacing: 10,
-
       childAspectRatio: 1.65,
-
       shrinkWrap: true,
-
-      physics:
-      const NeverScrollableScrollPhysics(),
-
+      physics: const NeverScrollableScrollPhysics(),
       children: const [
         _StatCard(
-          icon:
-          Icons.groups_rounded,
+          icon: Icons.groups_rounded,
           value: '1,284',
           label: 'Total Members',
           change: '↑ +48',
         ),
 
         _StatCard(
-          icon:
-          Icons.monetization_on_rounded,
+          icon: Icons.monetization_on_rounded,
           value: '₹143,500',
           label: 'Monthly Revenue',
           change: '↑ +12.4%',
         ),
 
         _StatCard(
-          icon:
-          Icons.directions_run_rounded,
+          icon: Icons.directions_run_rounded,
           value: '24',
           label: 'Active Trainers',
           change: '↑ +3',
         ),
 
         _StatCard(
-          icon:
-          Icons.star_rounded,
+          icon: Icons.star_rounded,
           value: '156',
           label: 'New This Month',
           change: '↑ +22%',
@@ -295,8 +225,7 @@ class _StatsGrid
   }
 }
 
-class _StatCard
-    extends StatelessWidget {
+class _StatCard extends StatelessWidget {
   const _StatCard({
     required this.icon,
     required this.value,
@@ -310,61 +239,36 @@ class _StatCard
   final String change;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Container(
-      padding:
-      const EdgeInsets.all(14),
-
-      decoration:
-      BoxDecoration(
-        color:
-        AppColors.surface,
-
-        borderRadius:
-        AppRadius.radiusLG,
-
-        border:
-        Border.all(
-          color:
-          AppColors.border,
-
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadius.radiusLG,
+        border: Border.all(
+          color: AppColors.border,
           width: 0.5,
         ),
       ),
-
       child: Column(
         crossAxisAlignment:
-        CrossAxisAlignment
-            .start,
-
+        CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Icon(
                 icon,
-
                 size: 18,
-
-                color:
-                AppColors.primary,
+                color: AppColors.primary,
               ),
 
               const Spacer(),
 
               Text(
                 change,
-
-                style:
-                AppTextStyles
-                    .labelMedium
-                    .copyWith(
-                  color:
-                  AppColors.primary,
-
-                  fontWeight:
-                  FontWeight.w600,
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -374,13 +278,8 @@ class _StatCard
 
           Text(
             value,
-
-            style:
-            AppTextStyles
-                .titleLarge
-                .copyWith(
-              fontWeight:
-              FontWeight.w800,
+            style: AppTextStyles.titleLarge.copyWith(
+              fontWeight: FontWeight.w800,
             ),
           ),
 
@@ -390,14 +289,8 @@ class _StatCard
 
           Text(
             label,
-
-            style:
-            AppTextStyles
-                .labelMedium
-                .copyWith(
-              color:
-              AppColors
-                  .textSecondary,
+            style: AppTextStyles.labelMedium.copyWith(
+              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -406,14 +299,15 @@ class _StatCard
   }
 }
 
-class _RevenueCard
-    extends StatelessWidget {
+// ------------------------------------------------------------
+// REVENUE
+// ------------------------------------------------------------
+
+class _RevenueCard extends StatelessWidget {
   const _RevenueCard();
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     final values = [
       0.35,
       0.45,
@@ -446,59 +340,34 @@ class _RevenueCard
 
     return Container(
       height: 180,
-
-      padding:
-      const EdgeInsets.all(16),
-
-      decoration:
-      BoxDecoration(
-        color:
-        AppColors.surface,
-
-        borderRadius:
-        AppRadius.radiusLG,
-
-        border:
-        Border.all(
-          color:
-          AppColors.border,
-
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadius.radiusLG,
+        border: Border.all(
+          color: AppColors.border,
           width: 0.5,
         ),
       ),
-
       child: Column(
         children: [
           Row(
             children: [
               Column(
                 crossAxisAlignment:
-                CrossAxisAlignment
-                    .start,
-
+                CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Revenue',
-
-                    style:
-                    AppTextStyles
-                        .titleMedium
-                        .copyWith(
-                      fontWeight:
-                      FontWeight.w700,
+                    style: AppTextStyles.titleMedium.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
 
                   Text(
                     '2024 Overview',
-
-                    style:
-                    AppTextStyles
-                        .labelMedium
-                        .copyWith(
-                      color:
-                      AppColors
-                          .textSecondary,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -508,14 +377,8 @@ class _RevenueCard
 
               Text(
                 '1M',
-
-                style:
-                AppTextStyles
-                    .labelMedium
-                    .copyWith(
-                  color:
-                  AppColors
-                      .textSecondary,
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.textSecondary,
                 ),
               ),
 
@@ -525,14 +388,8 @@ class _RevenueCard
 
               Text(
                 '3M',
-
-                style:
-                AppTextStyles
-                    .labelMedium
-                    .copyWith(
-                  color:
-                  AppColors
-                      .textSecondary,
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.textSecondary,
                 ),
               ),
 
@@ -541,34 +398,20 @@ class _RevenueCard
               ),
 
               Container(
-                padding:
-                const EdgeInsets
-                    .symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 8,
                   vertical: 5,
                 ),
-
-                decoration:
-                BoxDecoration(
-                  color:
-                  AppColors.primary,
-
-                  borderRadius:
-                  BorderRadius
-                      .circular(
-                    8,
-                  ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-
                 child: const Text(
                   '1Y',
-
                   style: TextStyle(
-                    color:
-                    Colors.black,
+                    color: Colors.black,
                     fontSize: 10,
-                    fontWeight:
-                    FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -579,49 +422,29 @@ class _RevenueCard
 
           SizedBox(
             height: 58,
-
             child: Row(
               crossAxisAlignment:
               CrossAxisAlignment.end,
-
               children: List.generate(
                 values.length,
                     (index) {
                   return Expanded(
                     child: Padding(
-                      padding:
-                      const EdgeInsets
-                          .symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 2,
                       ),
-
-                      child:
-                      FractionallySizedBox(
-                        heightFactor:
-                        values[index],
-
+                      child: FractionallySizedBox(
+                        heightFactor: values[index],
                         alignment:
-                        Alignment
-                            .bottomCenter,
-
+                        Alignment.bottomCenter,
                         child: Container(
-                          decoration:
-                          BoxDecoration(
-                            color: index >=
-                                9
-                                ? AppColors
-                                .primary
-                                : AppColors
-                                .border,
-
+                          decoration: BoxDecoration(
+                            color: index >= 9
+                                ? AppColors.primary
+                                : AppColors.border,
                             borderRadius:
-                            const BorderRadius
-                                .vertical(
-                              top:
-                              Radius
-                                  .circular(
-                                4,
-                              ),
+                            const BorderRadius.vertical(
+                              top: Radius.circular(4),
                             ),
                           ),
                         ),
@@ -638,24 +461,17 @@ class _RevenueCard
           ),
 
           Row(
-            children:
-            List.generate(
+            children: List.generate(
               months.length,
                   (index) {
                 return Expanded(
                   child: Text(
                     months[index],
-
-                    textAlign:
-                    TextAlign.center,
-
-                    style:
-                    const TextStyle(
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
                       fontSize: 7,
-
                       color:
-                      AppColors
-                          .textSecondary,
+                      AppColors.textSecondary,
                     ),
                   ),
                 );
@@ -668,173 +484,193 @@ class _RevenueCard
   }
 }
 
-class _ManagementGrid
-    extends StatelessWidget {
+// ------------------------------------------------------------
+// MANAGEMENT GRID
+// ------------------------------------------------------------
+
+class _ManagementGrid extends StatelessWidget {
   const _ManagementGrid();
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return GridView.count(
       crossAxisCount: 2,
-
       crossAxisSpacing: 10,
-
       mainAxisSpacing: 10,
-
       childAspectRatio: 1.6,
-
       shrinkWrap: true,
-
-      physics:
-      const NeverScrollableScrollPhysics(),
-
-      children: const [
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
         _ManagementCard(
-          icon:
-          Icons.groups_rounded,
+          icon: Icons.groups_rounded,
           title: 'Members',
-          subtitle:
-          '1,284 total',
+          subtitle: '1,284 total',
+          onTap: () {
+            // TODO: Connect when Member Management is implemented.
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Member Management will be connected next.',
+                ),
+              ),
+            );
+          },
         ),
 
         _ManagementCard(
-          icon:
-          Icons.directions_run_rounded,
+          icon: Icons.directions_run_rounded,
           title: 'Trainers',
-          subtitle:
-          '24 active',
+          subtitle: '24 active',
+          onTap: () {
+            // TODO: Connect when Trainer Management is implemented.
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Trainer Management will be connected next.',
+                ),
+              ),
+            );
+          },
         ),
 
         _ManagementCard(
-          icon:
-          Icons.monetization_on_rounded,
-          title: 'Finances',
-          subtitle:
-          '₹143.5K/mo',
+          icon: Icons.fitness_center_rounded,
+          title: 'Gym Management',
+          subtitle: 'Gym profile & details',
+          onTap: () {
+            context.push(
+              AppRoutes.ownerGymManagement,
+            );
+          },
         ),
 
         _ManagementCard(
-          icon:
-          Icons.bar_chart_rounded,
-          title: 'Reports',
-          subtitle:
-          'Analytics',
+          icon: Icons.card_membership_rounded,
+          title: 'Membership Plans',
+          subtitle: 'Plans & pricing',
+          onTap: () {
+            context.push(
+              AppRoutes.ownerMembershipPlans,
+            );
+          },
         ),
       ],
     );
   }
 }
 
-class _ManagementCard
-    extends StatelessWidget {
+// ------------------------------------------------------------
+// MANAGEMENT CARD
+// ------------------------------------------------------------
+
+class _ManagementCard extends StatelessWidget {
   const _ManagementCard({
     required this.icon,
     required this.title,
     required this.subtitle,
+    required this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
+  final VoidCallback onTap;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
-    return Container(
-      padding:
-      const EdgeInsets.all(20),
-
-      decoration:
-      BoxDecoration(
-        color:
-        AppColors.surface,
-
-        borderRadius:
-        AppRadius.radiusLG,
-
-        border:
-        Border.all(
-          color:
-          AppColors.border,
-
-          width: 0.5,
-        ),
-      ),
-
-      child: Row(
-        children: [
-          Icon(
-            icon,
-
-            size: 22,
-
-            color:
-            AppColors.primary,
-          ),
-
-          const SizedBox(
-            width: 10,
-          ),
-
-          Expanded(
-            child: Column(
-              mainAxisAlignment:
-              MainAxisAlignment
-                  .center,
-
-              crossAxisAlignment:
-              CrossAxisAlignment
-                  .start,
-
-              children: [
-                Text(
-                  title,
-
-                  style:
-                  AppTextStyles
-                      .bodyMedium
-                      .copyWith(
-                    fontWeight:
-                    FontWeight.w700,
-                  ),
-                ),
-
-                const SizedBox(
-                  height: 2,
-                ),
-
-                Text(
-                  subtitle,
-
-                  style:
-                  AppTextStyles
-                      .labelMedium
-                      .copyWith(
-                    color:
-                    AppColors
-                        .textSecondary,
-                  ),
-                ),
-              ],
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: AppRadius.radiusLG,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.radiusLG,
+        child: Ink(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: AppRadius.radiusLG,
+            border: Border.all(
+              color: AppColors.border,
+              width: 0.5,
             ),
           ),
-        ],
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 22,
+                color: AppColors.primary,
+              ),
+
+              const SizedBox(
+                width: 10,
+              ),
+
+              Expanded(
+                child: Column(
+                  mainAxisAlignment:
+                  MainAxisAlignment.center,
+                  crossAxisAlignment:
+                  CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow:
+                      TextOverflow.ellipsis,
+                      style:
+                      AppTextStyles.bodyMedium.copyWith(
+                        fontWeight:
+                        FontWeight.w700,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 2,
+                    ),
+
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow:
+                      TextOverflow.ellipsis,
+                      style:
+                      AppTextStyles.labelMedium.copyWith(
+                        color:
+                        AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(
+                width: 4,
+              ),
+
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color:
+                AppColors.textSecondary,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-class _RecentActivityList
-    extends StatelessWidget {
+// ------------------------------------------------------------
+// RECENT ACTIVITY
+// ------------------------------------------------------------
+
+class _RecentActivityList extends StatelessWidget {
   const _RecentActivityList();
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Column(
       children: const [
         _ActivityItem(
@@ -842,8 +678,7 @@ class _RecentActivityList
           Icons.person_add_alt_1_rounded,
           title:
           'New member joined: Maria Santos',
-          time:
-          '2 min ago',
+          time: '2 min ago',
         ),
 
         SizedBox(
@@ -855,8 +690,7 @@ class _RecentActivityList
           Icons.calendar_month_rounded,
           title:
           'Trainer Mike added session',
-          time:
-          '15 min ago',
+          time: '15 min ago',
         ),
 
         SizedBox(
@@ -868,8 +702,7 @@ class _RecentActivityList
           Icons.credit_card_rounded,
           title:
           'Payment received ₹2,800',
-          time:
-          '1 hr ago',
+          time: '1 hr ago',
         ),
 
         SizedBox(
@@ -881,16 +714,14 @@ class _RecentActivityList
           Icons.warning_amber_rounded,
           title:
           'Membership expired: 3 users',
-          time:
-          '3 hr ago',
+          time: '3 hr ago',
         ),
       ],
     );
   }
 }
 
-class _ActivityItem
-    extends StatelessWidget {
+class _ActivityItem extends StatelessWidget {
   const _ActivityItem({
     required this.icon,
     required this.title,
@@ -902,42 +733,26 @@ class _ActivityItem
   final String time;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Container(
-      padding:
-      const EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 12,
         vertical: 11,
       ),
-
-      decoration:
-      BoxDecoration(
-        color:
-        AppColors.surface,
-
-        borderRadius:
-        AppRadius.radiusMD,
-
-        border:
-        Border.all(
-          color:
-          AppColors.border,
-
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadius.radiusMD,
+        border: Border.all(
+          color: AppColors.border,
           width: 0.5,
         ),
       ),
-
       child: Row(
         children: [
           Icon(
             icon,
-
             size: 17,
-
-            color:
-            AppColors.primary,
+            color: AppColors.primary,
           ),
 
           const SizedBox(
@@ -947,16 +762,11 @@ class _ActivityItem
           Expanded(
             child: Text(
               title,
-
               maxLines: 1,
-
               overflow:
               TextOverflow.ellipsis,
-
               style:
-              AppTextStyles
-                  .bodySmall
-                  .copyWith(
+              AppTextStyles.bodySmall.copyWith(
                 fontWeight:
                 FontWeight.w500,
               ),
@@ -969,15 +779,10 @@ class _ActivityItem
 
           Text(
             time,
-
             style:
-            AppTextStyles
-                .labelMedium
-                .copyWith(
+            AppTextStyles.labelMedium.copyWith(
               color:
-              AppColors
-                  .textSecondary,
-
+              AppColors.textSecondary,
               fontSize: 9,
             ),
           ),
@@ -991,8 +796,7 @@ class _ActivityItem
 // SECTION TITLE
 // ------------------------------------------------------------
 
-class _SectionTitle
-    extends StatelessWidget {
+class _SectionTitle extends StatelessWidget {
   const _SectionTitle({
     required this.title,
   });
@@ -1000,22 +804,12 @@ class _SectionTitle
   final String title;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Text(
       title,
-
-      style:
-      AppTextStyles.labelMedium
-          .copyWith(
-        color:
-        AppColors
-            .textSecondary,
-
-        fontWeight:
-        FontWeight.w600,
-
+      style: AppTextStyles.labelMedium.copyWith(
+        color: AppColors.textSecondary,
+        fontWeight: FontWeight.w600,
         letterSpacing: 0.8,
       ),
     );

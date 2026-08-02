@@ -18,6 +18,7 @@ import '../../features/dashboard/owner/presentation/screens/owner_shell.dart';
 import '../../features/dashboard/trainer/presentation/screens/trainer_shell.dart';
 import '../../features/gym/presentation/screens/gym_management_screen.dart';
 import '../../features/membership/presentation/screens/membership_screen.dart';
+import '../../features/membership_plan/presentation/screens/membership_plan_management_screen.dart';
 import '../../features/owner/presentation/screens/owner_setup_screen.dart';
 import '../../features/profile/domain/entities/user_profile.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
@@ -402,6 +403,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             state,
             ) {
           return const GymManagementScreen();
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.ownerMembershipPlans,
+        builder: (context, state) {
+          return const MembershipPlanManagementScreen();
         },
       ),
     ],
