@@ -1,0 +1,61 @@
+import '../../domain/entities/managed_member.dart';
+import '../../domain/repositories/member_management_repository.dart';
+
+import '../datasources/member_management_remote_datasource.dart';
+
+class MemberManagementRepositoryImpl
+    implements MemberManagementRepository {
+  MemberManagementRepositoryImpl(
+      this._dataSource,
+      );
+
+  final MemberManagementRemoteDataSource
+  _dataSource;
+
+  @override
+  Future<List<ManagedMember>>
+  getMembersByGymId(
+      String gymId,
+      ) {
+    return _dataSource
+        .getMembersByGymId(gymId);
+  }
+
+  @override
+  Future<ManagedMember?>
+  getMemberById(
+      String uid,
+      ) {
+    return _dataSource
+        .getMemberById(uid);
+  }
+
+  @override
+  Future<List<ManagedMember>>
+  searchMembers(
+      String query,
+      ) {
+    return _dataSource
+        .searchMembers(query);
+  }
+
+  @override
+  Future<void> assignMemberToGym({
+    required String uid,
+    required String gymId,
+  }) {
+    return _dataSource
+        .assignMemberToGym(
+      uid: uid,
+      gymId: gymId,
+    );
+  }
+
+  @override
+  Future<void> removeMemberFromGym(
+      String uid,
+      ) {
+    return _dataSource
+        .removeMemberFromGym(uid);
+  }
+}

@@ -17,6 +17,8 @@ import '../../core/enums/app_role.dart';
 import '../../features/dashboard/owner/presentation/screens/owner_shell.dart';
 import '../../features/dashboard/trainer/presentation/screens/trainer_shell.dart';
 import '../../features/gym/presentation/screens/gym_management_screen.dart';
+import '../../features/member_management/presentation/screens/member_details_screen.dart';
+import '../../features/member_management/presentation/screens/member_management_screen.dart';
 import '../../features/membership/presentation/screens/membership_screen.dart';
 import '../../features/membership_plan/presentation/screens/membership_plan_management_screen.dart';
 import '../../features/owner/presentation/screens/owner_setup_screen.dart';
@@ -24,6 +26,8 @@ import '../../features/profile/domain/entities/user_profile.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/progress/presentation/screens/progress_screen.dart';
 import '../../features/role_selection/presentation/screens/role_selection_screen.dart';
+import '../../features/trainer_management/presentation/screens/trainer_details_screen.dart';
+import '../../features/trainer_management/presentation/screens/trainer_management_screen.dart';
 import '../../features/workout/domain/entities/workout.dart';
 import '../../features/workout/presentation/screens/workout_completed_screen.dart';
 import '../../features/workout/presentation/screens/workout_detail_screen.dart';
@@ -410,6 +414,50 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.ownerMembershipPlans,
         builder: (context, state) {
           return const MembershipPlanManagementScreen();
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.memberManagement,
+        builder: (context, state) {
+          return const MemberManagementScreen();
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.memberDetails,
+        builder: (context, state) {
+          final memberId =
+          state.extra as String;
+
+          return MemberDetailsScreen(
+            memberId: memberId,
+          );
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.ownerTrainerManagement,
+        builder: (
+            context,
+            state,
+            ) {
+          return const TrainerManagementScreen();
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.trainerDetails,
+        builder: (
+            context,
+            state,
+            ) {
+          final trainerUid =
+          state.extra as String;
+
+          return TrainerDetailsScreen(
+            trainerUid: trainerUid,
+          );
         },
       ),
     ],

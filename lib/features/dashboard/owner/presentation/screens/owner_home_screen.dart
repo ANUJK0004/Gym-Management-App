@@ -53,7 +53,7 @@ class OwnerHomeScreen extends StatelessWidget {
                       height: 10,
                     ),
 
-                    _ManagementGrid(),
+                    const _ManagementGrid(),
 
                     const SizedBox(
                       height: 22,
@@ -97,10 +97,13 @@ class _OwnerHeader extends StatelessWidget {
             children: [
               Text(
                 'ADMIN CONSOLE',
-                style: AppTextStyles.labelMedium.copyWith(
-                  color: AppColors.textSecondary,
+                style:
+                AppTextStyles.labelMedium.copyWith(
+                  color:
+                  AppColors.textSecondary,
                   letterSpacing: 0.8,
-                  fontWeight: FontWeight.w600,
+                  fontWeight:
+                  FontWeight.w600,
                 ),
               ),
 
@@ -110,8 +113,10 @@ class _OwnerHeader extends StatelessWidget {
 
               Text(
                 'GymSync HQ',
-                style: AppTextStyles.headlineMedium.copyWith(
-                  fontWeight: FontWeight.w800,
+                style:
+                AppTextStyles.headlineMedium.copyWith(
+                  fontWeight:
+                  FontWeight.w800,
                 ),
               ),
             ],
@@ -119,7 +124,8 @@ class _OwnerHeader extends StatelessWidget {
         ),
 
         _HeaderIconButton(
-          icon: Icons.notifications_none_rounded,
+          icon:
+          Icons.notifications_none_rounded,
         ),
 
         const SizedBox(
@@ -129,16 +135,23 @@ class _OwnerHeader extends StatelessWidget {
         Container(
           width: 42,
           height: 42,
-          decoration: const BoxDecoration(
-            color: AppColors.primary,
-            shape: BoxShape.circle,
+          decoration:
+          const BoxDecoration(
+            color:
+            AppColors.primary,
+            shape:
+            BoxShape.circle,
           ),
-          alignment: Alignment.center,
+          alignment:
+          Alignment.center,
           child: Text(
             'AD',
-            style: AppTextStyles.titleMedium.copyWith(
-              color: Colors.black,
-              fontWeight: FontWeight.w800,
+            style:
+            AppTextStyles.titleMedium.copyWith(
+              color:
+              Colors.black,
+              fontWeight:
+              FontWeight.w800,
             ),
           ),
         ),
@@ -147,7 +160,8 @@ class _OwnerHeader extends StatelessWidget {
   }
 }
 
-class _HeaderIconButton extends StatelessWidget {
+class _HeaderIconButton
+    extends StatelessWidget {
   const _HeaderIconButton({
     required this.icon,
   });
@@ -155,22 +169,30 @@ class _HeaderIconButton extends StatelessWidget {
   final IconData icon;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Container(
       width: 42,
       height: 42,
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: AppColors.border,
+      decoration:
+      BoxDecoration(
+        color:
+        AppColors.surface,
+        shape:
+        BoxShape.circle,
+        border:
+        Border.all(
+          color:
+          AppColors.border,
           width: 0.5,
         ),
       ),
       child: Icon(
         icon,
         size: 20,
-        color: AppColors.textPrimary,
+        color:
+        AppColors.textPrimary,
       ),
     );
   }
@@ -180,52 +202,73 @@ class _HeaderIconButton extends StatelessWidget {
 // STATS
 // ------------------------------------------------------------
 
-class _StatsGrid extends StatelessWidget {
+class _StatsGrid
+    extends StatelessWidget {
   const _StatsGrid();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return GridView.count(
       crossAxisCount: 2,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
       childAspectRatio: 1.65,
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      physics:
+      const NeverScrollableScrollPhysics(),
       children: const [
         _StatCard(
-          icon: Icons.groups_rounded,
-          value: '1,284',
-          label: 'Total Members',
-          change: '↑ +48',
+          icon:
+          Icons.groups_rounded,
+          value:
+          '1,284',
+          label:
+          'Total Members',
+          change:
+          '↑ +48',
         ),
 
         _StatCard(
-          icon: Icons.monetization_on_rounded,
-          value: '₹143,500',
-          label: 'Monthly Revenue',
-          change: '↑ +12.4%',
+          icon:
+          Icons.monetization_on_rounded,
+          value:
+          '₹143,500',
+          label:
+          'Monthly Revenue',
+          change:
+          '↑ +12.4%',
         ),
 
         _StatCard(
-          icon: Icons.directions_run_rounded,
-          value: '24',
-          label: 'Active Trainers',
-          change: '↑ +3',
+          icon:
+          Icons.directions_run_rounded,
+          value:
+          '24',
+          label:
+          'Active Trainers',
+          change:
+          '↑ +3',
         ),
 
         _StatCard(
-          icon: Icons.star_rounded,
-          value: '156',
-          label: 'New This Month',
-          change: '↑ +22%',
+          icon:
+          Icons.star_rounded,
+          value:
+          '156',
+          label:
+          'New This Month',
+          change:
+          '↑ +22%',
         ),
       ],
     );
   }
 }
 
-class _StatCard extends StatelessWidget {
+class _StatCard
+    extends StatelessWidget {
   const _StatCard({
     required this.icon,
     required this.value,
@@ -239,14 +282,22 @@ class _StatCard extends StatelessWidget {
   final String change;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: AppRadius.radiusLG,
-        border: Border.all(
-          color: AppColors.border,
+      padding:
+      const EdgeInsets.all(14),
+      decoration:
+      BoxDecoration(
+        color:
+        AppColors.surface,
+        borderRadius:
+        AppRadius.radiusLG,
+        border:
+        Border.all(
+          color:
+          AppColors.border,
           width: 0.5,
         ),
       ),
@@ -259,16 +310,20 @@ class _StatCard extends StatelessWidget {
               Icon(
                 icon,
                 size: 18,
-                color: AppColors.primary,
+                color:
+                AppColors.primary,
               ),
 
               const Spacer(),
 
               Text(
                 change,
-                style: AppTextStyles.labelMedium.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
+                style:
+                AppTextStyles.labelMedium.copyWith(
+                  color:
+                  AppColors.primary,
+                  fontWeight:
+                  FontWeight.w600,
                 ),
               ),
             ],
@@ -278,8 +333,10 @@ class _StatCard extends StatelessWidget {
 
           Text(
             value,
-            style: AppTextStyles.titleLarge.copyWith(
-              fontWeight: FontWeight.w800,
+            style:
+            AppTextStyles.titleLarge.copyWith(
+              fontWeight:
+              FontWeight.w800,
             ),
           ),
 
@@ -289,8 +346,10 @@ class _StatCard extends StatelessWidget {
 
           Text(
             label,
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.textSecondary,
+            style:
+            AppTextStyles.labelMedium.copyWith(
+              color:
+              AppColors.textSecondary,
             ),
           ),
         ],
@@ -303,11 +362,14 @@ class _StatCard extends StatelessWidget {
 // REVENUE
 // ------------------------------------------------------------
 
-class _RevenueCard extends StatelessWidget {
+class _RevenueCard
+    extends StatelessWidget {
   const _RevenueCard();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     final values = [
       0.35,
       0.45,
@@ -340,12 +402,18 @@ class _RevenueCard extends StatelessWidget {
 
     return Container(
       height: 180,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: AppRadius.radiusLG,
-        border: Border.all(
-          color: AppColors.border,
+      padding:
+      const EdgeInsets.all(16),
+      decoration:
+      BoxDecoration(
+        color:
+        AppColors.surface,
+        borderRadius:
+        AppRadius.radiusLG,
+        border:
+        Border.all(
+          color:
+          AppColors.border,
           width: 0.5,
         ),
       ),
@@ -359,15 +427,19 @@ class _RevenueCard extends StatelessWidget {
                 children: [
                   Text(
                     'Revenue',
-                    style: AppTextStyles.titleMedium.copyWith(
-                      fontWeight: FontWeight.w700,
+                    style:
+                    AppTextStyles.titleMedium.copyWith(
+                      fontWeight:
+                      FontWeight.w700,
                     ),
                   ),
 
                   Text(
                     '2024 Overview',
-                    style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.textSecondary,
+                    style:
+                    AppTextStyles.labelMedium.copyWith(
+                      color:
+                      AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -377,8 +449,10 @@ class _RevenueCard extends StatelessWidget {
 
               Text(
                 '1M',
-                style: AppTextStyles.labelMedium.copyWith(
-                  color: AppColors.textSecondary,
+                style:
+                AppTextStyles.labelMedium.copyWith(
+                  color:
+                  AppColors.textSecondary,
                 ),
               ),
 
@@ -388,8 +462,10 @@ class _RevenueCard extends StatelessWidget {
 
               Text(
                 '3M',
-                style: AppTextStyles.labelMedium.copyWith(
-                  color: AppColors.textSecondary,
+                style:
+                AppTextStyles.labelMedium.copyWith(
+                  color:
+                  AppColors.textSecondary,
                 ),
               ),
 
@@ -398,20 +474,31 @@ class _RevenueCard extends StatelessWidget {
               ),
 
               Container(
-                padding: const EdgeInsets.symmetric(
+                padding:
+                const EdgeInsets.symmetric(
                   horizontal: 8,
                   vertical: 5,
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(8),
+                decoration:
+                BoxDecoration(
+                  color:
+                  AppColors.primary,
+                  borderRadius:
+                  BorderRadius.circular(
+                    8,
+                  ),
                 ),
-                child: const Text(
+                child:
+                const Text(
                   '1Y',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                  style:
+                  TextStyle(
+                    color:
+                    Colors.black,
+                    fontSize:
+                    10,
+                    fontWeight:
+                    FontWeight.bold,
                   ),
                 ),
               ),
@@ -425,26 +512,39 @@ class _RevenueCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment:
               CrossAxisAlignment.end,
-              children: List.generate(
+              children:
+              List.generate(
                 values.length,
                     (index) {
                   return Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
+                      padding:
+                      const EdgeInsets.symmetric(
                         horizontal: 2,
                       ),
-                      child: FractionallySizedBox(
-                        heightFactor: values[index],
+                      child:
+                      FractionallySizedBox(
+                        heightFactor:
+                        values[index],
                         alignment:
                         Alignment.bottomCenter,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: index >= 9
-                                ? AppColors.primary
-                                : AppColors.border,
+                        child:
+                        Container(
+                          decoration:
+                          BoxDecoration(
+                            color:
+                            index >= 9
+                                ? AppColors
+                                .primary
+                                : AppColors
+                                .border,
                             borderRadius:
-                            const BorderRadius.vertical(
-                              top: Radius.circular(4),
+                            const BorderRadius
+                                .vertical(
+                              top:
+                              Radius.circular(
+                                4,
+                              ),
                             ),
                           ),
                         ),
@@ -461,17 +561,21 @@ class _RevenueCard extends StatelessWidget {
           ),
 
           Row(
-            children: List.generate(
+            children:
+            List.generate(
               months.length,
                   (index) {
                 return Expanded(
                   child: Text(
                     months[index],
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    textAlign:
+                    TextAlign.center,
+                    style:
+                    const TextStyle(
                       fontSize: 7,
                       color:
-                      AppColors.textSecondary,
+                      AppColors
+                          .textSecondary,
                     ),
                   ),
                 );
@@ -488,31 +592,34 @@ class _RevenueCard extends StatelessWidget {
 // MANAGEMENT GRID
 // ------------------------------------------------------------
 
-class _ManagementGrid extends StatelessWidget {
+class _ManagementGrid
+    extends StatelessWidget {
   const _ManagementGrid();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return GridView.count(
       crossAxisCount: 2,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
       childAspectRatio: 1.6,
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      physics:
+      const NeverScrollableScrollPhysics(),
       children: [
         _ManagementCard(
-          icon: Icons.groups_rounded,
-          title: 'Members',
-          subtitle: '1,284 total',
+          icon:
+          Icons.groups_rounded,
+          title:
+          'Members',
+          subtitle:
+          'Manage gym members',
           onTap: () {
-            // TODO: Connect when Member Management is implemented.
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Member Management will be connected next.',
-                ),
-              ),
+            context.push(
+              AppRoutes
+                  .memberManagement,
             );
           },
         ),
@@ -520,37 +627,40 @@ class _ManagementGrid extends StatelessWidget {
         _ManagementCard(
           icon: Icons.directions_run_rounded,
           title: 'Trainers',
-          subtitle: '24 active',
+          subtitle: 'Manage trainers',
           onTap: () {
-            // TODO: Connect when Trainer Management is implemented.
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Trainer Management will be connected next.',
-                ),
-              ),
+            context.push(
+              AppRoutes.ownerTrainerManagement,
             );
           },
         ),
 
         _ManagementCard(
-          icon: Icons.fitness_center_rounded,
-          title: 'Gym Management',
-          subtitle: 'Gym profile & details',
+          icon:
+          Icons.fitness_center_rounded,
+          title:
+          'Gym Management',
+          subtitle:
+          'Gym profile & details',
           onTap: () {
             context.push(
-              AppRoutes.ownerGymManagement,
+              AppRoutes
+                  .ownerGymManagement,
             );
           },
         ),
 
         _ManagementCard(
-          icon: Icons.card_membership_rounded,
-          title: 'Membership Plans',
-          subtitle: 'Plans & pricing',
+          icon:
+          Icons.card_membership_rounded,
+          title:
+          'Membership Plans',
+          subtitle:
+          'Plans & pricing',
           onTap: () {
             context.push(
-              AppRoutes.ownerMembershipPlans,
+              AppRoutes
+                  .ownerMembershipPlans,
             );
           },
         ),
@@ -563,7 +673,8 @@ class _ManagementGrid extends StatelessWidget {
 // MANAGEMENT CARD
 // ------------------------------------------------------------
 
-class _ManagementCard extends StatelessWidget {
+class _ManagementCard
+    extends StatelessWidget {
   const _ManagementCard({
     required this.icon,
     required this.title,
@@ -577,20 +688,32 @@ class _ManagementCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Material(
-      color: Colors.transparent,
-      borderRadius: AppRadius.radiusLG,
+      color:
+      Colors.transparent,
+      borderRadius:
+      AppRadius.radiusLG,
       child: InkWell(
-        onTap: onTap,
-        borderRadius: AppRadius.radiusLG,
+        onTap:
+        onTap,
+        borderRadius:
+        AppRadius.radiusLG,
         child: Ink(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: AppRadius.radiusLG,
-            border: Border.all(
-              color: AppColors.border,
+          padding:
+          const EdgeInsets.all(20),
+          decoration:
+          BoxDecoration(
+            color:
+            AppColors.surface,
+            borderRadius:
+            AppRadius.radiusLG,
+            border:
+            Border.all(
+              color:
+              AppColors.border,
               width: 0.5,
             ),
           ),
@@ -599,7 +722,8 @@ class _ManagementCard extends StatelessWidget {
               Icon(
                 icon,
                 size: 22,
-                color: AppColors.primary,
+                color:
+                AppColors.primary,
               ),
 
               const SizedBox(
@@ -666,11 +790,14 @@ class _ManagementCard extends StatelessWidget {
 // RECENT ACTIVITY
 // ------------------------------------------------------------
 
-class _RecentActivityList extends StatelessWidget {
+class _RecentActivityList
+    extends StatelessWidget {
   const _RecentActivityList();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Column(
       children: const [
         _ActivityItem(
@@ -678,7 +805,8 @@ class _RecentActivityList extends StatelessWidget {
           Icons.person_add_alt_1_rounded,
           title:
           'New member joined: Maria Santos',
-          time: '2 min ago',
+          time:
+          '2 min ago',
         ),
 
         SizedBox(
@@ -690,7 +818,8 @@ class _RecentActivityList extends StatelessWidget {
           Icons.calendar_month_rounded,
           title:
           'Trainer Mike added session',
-          time: '15 min ago',
+          time:
+          '15 min ago',
         ),
 
         SizedBox(
@@ -702,7 +831,8 @@ class _RecentActivityList extends StatelessWidget {
           Icons.credit_card_rounded,
           title:
           'Payment received ₹2,800',
-          time: '1 hr ago',
+          time:
+          '1 hr ago',
         ),
 
         SizedBox(
@@ -714,14 +844,16 @@ class _RecentActivityList extends StatelessWidget {
           Icons.warning_amber_rounded,
           title:
           'Membership expired: 3 users',
-          time: '3 hr ago',
+          time:
+          '3 hr ago',
         ),
       ],
     );
   }
 }
 
-class _ActivityItem extends StatelessWidget {
+class _ActivityItem
+    extends StatelessWidget {
   const _ActivityItem({
     required this.icon,
     required this.title,
@@ -733,17 +865,25 @@ class _ActivityItem extends StatelessWidget {
   final String time;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Container(
-      padding: const EdgeInsets.symmetric(
+      padding:
+      const EdgeInsets.symmetric(
         horizontal: 12,
         vertical: 11,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: AppRadius.radiusMD,
-        border: Border.all(
-          color: AppColors.border,
+      decoration:
+      BoxDecoration(
+        color:
+        AppColors.surface,
+        borderRadius:
+        AppRadius.radiusMD,
+        border:
+        Border.all(
+          color:
+          AppColors.border,
           width: 0.5,
         ),
       ),
@@ -752,7 +892,8 @@ class _ActivityItem extends StatelessWidget {
           Icon(
             icon,
             size: 17,
-            color: AppColors.primary,
+            color:
+            AppColors.primary,
           ),
 
           const SizedBox(
@@ -796,7 +937,8 @@ class _ActivityItem extends StatelessWidget {
 // SECTION TITLE
 // ------------------------------------------------------------
 
-class _SectionTitle extends StatelessWidget {
+class _SectionTitle
+    extends StatelessWidget {
   const _SectionTitle({
     required this.title,
   });
@@ -804,13 +946,19 @@ class _SectionTitle extends StatelessWidget {
   final String title;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Text(
       title,
-      style: AppTextStyles.labelMedium.copyWith(
-        color: AppColors.textSecondary,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.8,
+      style:
+      AppTextStyles.labelMedium.copyWith(
+        color:
+        AppColors.textSecondary,
+        fontWeight:
+        FontWeight.w600,
+        letterSpacing:
+        0.8,
       ),
     );
   }

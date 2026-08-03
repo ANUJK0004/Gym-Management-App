@@ -21,5 +21,9 @@ class AppRoutes {
   static const String editProfile = '/profile/edit';
   static const String ownerGymManagement = '/owner/gym-management';
   static const String ownerMembershipPlans = '/owner-membership-plans';
+  static const String memberManagement = '/owner/members';
+  static const String memberDetails = '/owner/members/details';
+  static const String ownerTrainerManagement = '/owner/trainers';
+  static const String trainerDetails = '/owner/trainers/details';
 
 }

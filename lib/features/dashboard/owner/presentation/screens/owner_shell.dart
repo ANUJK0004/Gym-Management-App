@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../app/theme/app_colors.dart';
-  import '../widgets/owner_bottom_nav.dart';
+import '../../../../member_management/presentation/screens/member_management_screen.dart';
+import '../widgets/owner_bottom_nav.dart';
 import 'owner_home_screen.dart';
 
 class OwnerShell extends StatefulWidget {
@@ -18,21 +19,26 @@ class _OwnerShellState
     extends State<OwnerShell> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    OwnerHomeScreen(),
+  late final List<Widget> _screens;
 
-    _OwnerPlaceholderScreen(
-      title: 'Members',
-    ),
+  @override
+  void initState() {
+    super.initState();
 
-    _OwnerPlaceholderScreen(
-      title: 'Finance',
-    ),
+    _screens = const [
+      OwnerHomeScreen(),
 
-    _OwnerPlaceholderScreen(
-      title: 'Settings',
-    ),
-  ];
+      MemberManagementScreen(),
+
+      _OwnerPlaceholderScreen(
+        title: 'Finance',
+      ),
+
+      _OwnerPlaceholderScreen(
+        title: 'Settings',
+      ),
+    ];
+  }
 
   @override
   Widget build(
