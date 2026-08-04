@@ -1,93 +1,228 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../app/routes/app_routes.dart';
 import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
 import '../../../../../app/theme/app_text_styles.dart';
+import '../../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../gym/presentation/providers/gym_provider.dart';
+import '../providers/owner_dashboard_provider.dart';
 
-class OwnerHomeScreen extends StatelessWidget {
+class OwnerHomeScreen extends ConsumerWidget {
   const OwnerHomeScreen({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      WidgetRef ref,
+      ) {
+    final statsAsync =
+    ref.watch(
+      ownerDashboardStatsProvider,
+    );
+
+    final gymAsync =
+    ref.watch(
+      ownerGymProvider,
+    );
+
+    final user =
+        ref.watch(
+          firebaseAuthProvider,
+        ).currentUser;
+
+    final displayName =
+    user?.displayName?.trim();
+
+    final ownerName =
+    displayName != null &&
+        displayName.isNotEmpty
+        ? displayName
+        : 'Owner';
+
+    final initials =
+    _getInitials(
+      ownerName,
+    );
+
     return SafeArea(
       child: Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(
-                14,
-                18,
-                14,
-                24,
-              ),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    const _OwnerHeader(),
+        backgroundColor:
+        AppColors.background,
 
-                    const SizedBox(
-                      height: 22,
-                    ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(
+              ownerDashboardStatsProvider,
+            );
 
-                    const _StatsGrid(),
+            ref.invalidate(
+              ownerGymProvider,
+            );
 
-                    const SizedBox(
-                      height: 22,
-                    ),
+            await ref.read(
+              ownerDashboardStatsProvider
+                  .future,
+            );
+          },
 
-                    const _RevenueCard(),
+          child: CustomScrollView(
+            physics:
+            const AlwaysScrollableScrollPhysics(),
 
-                    const SizedBox(
-                      height: 22,
-                    ),
+            slivers: [
+              SliverPadding(
+                padding:
+                const EdgeInsets.fromLTRB(
+                  14,
+                  18,
+                  14,
+                  24,
+                ),
 
-                    const _SectionTitle(
-                      title: 'MANAGE',
-                    ),
+                sliver:
+                SliverList(
+                  delegate:
+                  SliverChildListDelegate(
+                    [
+                      _OwnerHeader(
+                        ownerName:
+                        ownerName,
+                        initials:
+                        initials,
+                        gymAsync:
+                        gymAsync,
+                      ),
 
-                    const SizedBox(
-                      height: 10,
-                    ),
+                      const SizedBox(
+                        height: 22,
+                      ),
 
-                    const _ManagementGrid(),
+                      _StatsGrid(
+                        statsAsync:
+                        statsAsync,
+                      ),
 
-                    const SizedBox(
-                      height: 22,
-                    ),
+                      const SizedBox(
+                        height: 22,
+                      ),
 
-                    const _SectionTitle(
-                      title: 'RECENT ACTIVITY',
-                    ),
+                      const _RevenueCard(),
 
-                    const SizedBox(
-                      height: 10,
-                    ),
+                      const SizedBox(
+                        height: 22,
+                      ),
 
-                    const _RecentActivityList(),
-                  ],
+                      const _SectionTitle(
+                        title:
+                        'MANAGE',
+                      ),
+
+                      const SizedBox(
+                        height: 10,
+                      ),
+
+                      const _ManagementGrid(),
+
+                      const SizedBox(
+                        height: 22,
+                      ),
+
+                      const _SectionTitle(
+                        title:
+                        'RECENT ACTIVITY',
+                      ),
+
+                      const SizedBox(
+                        height: 10,
+                      ),
+
+                      const _RecentActivityList(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
+  String _getInitials(
+      String name,
+      ) {
+    final parts =
+    name
+        .split(' ')
+        .where(
+          (part) =>
+      part.isNotEmpty,
+    )
+        .toList();
+
+    if (parts.isEmpty) {
+      return 'O';
+    }
+
+    if (parts.length == 1) {
+      return parts.first
+          .substring(
+        0,
+        1,
+      )
+          .toUpperCase();
+    }
+
+    return (
+        parts.first.substring(
+          0,
+          1,
+        ) +
+            parts.last.substring(
+              0,
+              1,
+            )
+    ).toUpperCase();
+  }
+}
 // ------------------------------------------------------------
 // HEADER
 // ------------------------------------------------------------
 
-class _OwnerHeader extends StatelessWidget {
-  const _OwnerHeader();
+class _OwnerHeader
+    extends StatelessWidget {
+  const _OwnerHeader({
+    required this.ownerName,
+    required this.initials,
+    required this.gymAsync,
+  });
+
+  final String ownerName;
+  final String initials;
+  final AsyncValue gymAsync;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
+    final gymName =
+    gymAsync.when(
+      data: (gym) =>
+      gym?.name ??
+          'GymSync HQ',
+
+      loading: () =>
+      'Loading gym...',
+
+      error: (_, _) =>
+      'GymSync HQ',
+    );
+
     return Row(
       children: [
         Expanded(
@@ -98,10 +233,14 @@ class _OwnerHeader extends StatelessWidget {
               Text(
                 'ADMIN CONSOLE',
                 style:
-                AppTextStyles.labelMedium.copyWith(
+                AppTextStyles
+                    .labelMedium
+                    .copyWith(
                   color:
-                  AppColors.textSecondary,
-                  letterSpacing: 0.8,
+                  AppColors
+                      .textSecondary,
+                  letterSpacing:
+                  0.8,
                   fontWeight:
                   FontWeight.w600,
                 ),
@@ -112,11 +251,35 @@ class _OwnerHeader extends StatelessWidget {
               ),
 
               Text(
-                'GymSync HQ',
+                gymName,
+                maxLines: 1,
+                overflow:
+                TextOverflow.ellipsis,
                 style:
-                AppTextStyles.headlineMedium.copyWith(
+                AppTextStyles
+                    .headlineMedium
+                    .copyWith(
                   fontWeight:
                   FontWeight.w800,
+                ),
+              ),
+
+              const SizedBox(
+                height: 2,
+              ),
+
+              Text(
+                'Welcome, $ownerName',
+                maxLines: 1,
+                overflow:
+                TextOverflow.ellipsis,
+                style:
+                AppTextStyles
+                    .labelMedium
+                    .copyWith(
+                  color:
+                  AppColors
+                      .textSecondary,
                 ),
               ),
             ],
@@ -125,7 +288,8 @@ class _OwnerHeader extends StatelessWidget {
 
         _HeaderIconButton(
           icon:
-          Icons.notifications_none_rounded,
+          Icons
+              .notifications_none_rounded,
         ),
 
         const SizedBox(
@@ -145,9 +309,11 @@ class _OwnerHeader extends StatelessWidget {
           alignment:
           Alignment.center,
           child: Text(
-            'AD',
+            initials,
             style:
-            AppTextStyles.titleMedium.copyWith(
+            AppTextStyles
+                .titleMedium
+                .copyWith(
               color:
               Colors.black,
               fontWeight:
@@ -204,66 +370,134 @@ class _HeaderIconButton
 
 class _StatsGrid
     extends StatelessWidget {
-  const _StatsGrid();
+  const _StatsGrid({
+    required this.statsAsync,
+  });
+
+  final AsyncValue statsAsync;
 
   @override
   Widget build(
       BuildContext context,
       ) {
-    return GridView.count(
-      crossAxisCount: 2,
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
-      childAspectRatio: 1.65,
-      shrinkWrap: true,
-      physics:
-      const NeverScrollableScrollPhysics(),
-      children: const [
-        _StatCard(
-          icon:
-          Icons.groups_rounded,
-          value:
-          '1,284',
-          label:
-          'Total Members',
-          change:
-          '↑ +48',
-        ),
+    return statsAsync.when(
+      loading: () {
+        return const SizedBox(
+          height: 180,
+          child: Center(
+            child:
+            CircularProgressIndicator(),
+          ),
+        );
+      },
 
-        _StatCard(
-          icon:
-          Icons.monetization_on_rounded,
-          value:
-          '₹143,500',
-          label:
-          'Monthly Revenue',
-          change:
-          '↑ +12.4%',
-        ),
+      error: (
+          error,
+          stackTrace,
+          ) {
+        return Container(
+          padding:
+          const EdgeInsets.all(16),
+          decoration:
+          BoxDecoration(
+            color:
+            AppColors.surface,
+            borderRadius:
+            AppRadius.radiusLG,
+            border:
+            Border.all(
+              color:
+              AppColors.border,
+              width: 0.5,
+            ),
+          ),
+          child: Text(
+            'Unable to load dashboard statistics.',
+            style:
+            AppTextStyles.bodyMedium,
+          ),
+        );
+      },
 
-        _StatCard(
-          icon:
-          Icons.directions_run_rounded,
-          value:
-          '24',
-          label:
-          'Active Trainers',
-          change:
-          '↑ +3',
-        ),
+      data: (stats) {
+        return GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 1.65,
+          shrinkWrap: true,
+          physics:
+          const NeverScrollableScrollPhysics(),
 
-        _StatCard(
-          icon:
-          Icons.star_rounded,
-          value:
-          '156',
-          label:
-          'New This Month',
-          change:
-          '↑ +22%',
-        ),
-      ],
+          children: [
+            _StatCard(
+              icon:
+              Icons.groups_rounded,
+              value:
+              _formatNumber(
+                stats.totalMembers,
+              ),
+              label:
+              'Total Members',
+              change:
+              'Live',
+            ),
+
+            _StatCard(
+              icon:
+              Icons
+                  .monetization_on_rounded,
+              value:
+              '₹0',
+              label:
+              'Monthly Revenue',
+              change:
+              '—',
+            ),
+
+            _StatCard(
+              icon:
+              Icons
+                  .directions_run_rounded,
+              value:
+              stats.activeTrainers
+                  .toString(),
+              label:
+              'Active Trainers',
+              change:
+              'Live',
+            ),
+
+            _StatCard(
+              icon:
+              Icons.star_rounded,
+              value:
+              stats
+                  .newMembersThisMonth
+                  .toString(),
+              label:
+              'New This Month',
+              change:
+              'Live',
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  String _formatNumber(
+      int value,
+      ) {
+    if (value >= 1000000) {
+      return '${(value / 1000000).toStringAsFixed(1)}M';
+    }
+
+    if (value >= 1000) {
+      return '${(value / 1000).toStringAsFixed(1)}K';
+    }
+
+    return value.toString();
   }
 }
 
