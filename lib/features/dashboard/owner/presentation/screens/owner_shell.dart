@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../app/theme/app_colors.dart';
 import '../../../../finance/presentation/screens/finance_screen.dart';
 import '../../../../member_management/presentation/screens/member_management_screen.dart';
+import '../../../../owner_settings/presentation/screens/owner_settings_screen.dart';
 import '../widgets/owner_bottom_nav.dart';
 import 'owner_home_screen.dart';
 
@@ -33,9 +34,7 @@ class _OwnerShellState
 
       FinanceScreen(),
 
-      _OwnerPlaceholderScreen(
-        title: 'Settings',
-      ),
+      OwnerSettingsScreen(),
     ];
   }
 
