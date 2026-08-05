@@ -7,10 +7,13 @@ import 'package:sweatsync/app/theme/app_colors.dart';
 import 'package:sweatsync/app/theme/app_text_styles.dart';
 
 import '../providers/owner_settings_provider.dart';
+import '../widgets/admin_account_tile.dart';
+import '../widgets/logout_button.dart';
 import '../widgets/membership_plan_settings_card.dart';
 import '../widgets/owner_business_header.dart';
 import '../widgets/owner_settings_section.dart';
 import '../widgets/owner_settings_tile.dart';
+import '../widgets/system_setting_switch_tile.dart';
 
 class OwnerSettingsScreen extends ConsumerWidget {
   const OwnerSettingsScreen({super.key});
@@ -125,8 +128,166 @@ class OwnerSettingsScreen extends ConsumerWidget {
                               context.push(AppRoutes.ownerMembershipPlans);
                             },
                           ),
+
+                          MembershipPlanSettingsCard(
+                            planName: "Add New Plan",
+                            price: "",
+                            isAddNew: true,
+                            onTap: () {},
+                          ),
                         ],
                       ),
+
+                      const SizedBox(height:22),
+
+                      OwnerSettingsSection(
+
+                        title:"SYSTEM SETTINGS",
+
+                        children:[
+
+                          SystemSettingSwitchTile(
+
+                            icon: Icons.notifications,
+
+                            title:"Push Notifications",
+
+                            subtitle:"Alerts for new members & payments",
+
+                            value:true,
+
+                            onChanged:(v){},
+
+                          ),
+
+                          SystemSettingSwitchTile(
+
+                            icon: Icons.autorenew,
+
+                            title:"Auto-Renew",
+
+                            subtitle:"Auto-renew expiring memberships",
+
+                            value:true,
+
+                            onChanged:(v){},
+
+                          ),
+
+                          SystemSettingSwitchTile(
+
+                            icon: Icons.dark_mode,
+
+                            title:"Dark Mode",
+
+                            subtitle:"App-wide dark theme",
+
+                            value:true,
+
+                            onChanged:(v){},
+
+                          ),
+
+                          SystemSettingSwitchTile(
+
+                            icon: Icons.build,
+
+                            title:"Maintenance Mode",
+
+                            subtitle:"Restrict member access temporarily",
+
+                            value:false,
+
+                            onChanged:(v){},
+
+                            showDivider:false,
+
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height:22),
+
+                      OwnerSettingsSection(
+
+                        title:"ADMIN ACCOUNT",
+
+                        children:[
+
+                          AdminAccountTile(
+
+                            icon: Icons.lock,
+
+                            title:"Change Password",
+
+                            onTap:(){},
+
+                          ),
+
+                          AdminAccountTile(
+
+                            icon: Icons.groups,
+
+                            title:"Manage Admin Accounts",
+
+                            onTap:(){},
+
+                          ),
+
+                          AdminAccountTile(
+
+                            icon: Icons.receipt_long,
+
+                            title:"Audit Log",
+
+                            onTap:(){},
+
+                          ),
+
+                          AdminAccountTile(
+
+                            icon: Icons.backup,
+
+                            title:"Backup Data",
+
+                            showDivider:false,
+
+                            onTap:(){},
+
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height:26),
+
+                      LogoutButton(
+
+                        onPressed: (){
+
+                          // Sign out later
+
+                        },
+
+                      ),
+
+                      const SizedBox(height:18),
+
+                      Center(
+
+                        child: Text(
+
+                          "GymSync Admin Console v2.1.0",
+
+                          style: AppTextStyles.labelMedium.copyWith(
+
+                            color: AppColors.textSecondary,
+
+                          ),
+
+                        ),
+
+                      ),
+
                     ]),
                   ),
                 ),

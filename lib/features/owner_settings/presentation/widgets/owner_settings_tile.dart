@@ -12,6 +12,7 @@ class OwnerSettingsTile
     this.value,
     this.onTap,
     this.showDivider = true,
+    this.trailing,
   });
 
   final IconData icon;
@@ -19,6 +20,7 @@ class OwnerSettingsTile
   final String? value;
   final VoidCallback? onTap;
   final bool showDivider;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +55,11 @@ class OwnerSettingsTile
                   ),
                 ),
 
-                if (value != null)
+                if(trailing!=null)
+
+                  trailing!
+
+                else if (value != null)
                   Text(
                     value!,
                     style: AppTextStyles

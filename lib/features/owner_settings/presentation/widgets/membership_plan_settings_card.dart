@@ -3,71 +3,52 @@ import 'package:flutter/material.dart';
 import 'package:sweatsync/app/theme/app_colors.dart';
 import 'package:sweatsync/app/theme/app_text_styles.dart';
 
-class MembershipPlanSettingsCard
-    extends StatelessWidget {
+class MembershipPlanSettingsCard extends StatelessWidget {
   const MembershipPlanSettingsCard({
     super.key,
     required this.planName,
     required this.price,
     required this.onTap,
+    this.isAddNew = false,
   });
 
   final String planName;
   final String price;
   final VoidCallback onTap;
+  final bool isAddNew;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding:
-        const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 15,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
         child: Row(
           children: [
-            const Icon(
-              Icons.workspace_premium_rounded,
-              size: 20,
-              color: Colors.amber,
+            Icon(
+              isAddNew ? Icons.add_rounded : Icons.workspace_premium_rounded,
+              color: isAddNew ? Colors.deepPurpleAccent : Colors.amber,
             ),
 
-            const SizedBox(
-              width: 14,
-            ),
+            const SizedBox(width: 14),
 
-            Expanded(
-              child: Text(
-                planName,
-                style:
-                AppTextStyles.bodyMedium,
+            Expanded(child: Text(planName, style: AppTextStyles.bodyMedium)),
+
+            if (!isAddNew)
+              Text(
+                price,
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
 
-            Text(
-              price,
-              style: AppTextStyles
-                  .labelMedium
-                  .copyWith(
-                color:
-                AppColors.primary,
-                fontWeight:
-                FontWeight.w700,
-              ),
-            ),
-
-            const SizedBox(
-              width: 8,
-            ),
+            const SizedBox(width: 8),
 
             const Icon(
-              Icons
-                  .chevron_right_rounded,
+              Icons.chevron_right_rounded,
               size: 20,
-              color:
-              AppColors.textSecondary,
+              color: AppColors.textSecondary,
             ),
           ],
         ),

@@ -65,31 +65,3 @@ class _OwnerShellState
     );
   }
 }
-
-class _OwnerPlaceholderScreen
-    extends StatelessWidget {
-  const _OwnerPlaceholderScreen({
-    required this.title,
-  });
-
-  final String title;
-
-  @override
-  Widget build(
-      BuildContext context,
-      ) {
-    return SafeArea(
-      child: Center(
-        child: Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight:
-            FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-}
