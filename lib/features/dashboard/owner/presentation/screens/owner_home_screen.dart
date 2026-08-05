@@ -6,8 +6,8 @@ import '../../../../../app/routes/app_routes.dart';
 import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
 import '../../../../../app/theme/app_text_styles.dart';
-import '../../../../auth/presentation/providers/auth_provider.dart';
-import '../../../../gym/presentation/providers/gym_provider.dart';
+
+import '../../domain/entities/owner_dashboard_data.dart';
 import '../providers/owner_dashboard_provider.dart';
 
 class OwnerHomeScreen extends ConsumerWidget {
@@ -20,209 +20,215 @@ class OwnerHomeScreen extends ConsumerWidget {
       BuildContext context,
       WidgetRef ref,
       ) {
-    final statsAsync =
-    ref.watch(
-      ownerDashboardStatsProvider,
-    );
-
-    final gymAsync =
-    ref.watch(
-      ownerGymProvider,
-    );
-
-    final user =
-        ref.watch(
-          firebaseAuthProvider,
-        ).currentUser;
-
-    final displayName =
-    user?.displayName?.trim();
-
-    final ownerName =
-    displayName != null &&
-        displayName.isNotEmpty
-        ? displayName
-        : 'Owner';
-
-    final initials =
-    _getInitials(
-      ownerName,
+    final dashboardAsync = ref.watch(
+      ownerDashboardProvider,
     );
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor:
-        AppColors.background,
+        backgroundColor: AppColors.background,
 
         body: RefreshIndicator(
           onRefresh: () async {
             ref.invalidate(
-              ownerDashboardStatsProvider,
-            );
-
-            ref.invalidate(
-              ownerGymProvider,
+              ownerDashboardProvider,
             );
 
             await ref.read(
-              ownerDashboardStatsProvider
-                  .future,
+              ownerDashboardProvider.future,
             );
           },
 
-          child: CustomScrollView(
-            physics:
-            const AlwaysScrollableScrollPhysics(),
+          child: dashboardAsync.when(
+            loading: () {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
 
-            slivers: [
-              SliverPadding(
-                padding:
-                const EdgeInsets.fromLTRB(
-                  14,
-                  18,
-                  14,
-                  24,
-                ),
+            error: (error, stackTrace) {
+              return ListView(
+                physics:
+                const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height:
+                    MediaQuery.of(context).size.height *
+                        0.7,
+                    child: Center(
+                      child: Padding(
+                        padding:
+                        const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisAlignment:
+                          MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              size: 60,
+                              color: Colors.redAccent,
+                            ),
 
-                sliver:
-                SliverList(
-                  delegate:
-                  SliverChildListDelegate(
-                    [
-                      _OwnerHeader(
-                        ownerName:
-                        ownerName,
-                        initials:
-                        initials,
-                        gymAsync:
-                        gymAsync,
+                            const SizedBox(height: 16),
+
+                            Text(
+                              'Unable to load dashboard',
+                              style: AppTextStyles
+                                  .titleLarge
+                                  .copyWith(
+                                fontWeight:
+                                FontWeight.w700,
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            Text(
+                              error.toString(),
+                              textAlign:
+                              TextAlign.center,
+                              style: AppTextStyles
+                                  .bodyMedium,
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            FilledButton.icon(
+                              onPressed: () {
+                                ref.invalidate(
+                                  ownerDashboardProvider,
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.refresh,
+                              ),
+                              label: const Text(
+                                'Retry',
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-
-                      const SizedBox(
-                        height: 22,
-                      ),
-
-                      _StatsGrid(
-                        statsAsync:
-                        statsAsync,
-                      ),
-
-                      const SizedBox(
-                        height: 22,
-                      ),
-
-                      const _RevenueCard(),
-
-                      const SizedBox(
-                        height: 22,
-                      ),
-
-                      const _SectionTitle(
-                        title:
-                        'MANAGE',
-                      ),
-
-                      const SizedBox(
-                        height: 10,
-                      ),
-
-                      const _ManagementGrid(),
-
-                      const SizedBox(
-                        height: 22,
-                      ),
-
-                      const _SectionTitle(
-                        title:
-                        'RECENT ACTIVITY',
-                      ),
-
-                      const SizedBox(
-                        height: 10,
-                      ),
-
-                      const _RecentActivityList(),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ],
+                ],
+              );
+            },
+
+            data: (dashboard) {
+              return CustomScrollView(
+                physics:
+                const AlwaysScrollableScrollPhysics(),
+
+                slivers: [
+                  SliverPadding(
+                    padding:
+                    const EdgeInsets.fromLTRB(
+                      14,
+                      18,
+                      14,
+                      24,
+                    ),
+
+                    sliver: SliverList(
+                      delegate:
+                      SliverChildListDelegate(
+                        [
+                          _OwnerHeader(
+                            dashboard: dashboard,
+                          ),
+
+                          const SizedBox(
+                            height: 22,
+                          ),
+
+                          _StatsGrid(
+                            dashboard: dashboard,
+                          ),
+
+                          const SizedBox(
+                            height: 22,
+                          ),
+
+                          _RevenueCard(
+                            dashboard: dashboard,
+                          ),
+
+                          const SizedBox(
+                            height: 22,
+                          ),
+
+                          const _SectionTitle(
+                            title: 'MANAGE',
+                          ),
+
+                          const SizedBox(
+                            height: 10,
+                          ),
+
+                          const _ManagementGrid(),
+
+                          const SizedBox(
+                            height: 22,
+                          ),
+
+                          const _SectionTitle(
+                            title:
+                            'RECENT ACTIVITY',
+                          ),
+
+                          const SizedBox(
+                            height: 10,
+                          ),
+
+                          const _RecentActivityList(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
     );
   }
+}
 
-  String _getInitials(
-      String name,
-      ) {
-    final parts =
-    name
-        .split(' ')
-        .where(
-          (part) =>
-      part.isNotEmpty,
-    )
-        .toList();
+String getInitials(String name) {
+  final parts = name
+      .trim()
+      .split(' ')
+      .where(
+        (e) => e.isNotEmpty,
+  )
+      .toList();
 
-    if (parts.isEmpty) {
-      return 'O';
-    }
-
-    if (parts.length == 1) {
-      return parts.first
-          .substring(
-        0,
-        1,
-      )
-          .toUpperCase();
-    }
-
-    return (
-        parts.first.substring(
-          0,
-          1,
-        ) +
-            parts.last.substring(
-              0,
-              1,
-            )
-    ).toUpperCase();
+  if (parts.isEmpty) {
+    return 'O';
   }
+
+  if (parts.length == 1) {
+    return parts.first[0].toUpperCase();
+  }
+
+  return '${parts.first[0]}${parts.last[0]}'
+      .toUpperCase();
 }
 // ------------------------------------------------------------
 // HEADER
 // ------------------------------------------------------------
 
-class _OwnerHeader
-    extends StatelessWidget {
+class _OwnerHeader extends StatelessWidget {
   const _OwnerHeader({
-    required this.ownerName,
-    required this.initials,
-    required this.gymAsync,
+    required this.dashboard,
   });
 
-  final String ownerName;
-  final String initials;
-  final AsyncValue gymAsync;
+  final OwnerDashboardData dashboard;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
-    final gymName =
-    gymAsync.when(
-      data: (gym) =>
-      gym?.name ??
-          'GymSync HQ',
-
-      loading: () =>
-      'Loading gym...',
-
-      error: (_, _) =>
-      'GymSync HQ',
-    );
-
+  Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
@@ -232,15 +238,12 @@ class _OwnerHeader
             children: [
               Text(
                 'ADMIN CONSOLE',
-                style:
-                AppTextStyles
+                style: AppTextStyles
                     .labelMedium
                     .copyWith(
                   color:
-                  AppColors
-                      .textSecondary,
-                  letterSpacing:
-                  0.8,
+                  AppColors.textSecondary,
+                  letterSpacing: 0.8,
                   fontWeight:
                   FontWeight.w600,
                 ),
@@ -251,12 +254,11 @@ class _OwnerHeader
               ),
 
               Text(
-                gymName,
+                dashboard.gymName,
                 maxLines: 1,
                 overflow:
                 TextOverflow.ellipsis,
-                style:
-                AppTextStyles
+                style: AppTextStyles
                     .headlineMedium
                     .copyWith(
                   fontWeight:
@@ -269,58 +271,63 @@ class _OwnerHeader
               ),
 
               Text(
-                'Welcome, $ownerName',
+                'Welcome, ${dashboard.ownerName}',
                 maxLines: 1,
                 overflow:
                 TextOverflow.ellipsis,
-                style:
-                AppTextStyles
+                style: AppTextStyles
                     .labelMedium
                     .copyWith(
                   color:
-                  AppColors
-                      .textSecondary,
+                  AppColors.textSecondary,
                 ),
               ),
             ],
           ),
         ),
 
-        _HeaderIconButton(
+        const _HeaderIconButton(
           icon:
-          Icons
-              .notifications_none_rounded,
+          Icons.notifications_none_rounded,
         ),
 
-        const SizedBox(
-          width: 10,
-        ),
+        const SizedBox(width: 10),
 
-        Container(
-          width: 42,
-          height: 42,
-          decoration:
-          const BoxDecoration(
-            color:
-            AppColors.primary,
-            shape:
-            BoxShape.circle,
-          ),
-          alignment:
-          Alignment.center,
-          child: Text(
-            initials,
-            style:
-            AppTextStyles
-                .titleMedium
-                .copyWith(
+        if (dashboard.ownerPhotoUrl != null &&
+            dashboard.ownerPhotoUrl!
+                .isNotEmpty)
+          CircleAvatar(
+            radius: 21,
+            backgroundImage:
+            NetworkImage(
+              dashboard.ownerPhotoUrl!,
+            ),
+          )
+        else
+          Container(
+            width: 42,
+            height: 42,
+            decoration:
+            const BoxDecoration(
               color:
-              Colors.black,
-              fontWeight:
-              FontWeight.w800,
+              AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+            alignment:
+            Alignment.center,
+            child: Text(
+              getInitials(
+                dashboard.ownerName,
+              ),
+              style: AppTextStyles
+                  .titleMedium
+                  .copyWith(
+                color: Colors.black,
+                fontWeight:
+                FontWeight.w800,
+              ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -335,30 +342,22 @@ class _HeaderIconButton
   final IconData icon;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Container(
       width: 42,
       height: 42,
-      decoration:
-      BoxDecoration(
-        color:
-        AppColors.surface,
-        shape:
-        BoxShape.circle,
-        border:
-        Border.all(
-          color:
-          AppColors.border,
-          width: 0.5,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: AppColors.border,
+          width: .5,
         ),
       ),
       child: Icon(
         icon,
         size: 20,
-        color:
-        AppColors.textPrimary,
+        color: AppColors.textPrimary,
       ),
     );
   }
@@ -368,127 +367,59 @@ class _HeaderIconButton
 // STATS
 // ------------------------------------------------------------
 
-class _StatsGrid
-    extends StatelessWidget {
+class _StatsGrid extends StatelessWidget {
   const _StatsGrid({
-    required this.statsAsync,
+    required this.dashboard,
   });
 
-  final AsyncValue statsAsync;
+  final OwnerDashboardData dashboard;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
-    return statsAsync.when(
-      loading: () {
-        return const SizedBox(
-          height: 180,
-          child: Center(
-            child:
-            CircularProgressIndicator(),
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      childAspectRatio: 1.65,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        _StatCard(
+          icon: Icons.groups_rounded,
+          value: _formatNumber(
+            dashboard.totalMembers,
           ),
-        );
-      },
+          label: 'Total Members',
+          change: '${dashboard.activeMembers} Active',
+        ),
 
-      error: (
-          error,
-          stackTrace,
-          ) {
-        return Container(
-          padding:
-          const EdgeInsets.all(16),
-          decoration:
-          BoxDecoration(
-            color:
-            AppColors.surface,
-            borderRadius:
-            AppRadius.radiusLG,
-            border:
-            Border.all(
-              color:
-              AppColors.border,
-              width: 0.5,
-            ),
-          ),
-          child: Text(
-            'Unable to load dashboard statistics.',
-            style:
-            AppTextStyles.bodyMedium,
-          ),
-        );
-      },
+        _StatCard(
+          icon: Icons.monetization_on_rounded,
+          value:
+          '₹${dashboard.monthlyRevenue.toStringAsFixed(0)}',
+          label: 'Monthly Revenue',
+          change: 'Live',
+        ),
 
-      data: (stats) {
-        return GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 1.65,
-          shrinkWrap: true,
-          physics:
-          const NeverScrollableScrollPhysics(),
+        _StatCard(
+          icon: Icons.directions_run_rounded,
+          value: dashboard.activeTrainers.toString(),
+          label: 'Active Trainers',
+          change: 'Working',
+        ),
 
-          children: [
-            _StatCard(
-              icon:
-              Icons.groups_rounded,
-              value:
-              _formatNumber(
-                stats.totalMembers,
-              ),
-              label:
-              'Total Members',
-              change:
-              'Live',
-            ),
-
-            _StatCard(
-              icon:
-              Icons
-                  .monetization_on_rounded,
-              value:
-              '₹0',
-              label:
-              'Monthly Revenue',
-              change:
-              '—',
-            ),
-
-            _StatCard(
-              icon:
-              Icons
-                  .directions_run_rounded,
-              value:
-              stats.activeTrainers
-                  .toString(),
-              label:
-              'Active Trainers',
-              change:
-              'Live',
-            ),
-
-            _StatCard(
-              icon:
-              Icons.star_rounded,
-              value:
-              stats
-                  .newMembersThisMonth
-                  .toString(),
-              label:
-              'New This Month',
-              change:
-              'Live',
-            ),
-          ],
-        );
-      },
+        _StatCard(
+          icon: Icons.star_rounded,
+          value:
+          dashboard.newMembersThisMonth.toString(),
+          label: 'New This Month',
+          change: 'This Month',
+        ),
+      ],
     );
   }
 
-  String _formatNumber(
-      int value,
-      ) {
+  String _formatNumber(int value) {
     if (value >= 1000000) {
       return '${(value / 1000000).toStringAsFixed(1)}M';
     }
@@ -501,8 +432,7 @@ class _StatsGrid
   }
 }
 
-class _StatCard
-    extends StatelessWidget {
+class _StatCard extends StatelessWidget {
   const _StatCard({
     required this.icon,
     required this.value,
@@ -516,23 +446,15 @@ class _StatCard
   final String change;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Container(
-      padding:
-      const EdgeInsets.all(14),
-      decoration:
-      BoxDecoration(
-        color:
-        AppColors.surface,
-        borderRadius:
-        AppRadius.radiusLG,
-        border:
-        Border.all(
-          color:
-          AppColors.border,
-          width: 0.5,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadius.radiusLG,
+        border: Border.all(
+          color: AppColors.border,
+          width: .5,
         ),
       ),
       child: Column(
@@ -544,20 +466,17 @@ class _StatCard
               Icon(
                 icon,
                 size: 18,
-                color:
-                AppColors.primary,
+                color: AppColors.primary,
               ),
 
               const Spacer(),
 
               Text(
                 change,
-                style:
-                AppTextStyles.labelMedium.copyWith(
-                  color:
-                  AppColors.primary,
-                  fontWeight:
-                  FontWeight.w600,
+                style: AppTextStyles.labelMedium
+                    .copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -567,23 +486,19 @@ class _StatCard
 
           Text(
             value,
-            style:
-            AppTextStyles.titleLarge.copyWith(
-              fontWeight:
-              FontWeight.w800,
+            style: AppTextStyles.titleLarge
+                .copyWith(
+              fontWeight: FontWeight.w800,
             ),
           ),
 
-          const SizedBox(
-            height: 2,
-          ),
+          const SizedBox(height: 2),
 
           Text(
             label,
-            style:
-            AppTextStyles.labelMedium.copyWith(
-              color:
-              AppColors.textSecondary,
+            style: AppTextStyles.labelMedium
+                .copyWith(
+              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -596,27 +511,28 @@ class _StatCard
 // REVENUE
 // ------------------------------------------------------------
 
-class _RevenueCard
-    extends StatelessWidget {
-  const _RevenueCard();
+class _RevenueCard extends StatelessWidget {
+  const _RevenueCard({
+    required this.dashboard,
+  });
+
+  final OwnerDashboardData dashboard;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     final values = [
-      0.35,
-      0.45,
-      0.52,
-      0.58,
-      0.62,
-      0.68,
-      0.72,
-      0.67,
-      0.76,
-      0.86,
-      0.82,
-      0.92,
+      .35,
+      .45,
+      .52,
+      .58,
+      .62,
+      .68,
+      .72,
+      .67,
+      .76,
+      .86,
+      .82,
+      .92,
     ];
 
     final months = [
@@ -636,19 +552,13 @@ class _RevenueCard
 
     return Container(
       height: 180,
-      padding:
-      const EdgeInsets.all(16),
-      decoration:
-      BoxDecoration(
-        color:
-        AppColors.surface,
-        borderRadius:
-        AppRadius.radiusLG,
-        border:
-        Border.all(
-          color:
-          AppColors.border,
-          width: 0.5,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadius.radiusLG,
+        border: Border.all(
+          color: AppColors.border,
+          width: .5,
         ),
       ),
       child: Column(
@@ -661,19 +571,19 @@ class _RevenueCard
                 children: [
                   Text(
                     'Revenue',
-                    style:
-                    AppTextStyles.titleMedium.copyWith(
+                    style: AppTextStyles.titleMedium
+                        .copyWith(
                       fontWeight:
                       FontWeight.w700,
                     ),
                   ),
 
                   Text(
-                    '2024 Overview',
-                    style:
-                    AppTextStyles.labelMedium.copyWith(
-                      color:
-                      AppColors.textSecondary,
+                    'Current Month',
+                    style: AppTextStyles.labelMedium
+                        .copyWith(
+                      color: AppColors
+                          .textSecondary,
                     ),
                   ),
                 ],
@@ -682,58 +592,11 @@ class _RevenueCard
               const Spacer(),
 
               Text(
-                '1M',
-                style:
-                AppTextStyles.labelMedium.copyWith(
-                  color:
-                  AppColors.textSecondary,
-                ),
-              ),
-
-              const SizedBox(
-                width: 18,
-              ),
-
-              Text(
-                '3M',
-                style:
-                AppTextStyles.labelMedium.copyWith(
-                  color:
-                  AppColors.textSecondary,
-                ),
-              ),
-
-              const SizedBox(
-                width: 14,
-              ),
-
-              Container(
-                padding:
-                const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 5,
-                ),
-                decoration:
-                BoxDecoration(
-                  color:
-                  AppColors.primary,
-                  borderRadius:
-                  BorderRadius.circular(
-                    8,
-                  ),
-                ),
-                child:
-                const Text(
-                  '1Y',
-                  style:
-                  TextStyle(
-                    color:
-                    Colors.black,
-                    fontSize:
-                    10,
-                    fontWeight:
-                    FontWeight.bold,
-                  ),
+                '₹${dashboard.monthlyRevenue.toStringAsFixed(0)}',
+                style: AppTextStyles.titleMedium
+                    .copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
@@ -746,8 +609,7 @@ class _RevenueCard
             child: Row(
               crossAxisAlignment:
               CrossAxisAlignment.end,
-              children:
-              List.generate(
+              children: List.generate(
                 values.length,
                     (index) {
                   return Expanded(
@@ -762,12 +624,10 @@ class _RevenueCard
                         values[index],
                         alignment:
                         Alignment.bottomCenter,
-                        child:
-                        Container(
+                        child: Container(
                           decoration:
                           BoxDecoration(
-                            color:
-                            index >= 9
+                            color: index >= 9
                                 ? AppColors
                                 .primary
                                 : AppColors
@@ -775,10 +635,8 @@ class _RevenueCard
                             borderRadius:
                             const BorderRadius
                                 .vertical(
-                              top:
-                              Radius.circular(
-                                4,
-                              ),
+                              top: Radius.circular(
+                                  4),
                             ),
                           ),
                         ),
@@ -790,13 +648,10 @@ class _RevenueCard
             ),
           ),
 
-          const SizedBox(
-            height: 4,
-          ),
+          const SizedBox(height: 4),
 
           Row(
-            children:
-            List.generate(
+            children: List.generate(
               months.length,
                   (index) {
                 return Expanded(
@@ -804,11 +659,9 @@ class _RevenueCard
                     months[index],
                     textAlign:
                     TextAlign.center,
-                    style:
-                    const TextStyle(
+                    style: const TextStyle(
                       fontSize: 7,
-                      color:
-                      AppColors
+                      color: AppColors
                           .textSecondary,
                     ),
                   ),
@@ -826,34 +679,26 @@ class _RevenueCard
 // MANAGEMENT GRID
 // ------------------------------------------------------------
 
-class _ManagementGrid
-    extends StatelessWidget {
+class _ManagementGrid extends StatelessWidget {
   const _ManagementGrid();
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return GridView.count(
       crossAxisCount: 2,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
       childAspectRatio: 1.6,
       shrinkWrap: true,
-      physics:
-      const NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       children: [
         _ManagementCard(
-          icon:
-          Icons.groups_rounded,
-          title:
-          'Members',
-          subtitle:
-          'Manage gym members',
+          icon: Icons.groups_rounded,
+          title: 'Members',
+          subtitle: 'Manage gym members',
           onTap: () {
             context.push(
-              AppRoutes
-                  .memberManagement,
+              AppRoutes.memberManagement,
             );
           },
         ),
@@ -870,31 +715,23 @@ class _ManagementGrid
         ),
 
         _ManagementCard(
-          icon:
-          Icons.fitness_center_rounded,
-          title:
-          'Gym Management',
-          subtitle:
-          'Gym profile & details',
+          icon: Icons.fitness_center_rounded,
+          title: 'Gym Management',
+          subtitle: 'Gym profile',
           onTap: () {
             context.push(
-              AppRoutes
-                  .ownerGymManagement,
+              AppRoutes.ownerGymManagement,
             );
           },
         ),
 
         _ManagementCard(
-          icon:
-          Icons.card_membership_rounded,
-          title:
-          'Membership Plans',
-          subtitle:
-          'Plans & pricing',
+          icon: Icons.workspace_premium_rounded,
+          title: 'Membership Plans',
+          subtitle: 'Plans & Pricing',
           onTap: () {
             context.push(
-              AppRoutes
-                  .ownerMembershipPlans,
+              AppRoutes.ownerMembershipPlans,
             );
           },
         ),
@@ -907,8 +744,7 @@ class _ManagementGrid
 // MANAGEMENT CARD
 // ------------------------------------------------------------
 
-class _ManagementCard
-    extends StatelessWidget {
+class _ManagementCard extends StatelessWidget {
   const _ManagementCard({
     required this.icon,
     required this.title,
@@ -922,33 +758,21 @@ class _ManagementCard
   final VoidCallback onTap;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Material(
-      color:
-      Colors.transparent,
-      borderRadius:
-      AppRadius.radiusLG,
+      color: Colors.transparent,
+      borderRadius: AppRadius.radiusLG,
       child: InkWell(
-        onTap:
-        onTap,
-        borderRadius:
-        AppRadius.radiusLG,
+        onTap: onTap,
+        borderRadius: AppRadius.radiusLG,
         child: Ink(
-          padding:
-          const EdgeInsets.all(20),
-          decoration:
-          BoxDecoration(
-            color:
-            AppColors.surface,
-            borderRadius:
-            AppRadius.radiusLG,
-            border:
-            Border.all(
-              color:
-              AppColors.border,
-              width: 0.5,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: AppRadius.radiusLG,
+            border: Border.all(
+              color: AppColors.border,
+              width: .5,
             ),
           ),
           child: Row(
@@ -956,13 +780,10 @@ class _ManagementCard
               Icon(
                 icon,
                 size: 22,
-                color:
-                AppColors.primary,
+                color: AppColors.primary,
               ),
 
-              const SizedBox(
-                width: 10,
-              ),
+              const SizedBox(width: 10),
 
               Expanded(
                 child: Column(
@@ -974,26 +795,22 @@ class _ManagementCard
                     Text(
                       title,
                       maxLines: 1,
-                      overflow:
-                      TextOverflow.ellipsis,
-                      style:
-                      AppTextStyles.bodyMedium.copyWith(
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodyMedium
+                          .copyWith(
                         fontWeight:
                         FontWeight.w700,
                       ),
                     ),
 
-                    const SizedBox(
-                      height: 2,
-                    ),
+                    const SizedBox(height: 2),
 
                     Text(
                       subtitle,
                       maxLines: 1,
-                      overflow:
-                      TextOverflow.ellipsis,
-                      style:
-                      AppTextStyles.labelMedium.copyWith(
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.labelMedium
+                          .copyWith(
                         color:
                         AppColors.textSecondary,
                       ),
@@ -1002,15 +819,10 @@ class _ManagementCard
                 ),
               ),
 
-              const SizedBox(
-                width: 4,
-              ),
-
               const Icon(
                 Icons.chevron_right_rounded,
                 size: 18,
-                color:
-                AppColors.textSecondary,
+                color: AppColors.textSecondary,
               ),
             ],
           ),
@@ -1024,70 +836,48 @@ class _ManagementCard
 // RECENT ACTIVITY
 // ------------------------------------------------------------
 
-class _RecentActivityList
-    extends StatelessWidget {
+class _RecentActivityList extends StatelessWidget {
   const _RecentActivityList();
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Column(
       children: const [
         _ActivityItem(
-          icon:
-          Icons.person_add_alt_1_rounded,
-          title:
-          'New member joined: Maria Santos',
-          time:
-          '2 min ago',
+          icon: Icons.person_add_alt_1_rounded,
+          title: 'New member joined',
+          time: '2 min ago',
         ),
 
-        SizedBox(
-          height: 8,
-        ),
+        SizedBox(height: 8),
 
         _ActivityItem(
-          icon:
-          Icons.calendar_month_rounded,
-          title:
-          'Trainer Mike added session',
-          time:
-          '15 min ago',
+          icon: Icons.directions_run_rounded,
+          title: 'Trainer assigned',
+          time: '15 min ago',
         ),
 
-        SizedBox(
-          height: 8,
-        ),
+        SizedBox(height: 8),
 
         _ActivityItem(
-          icon:
-          Icons.credit_card_rounded,
-          title:
-          'Payment received ₹2,800',
-          time:
-          '1 hr ago',
+          icon: Icons.payments_rounded,
+          title: 'Membership payment received',
+          time: '1 hr ago',
         ),
 
-        SizedBox(
-          height: 8,
-        ),
+        SizedBox(height: 8),
 
         _ActivityItem(
-          icon:
-          Icons.warning_amber_rounded,
-          title:
-          'Membership expired: 3 users',
-          time:
-          '3 hr ago',
+          icon: Icons.warning_amber_rounded,
+          title: 'Membership expired',
+          time: '3 hr ago',
         ),
       ],
     );
   }
 }
 
-class _ActivityItem
-    extends StatelessWidget {
+class _ActivityItem extends StatelessWidget {
   const _ActivityItem({
     required this.icon,
     required this.title,
@@ -1099,26 +889,18 @@ class _ActivityItem
   final String time;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Container(
-      padding:
-      const EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 12,
         vertical: 11,
       ),
-      decoration:
-      BoxDecoration(
-        color:
-        AppColors.surface,
-        borderRadius:
-        AppRadius.radiusMD,
-        border:
-        Border.all(
-          color:
-          AppColors.border,
-          width: 0.5,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadius.radiusMD,
+        border: Border.all(
+          color: AppColors.border,
+          width: .5,
         ),
       ),
       child: Row(
@@ -1126,36 +908,30 @@ class _ActivityItem
           Icon(
             icon,
             size: 17,
-            color:
-            AppColors.primary,
+            color: AppColors.primary,
           ),
 
-          const SizedBox(
-            width: 10,
-          ),
+          const SizedBox(width: 10),
 
           Expanded(
             child: Text(
               title,
               maxLines: 1,
-              overflow:
-              TextOverflow.ellipsis,
-              style:
-              AppTextStyles.bodySmall.copyWith(
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.bodySmall
+                  .copyWith(
                 fontWeight:
                 FontWeight.w500,
               ),
             ),
           ),
 
-          const SizedBox(
-            width: 8,
-          ),
+          const SizedBox(width: 8),
 
           Text(
             time,
-            style:
-            AppTextStyles.labelMedium.copyWith(
+            style: AppTextStyles.labelMedium
+                .copyWith(
               color:
               AppColors.textSecondary,
               fontSize: 9,
@@ -1171,8 +947,7 @@ class _ActivityItem
 // SECTION TITLE
 // ------------------------------------------------------------
 
-class _SectionTitle
-    extends StatelessWidget {
+class _SectionTitle extends StatelessWidget {
   const _SectionTitle({
     required this.title,
   });
@@ -1180,19 +955,13 @@ class _SectionTitle
   final String title;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Text(
       title,
-      style:
-      AppTextStyles.labelMedium.copyWith(
-        color:
-        AppColors.textSecondary,
-        fontWeight:
-        FontWeight.w600,
-        letterSpacing:
-        0.8,
+      style: AppTextStyles.labelMedium.copyWith(
+        color: AppColors.textSecondary,
+        fontWeight: FontWeight.w600,
+        letterSpacing: .8,
       ),
     );
   }

@@ -1,4 +1,4 @@
-import '../../domain/entities/owner_dashboard_stats.dart';
+import '../../domain/entities/owner_dashboard_data.dart';
 import '../../domain/repositories/owner_dashboard_repository.dart';
 
 import '../datasources/owner_dashboard_remote_datasource.dart';
@@ -6,17 +6,18 @@ import '../datasources/owner_dashboard_remote_datasource.dart';
 class OwnerDashboardRepositoryImpl
     implements OwnerDashboardRepository {
   OwnerDashboardRepositoryImpl(
-      this._dataSource,
+      this._remoteDatasource,
       );
 
-  final OwnerDashboardRemoteDataSource _dataSource;
+  final OwnerDashboardRemoteDataSource
+  _remoteDatasource;
 
   @override
-  Future<OwnerDashboardStats> getDashboardStats({
-    required String gymId,
+  Future<OwnerDashboardData> getDashboard({
+    required String ownerId,
   }) {
-    return _dataSource.getDashboardStats(
-      gymId: gymId,
+    return _remoteDatasource.getDashboard(
+      ownerId: ownerId,
     );
   }
 }

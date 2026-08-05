@@ -1,7 +1,7 @@
-import '../entities/owner_dashboard_stats.dart';
+import '../entities/owner_dashboard_data.dart';
 
 abstract class OwnerDashboardRepository {
-  Future<OwnerDashboardStats> getDashboardStats({
-    required String gymId,
+  Future<OwnerDashboardData> getDashboard({
+    required String ownerId,
   });
 }

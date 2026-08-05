@@ -9,25 +9,22 @@ class FinanceRemoteDataSource {
 
   final FirebaseFirestore _firestore;
 
-  CollectionReference<
-      Map<String, dynamic>>
-  get _transactionsCollection {
-    return _firestore.collection(
-      'finance_transactions',
-    );
+  /// Returns the financeTransactions subcollection
+  /// inside a particular gym document.
+  CollectionReference<Map<String, dynamic>> _transactionsCollection(
+      String gymId,
+      ) {
+    return _firestore
+        .collection('gyms')
+        .doc(gymId)
+        .collection('financeTransactions');
   }
 
-  Future<List<FinanceTransactionModel>>
-  getTransactions({
+  Future<List<FinanceTransactionModel>> getTransactions({
     required String gymId,
     int limit = 20,
   }) async {
-    final snapshot =
-    await _transactionsCollection
-        .where(
-      'gymId',
-      isEqualTo: gymId,
-    )
+    final snapshot = await _transactionsCollection(gymId)
         .orderBy(
       'date',
       descending: true,
@@ -37,8 +34,7 @@ class FinanceRemoteDataSource {
 
     return snapshot.docs
         .map(
-      FinanceTransactionModel
-          .fromFirestore,
+          (doc) => FinanceTransactionModel.fromFirestore(doc),
     )
         .toList();
   }
