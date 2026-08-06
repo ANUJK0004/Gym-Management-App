@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
+import '../../../activity/application/activity_actor.dart';
+import '../../../activity/application/activity_target.dart';
+import '../../../activity/application/activity_type.dart';
+import '../../../activity/presentation/providers/activity_provider.dart';
 
+
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../gym/presentation/providers/gym_provider.dart';
 import '../../data/datasources/member_management_remote_datasource.dart';
 import '../../data/repositories/member_management_repository_impl.dart';
@@ -106,8 +111,7 @@ FutureProvider.family<
   },
 );
 
-class MemberManagementController
-    extends AsyncNotifier<void> {
+class MemberManagementController extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
@@ -115,66 +119,122 @@ class MemberManagementController
     required String uid,
     required String gymId,
   }) async {
-    state =
-    const AsyncLoading();
+    state = const AsyncLoading();
 
-    state =
-    await AsyncValue.guard(
-          () async {
-        final repository =
-        ref.read(
-          memberManagementRepositoryProvider,
-        );
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(
+        memberManagementRepositoryProvider,
+      );
 
-        await repository
-            .assignMemberToGym(
-          uid: uid,
+      final member =
+      await repository.getMemberById(uid);
+
+      await repository.assignMemberToGym(
+        uid: uid,
+        gymId: gymId,
+      );
+
+      final owner = ref
+          .read(firebaseAuthProvider)
+          .currentUser;
+
+      if (member != null && owner != null) {
+        await ref.read(activityServiceProvider).log(
           gymId: gymId,
-        );
 
-        ref.invalidate(
-          gymMembersProvider,
-        );
+          type: ActivityType.memberAssigned,
 
-        ref.invalidate(
-          memberDetailsProvider(
-            uid,
+          actor: ActivityActor(
+            id: owner.uid,
+            name:
+            owner.displayName ??
+                'Owner',
+            role: 'owner',
           ),
+
+          target: ActivityTarget(
+            id: member.uid,
+            name:
+            member.displayName ??
+                member.email,
+            type: 'member',
+          ),
+
+          metadata: {
+            'memberEmail': member.email,
+          },
         );
-      },
-    );
+      }
+
+      ref.invalidate(gymMembersProvider);
+
+      ref.invalidate(
+        memberDetailsProvider(uid),
+      );
+
+      ref.invalidate(
+        recentActivityProvider,
+      );
+    });
   }
 
   Future<void> removeMember({
     required String uid,
   }) async {
-    state =
-    const AsyncLoading();
+    state = const AsyncLoading();
 
-    state =
-    await AsyncValue.guard(
-          () async {
-        final repository =
-        ref.read(
-          memberManagementRepositoryProvider,
-        );
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(
+        memberManagementRepositoryProvider,
+      );
 
-        await repository
-            .removeMemberFromGym(
-          uid,
-        );
+      final member =
+      await repository.getMemberById(uid);
 
-        ref.invalidate(
-          gymMembersProvider,
-        );
+      await repository.removeMemberFromGym(
+        uid,
+      );
 
-        ref.invalidate(
-          memberDetailsProvider(
-            uid,
+      final owner = ref
+          .read(firebaseAuthProvider)
+          .currentUser;
+
+      if (member != null &&
+          owner != null &&
+          member.gymId != null) {
+        await ref.read(activityServiceProvider).log(
+          gymId: member.gymId!,
+
+          type: ActivityType.memberRemoved,
+
+          actor: ActivityActor(
+            id: owner.uid,
+            name:
+            owner.displayName ??
+                'Owner',
+            role: 'owner',
+          ),
+
+          target: ActivityTarget(
+            id: member.uid,
+            name:
+            member.displayName ??
+                member.email,
+            type: 'member',
           ),
         );
-      },
-    );
+      }
+
+      ref.invalidate(gymMembersProvider);
+
+      ref.invalidate(
+        memberDetailsProvider(uid),
+      );
+
+      ref.invalidate(
+        recentActivityProvider,
+      );
+    });
   }
 }
 

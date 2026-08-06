@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../activity/application/activity_actor.dart';
+import '../../../activity/application/activity_target.dart';
+import '../../../activity/application/activity_type.dart';
+import '../../../activity/presentation/providers/activity_provider.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/datasources/membership_plan_remote_datasource.dart';
 import '../../data/repositories/membership_plan_repository_impl.dart';
 
@@ -87,33 +92,65 @@ class MembershipPlanController
   }) async {
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(
-          () async {
-        final plan =
-        MembershipPlan(
-          id: '',
+    state = await AsyncValue.guard(() async {
+      final plan = MembershipPlan(
+        id: '',
+        gymId: gymId,
+        name: name,
+        price: price,
+        durationInDays: durationInDays,
+        description: description,
+        isActive: true,
+        createdAt: DateTime.now(),
+      );
+
+      final createdPlan =
+      await _repository.createMembershipPlan(
+        plan,
+      );
+
+      final owner =
+          ref.read(firebaseAuthProvider).currentUser;
+
+      if (owner != null) {
+        await ref
+            .read(activityServiceProvider)
+            .log(
           gymId: gymId,
-          name: name,
-          price: price,
-          durationInDays:
-          durationInDays,
-          description:
-          description,
-          isActive: true,
-          createdAt:
-          DateTime.now(),
-        );
 
-        await _repository
-            .createMembershipPlan(
-          plan,
-        );
+          type:
+          ActivityType.membershipPlanCreated,
 
-        ref.invalidate(
-          ownerMembershipPlansProvider,
+          actor: ActivityActor(
+            id: owner.uid,
+            name:
+            owner.displayName ??
+                'Owner',
+            role: 'owner',
+          ),
+
+          target: ActivityTarget(
+            id: createdPlan.id,
+            name: createdPlan.name,
+            type: 'membership_plan',
+          ),
+
+          metadata: {
+            'price': createdPlan.price,
+            'duration':
+            createdPlan.durationInDays,
+          },
         );
-      },
-    );
+      }
+
+      ref.invalidate(
+        ownerMembershipPlansProvider,
+      );
+
+      ref.invalidate(
+        recentActivityProvider,
+      );
+    });
   }
 
   Future<void> updatePlan({
@@ -126,30 +163,65 @@ class MembershipPlanController
   }) async {
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(
-          () async {
-        final updatedPlan =
-        plan.copyWith(
-          name: name,
-          price: price,
-          durationInDays:
-          durationInDays,
-          description:
-          description,
-          isActive:
-          isActive,
-        );
+    state = await AsyncValue.guard(() async {
+      final updatedPlan =
+      plan.copyWith(
+        name: name,
+        price: price,
+        durationInDays:
+        durationInDays,
+        description: description,
+        isActive: isActive,
+      );
 
-        await _repository
-            .updateMembershipPlan(
-          updatedPlan,
-        );
+      await _repository.updateMembershipPlan(
+        updatedPlan,
+      );
 
-        ref.invalidate(
-          ownerMembershipPlansProvider,
+      final owner =
+          ref.read(firebaseAuthProvider).currentUser;
+
+      if (owner != null) {
+        await ref
+            .read(activityServiceProvider)
+            .log(
+          gymId: plan.gymId,
+
+          type:
+          ActivityType.membershipPlanUpdated,
+
+          actor: ActivityActor(
+            id: owner.uid,
+            name:
+            owner.displayName ??
+                'Owner',
+            role: 'owner',
+          ),
+
+          target: ActivityTarget(
+            id: plan.id,
+            name: updatedPlan.name,
+            type: 'membership_plan',
+          ),
+
+          metadata: {
+            'price': updatedPlan.price,
+            'duration':
+            updatedPlan.durationInDays,
+            'active':
+            updatedPlan.isActive,
+          },
         );
-      },
-    );
+      }
+
+      ref.invalidate(
+        ownerMembershipPlansProvider,
+      );
+
+      ref.invalidate(
+        recentActivityProvider,
+      );
+    });
   }
 
   Future<void> togglePlanStatus(
@@ -157,21 +229,59 @@ class MembershipPlanController
       ) async {
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(
-          () async {
-        await _repository
-            .updateMembershipPlan(
-          plan.copyWith(
-            isActive:
-            !plan.isActive,
-          ),
-        );
+    state = await AsyncValue.guard(() async {
+      final updated =
+      plan.copyWith(
+        isActive: !plan.isActive,
+      );
 
-        ref.invalidate(
-          ownerMembershipPlansProvider,
+      await _repository
+          .updateMembershipPlan(
+        updated,
+      );
+
+      final owner =
+          ref.read(firebaseAuthProvider).currentUser;
+
+      if (owner != null) {
+        await ref
+            .read(activityServiceProvider)
+            .log(
+          gymId: plan.gymId,
+
+          type: updated.isActive
+              ? ActivityType.membershipPlanActivated
+              : ActivityType.membershipPlanDeactivated,
+
+          actor: ActivityActor(
+            id: owner.uid,
+            name:
+            owner.displayName ??
+                'Owner',
+            role: 'owner',
+          ),
+
+          target: ActivityTarget(
+            id: plan.id,
+            name: plan.name,
+            type: 'membership_plan',
+          ),
+
+          metadata: {
+            'active':
+            updated.isActive,
+          },
         );
-      },
-    );
+      }
+
+      ref.invalidate(
+        ownerMembershipPlansProvider,
+      );
+
+      ref.invalidate(
+        recentActivityProvider,
+      );
+    });
   }
 
   Future<void> deletePlan(
@@ -179,18 +289,47 @@ class MembershipPlanController
       ) async {
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(
-          () async {
-        await _repository
-            .deleteMembershipPlan(
-          plan.gymId,
-          plan.id,
-        );
+    state = await AsyncValue.guard(() async {
+      await _repository.deleteMembershipPlan(
+        plan.gymId,
+        plan.id,
+      );
 
-        ref.invalidate(
-          ownerMembershipPlansProvider,
+      final owner =
+          ref.read(firebaseAuthProvider).currentUser;
+
+      if (owner != null) {
+        await ref
+            .read(activityServiceProvider)
+            .log(
+          gymId: plan.gymId,
+
+          type:
+          ActivityType.membershipPlanDeleted,
+
+          actor: ActivityActor(
+            id: owner.uid,
+            name:
+            owner.displayName ??
+                'Owner',
+            role: 'owner',
+          ),
+
+          target: ActivityTarget(
+            id: plan.id,
+            name: plan.name,
+            type: 'membership_plan',
+          ),
         );
-      },
-    );
+      }
+
+      ref.invalidate(
+        ownerMembershipPlansProvider,
+      );
+
+      ref.invalidate(
+        recentActivityProvider,
+      );
+    });
   }
 }
