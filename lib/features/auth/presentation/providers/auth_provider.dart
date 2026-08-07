@@ -15,59 +15,42 @@ final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
 });
 
-final authRemoteDataSourceProvider =
-Provider<AuthRemoteDataSource>((ref) {
-  return AuthRemoteDataSource(
-    ref.watch(firebaseAuthProvider),
-  );
+final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
+  return AuthRemoteDataSource(ref.watch(firebaseAuthProvider));
 });
 
-final authRepositoryProvider =
-Provider<AuthRepository>((ref) {
-  return AuthRepositoryImpl(
-    ref.watch(authRemoteDataSourceProvider),
-  );
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepositoryImpl(ref.watch(authRemoteDataSourceProvider));
 });
 
-final authStateProvider =
-StreamProvider<AuthUser?>((ref) {
-  final repository =
-  ref.watch(authRepositoryProvider);
+final authStateProvider = StreamProvider<AuthUser?>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
 
   return repository.authStateChanges;
 });
 
-final userProfileRepositoryProvider =
-Provider<UserProfileRepository>((ref) {
-  return UserProfileRepositoryImpl(
-    ref.watch(userProfileDataSourceProvider),
-  );
+final userProfileRepositoryProvider = Provider<UserProfileRepository>((ref) {
+  return UserProfileRepositoryImpl(ref.watch(userProfileDataSourceProvider));
 });
 
 // ------------------------------------------------------------
 // AUTH CONTROLLER
 // ------------------------------------------------------------
 
-final authControllerProvider =
-AsyncNotifierProvider<AuthController, void>(
+final authControllerProvider = AsyncNotifierProvider<AuthController, void>(
   AuthController.new,
 );
 
-class AuthController
-    extends AsyncNotifier<void> {
-
+class AuthController extends AsyncNotifier<void> {
   late final AuthRepository _authRepository;
 
-  late final UserProfileRepository
-  _profileRepository;
+  late final UserProfileRepository _profileRepository;
 
   @override
   Future<void> build() async {
-    _authRepository =
-        ref.watch(authRepositoryProvider);
+    _authRepository = ref.watch(authRepositoryProvider);
 
-    _profileRepository =
-        ref.watch(userProfileRepositoryProvider);
+    _profileRepository = ref.watch(userProfileRepositoryProvider);
   }
 
   // ----------------------------------------------------------
@@ -81,25 +64,24 @@ class AuthController
   }) async {
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(
-          () async {
-        final authUser =
-        await _authRepository.signUp(
-          email: email,
-          password: password,
-        );
+    state = await AsyncValue.guard(() async {
+      final authUser = await _authRepository.signUp(
+        email: email,
+        password: password,
+      );
 
-        final profile = UserProfile(
-          uid: authUser.id,
-          email: authUser.email,
-          role: role,
-          profileCompleted: false,
-        );
+      final now = DateTime.now();
+      final profile = UserProfile(
+        uid: authUser.id,
+        email: authUser.email,
+        role: role,
+        profileCompleted: false,
+        createdAt: now,
+        updatedAt: now,
+      );
 
-        await _profileRepository
-            .createUserProfile(profile);
-      },
-    );
+      await _profileRepository.createUserProfile(profile);
+    });
   }
 
   // ----------------------------------------------------------
@@ -113,38 +95,29 @@ class AuthController
   }) async {
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(
-          () async {
-        final authUser =
-        await _authRepository.signIn(
-          email: email,
-          password: password,
+    state = await AsyncValue.guard(() async {
+      final authUser = await _authRepository.signIn(
+        email: email,
+        password: password,
+      );
+
+      final profile = await _profileRepository.getUserProfile(authUser.id);
+
+      if (profile == null) {
+        await _authRepository.signOut();
+
+        throw Exception('User profile not found.');
+      }
+
+      if (profile.role != role) {
+        await _authRepository.signOut();
+
+        throw Exception(
+          'This account is registered as a '
+          '${profile.role}. Please select the correct role.',
         );
-
-        final profile =
-        await _profileRepository
-            .getUserProfile(
-          authUser.id,
-        );
-
-        if (profile == null) {
-          await _authRepository.signOut();
-
-          throw Exception(
-            'User profile not found.',
-          );
-        }
-
-        if (profile.role != role) {
-          await _authRepository.signOut();
-
-          throw Exception(
-            'This account is registered as a '
-                '${profile.role}. Please select the correct role.',
-          );
-        }
-      },
-    );
+      }
+    });
   }
 
   // ----------------------------------------------------------
@@ -154,25 +127,18 @@ class AuthController
   Future<void> signOut() async {
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(
-      _authRepository.signOut,
-    );
+    state = await AsyncValue.guard(_authRepository.signOut);
   }
 
   // ----------------------------------------------------------
   // RESET PASSWORD
   // ----------------------------------------------------------
 
-  Future<void> resetPassword({
-    required String email,
-  }) async {
+  Future<void> resetPassword({required String email}) async {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(
-          () => _authRepository
-          .sendPasswordResetEmail(
-        email: email,
-      ),
+      () => _authRepository.sendPasswordResetEmail(email: email),
     );
   }
 
@@ -183,8 +149,6 @@ class AuthController
   Future<void> sendEmailVerification() async {
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(
-      _authRepository.sendEmailVerification,
-    );
+    state = await AsyncValue.guard(_authRepository.sendEmailVerification);
   }
 }

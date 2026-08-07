@@ -17,6 +17,8 @@ class UserProfileModel extends UserProfile {
     super.fitnessGoal,
     super.activityLevel,
     super.profileCompleted,
+    super.createdAt,
+    super.updatedAt,
   });
 
   factory UserProfileModel.fromFirestore(
@@ -54,6 +56,10 @@ class UserProfileModel extends UserProfile {
       activityLevel: data['activityLevel'] as String?,
 
       profileCompleted: data['profileCompleted'] as bool? ?? false,
+
+      createdAt: _parseDate(data['createdAt']),
+
+      updatedAt: _parseDate(data['updatedAt']),
     );
   }
 
@@ -86,6 +92,14 @@ class UserProfileModel extends UserProfile {
       'activityLevel': activityLevel,
 
       'profileCompleted': profileCompleted,
+
+      'createdAt': createdAt != null
+          ? Timestamp.fromDate(createdAt!)
+          : FieldValue.serverTimestamp(),
+
+      'updatedAt': updatedAt != null
+          ? Timestamp.fromDate(updatedAt!)
+          : FieldValue.serverTimestamp(),
     };
   }
 

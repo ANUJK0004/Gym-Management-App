@@ -13,17 +13,26 @@ class UserProfile {
     this.fitnessGoal,
     this.activityLevel,
     this.profileCompleted = false,
+    this.createdAt,
+    this.updatedAt,
   });
 
   final String uid;
   final String email;
 
+  /// Current application role.
+  ///
+  /// Expected values:
+  /// owner
+  /// trainer
+  /// member
   final String role;
 
-  /// ID of the gym this user belongs to or owns.
+  /// ID of the gym currently associated
+  /// with this user.
   ///
-  /// Null means the user is not currently connected
-  /// to any gym.
+  /// Null means the user is not currently
+  /// associated with a gym.
   final String? gymId;
 
   final String? displayName;
@@ -41,6 +50,12 @@ class UserProfile {
 
   final bool profileCompleted;
 
+  /// When the user profile was created.
+  final DateTime? createdAt;
+
+  /// Last time the profile was modified.
+  final DateTime? updatedAt;
+
   UserProfile copyWith({
     String? displayName,
     String? role,
@@ -53,22 +68,38 @@ class UserProfile {
     String? fitnessGoal,
     String? activityLevel,
     bool? profileCompleted,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return UserProfile(
       uid: uid,
       email: email,
+
       role: role ?? this.role,
+
       gymId: gymId ?? this.gymId,
+
       displayName: displayName ?? this.displayName,
+
       photoUrl: photoUrl ?? this.photoUrl,
+
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+
       gender: gender ?? this.gender,
+
       height: height ?? this.height,
+
       weight: weight ?? this.weight,
+
       fitnessGoal: fitnessGoal ?? this.fitnessGoal,
+
       activityLevel: activityLevel ?? this.activityLevel,
-      profileCompleted:
-      profileCompleted ?? this.profileCompleted,
+
+      profileCompleted: profileCompleted ?? this.profileCompleted,
+
+      createdAt: createdAt ?? this.createdAt,
+
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
