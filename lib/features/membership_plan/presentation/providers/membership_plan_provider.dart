@@ -44,10 +44,10 @@ Provider<MembershipPlanRepository>(
 final ownerMembershipPlansProvider =
 FutureProvider<List<MembershipPlan>>(
       (ref) async {
-    final gymAsync =
-    ref.watch(ownerGymProvider);
-
-    final gym = gymAsync.value;
+    final gym =
+    await ref.watch(
+      ownerGymProvider.future,
+    );
 
     if (gym == null) {
       return [];

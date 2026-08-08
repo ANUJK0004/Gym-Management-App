@@ -23,7 +23,8 @@ class MemberManagementRepositoryImpl
   }
 
   @override
-  Future<ManagedMember?> getMemberById(
+  Future<ManagedMember?>
+  getMemberById(
       String uid,
       ) {
     return _dataSource.getMemberById(
@@ -32,7 +33,8 @@ class MemberManagementRepositoryImpl
   }
 
   @override
-  Future<List<ManagedMember>> searchMembers({
+  Future<List<ManagedMember>>
+  searchMembers({
     required String query,
     required String gymId,
   }) {
@@ -48,15 +50,15 @@ class MemberManagementRepositoryImpl
     required String email,
     required String gymId,
   }) {
-    return _dataSource
-        .findEligibleMemberByEmail(
+    return _dataSource.findEligibleMemberByEmail(
       email: email,
       gymId: gymId,
     );
   }
 
   @override
-  Future<void> assignMemberToGym({
+  Future<void>
+  assignMemberToGym({
     required String uid,
     required String gymId,
   }) {
@@ -67,10 +69,39 @@ class MemberManagementRepositoryImpl
   }
 
   @override
-  Future<void> removeMemberFromGym(
+  Future<void>
+  removeMemberFromGym(
       String uid,
       ) {
     return _dataSource.removeMemberFromGym(
+      uid,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // MEMBERSHIP
+  // ----------------------------------------------------------
+
+  @override
+  Future<void>
+  assignMembershipPlan({
+    required String uid,
+    required String gymId,
+    required String planId,
+  }) {
+    return _dataSource.assignMembershipPlan(
+      uid: uid,
+      gymId: gymId,
+      planId: planId,
+    );
+  }
+
+  @override
+  Future<void>
+  removeMembershipPlan(
+      String uid,
+      ) {
+    return _dataSource.removeMembershipPlan(
       uid,
     );
   }

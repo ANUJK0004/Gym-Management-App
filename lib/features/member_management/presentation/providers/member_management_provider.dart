@@ -366,6 +366,205 @@ class MemberManagementController
   }
 
   // ----------------------------------------------------------
+// ASSIGN MEMBERSHIP PLAN
+// ----------------------------------------------------------
+
+  Future<void> assignMembershipPlan({
+    required String uid,
+    required String planId,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(
+          () async {
+        // ----------------------------------------------------
+        // 1. AUTHENTICATED OWNER
+        // ----------------------------------------------------
+
+        final owner =
+            ref
+                .read(firebaseAuthProvider)
+                .currentUser;
+
+        if (owner == null) {
+          throw Exception(
+            'No authenticated owner found.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // 2. OWNER GYM
+        // ----------------------------------------------------
+
+        final ownerGym =
+        await ref.watch(
+          ownerGymProvider.future,
+        );
+
+        if (ownerGym == null) {
+          throw Exception(
+            'Owner gym not found.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // 3. MEMBER
+        // ----------------------------------------------------
+
+        final repository =
+        ref.read(
+          memberManagementRepositoryProvider,
+        );
+
+        final member =
+        await repository.getMemberById(
+          uid,
+        );
+
+        if (member == null) {
+          throw Exception(
+            'Member account not found.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // 4. MEMBER MUST BELONG TO OWNER GYM
+        // ----------------------------------------------------
+
+        if (member.gymId != ownerGym.id) {
+          throw Exception(
+            'This member does not belong to your gym.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // 5. ASSIGN PLAN
+        // ----------------------------------------------------
+
+        await repository.assignMembershipPlan(
+          uid: uid,
+          gymId: ownerGym.id,
+          planId: planId,
+        );
+
+        // ----------------------------------------------------
+        // 6. REFRESH
+        // ----------------------------------------------------
+
+        ref.invalidate(
+          gymMembersProvider,
+        );
+
+        ref.invalidate(
+          memberDetailsProvider(uid),
+        );
+
+        ref.invalidate(
+          memberSearchProvider,
+        );
+      },
+    );
+  }
+
+// ----------------------------------------------------------
+// REMOVE MEMBERSHIP PLAN
+// ----------------------------------------------------------
+
+  Future<void> removeMembershipPlan({
+    required String uid,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(
+          () async {
+        // ----------------------------------------------------
+        // 1. AUTHENTICATED OWNER
+        // ----------------------------------------------------
+
+        final owner =
+            ref
+                .read(firebaseAuthProvider)
+                .currentUser;
+
+        if (owner == null) {
+          throw Exception(
+            'No authenticated owner found.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // 2. OWNER GYM
+        // ----------------------------------------------------
+
+        final ownerGym =
+        await ref.watch(
+          ownerGymProvider.future,
+        );
+
+        if (ownerGym == null) {
+          throw Exception(
+            'Owner gym not found.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // 3. MEMBER
+        // ----------------------------------------------------
+
+        final repository =
+        ref.read(
+          memberManagementRepositoryProvider,
+        );
+
+        final member =
+        await repository.getMemberById(
+          uid,
+        );
+
+        if (member == null) {
+          throw Exception(
+            'Member account not found.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // 4. VERIFY MEMBER
+        // ----------------------------------------------------
+
+        if (member.gymId != ownerGym.id) {
+          throw Exception(
+            'This member does not belong to your gym.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // 5. REMOVE MEMBERSHIP
+        // ----------------------------------------------------
+
+        await repository.removeMembershipPlan(
+          uid,
+        );
+
+        // ----------------------------------------------------
+        // 6. REFRESH
+        // ----------------------------------------------------
+
+        ref.invalidate(
+          gymMembersProvider,
+        );
+
+        ref.invalidate(
+          memberDetailsProvider(uid),
+        );
+
+        ref.invalidate(
+          memberSearchProvider,
+        );
+      },
+    );
+  }
+
+  // ----------------------------------------------------------
   // REMOVE MEMBER
   // ----------------------------------------------------------
 

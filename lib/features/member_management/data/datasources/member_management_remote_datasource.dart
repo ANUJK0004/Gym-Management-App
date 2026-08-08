@@ -325,6 +325,191 @@ class MemberManagementRemoteDataSource {
   }
 
   // ----------------------------------------------------------
+// ASSIGN MEMBERSHIP PLAN
+// ----------------------------------------------------------
+
+  Future<void> assignMembershipPlan({
+    required String uid,
+    required String gymId,
+    required String planId,
+  }) async {
+    final memberReference =
+    _firestore
+        .collection('users')
+        .doc(uid);
+
+    final planReference =
+    _firestore
+        .collection('gyms')
+        .doc(gymId)
+        .collection('membershipPlans')
+        .doc(planId);
+
+    await _firestore.runTransaction(
+          (transaction) async {
+        // ----------------------------------------------------
+        // READS MUST HAPPEN BEFORE WRITES
+        // ----------------------------------------------------
+
+        final memberSnapshot =
+        await transaction.get(
+          memberReference,
+        );
+
+        final planSnapshot =
+        await transaction.get(
+          planReference,
+        );
+
+        if (!memberSnapshot.exists) {
+          throw Exception(
+            'Member account not found.',
+          );
+        }
+
+        if (!planSnapshot.exists) {
+          throw Exception(
+            'Membership plan not found.',
+          );
+        }
+
+        final memberData =
+        memberSnapshot.data();
+
+        final planData =
+        planSnapshot.data();
+
+        if (memberData == null ||
+            planData == null) {
+          throw Exception(
+            'Unable to read membership data.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // VERIFY MEMBER BELONGS TO THIS GYM
+        // ----------------------------------------------------
+
+        final memberGymId =
+        memberData['gymId'] as String?;
+
+        if (memberGymId != gymId) {
+          throw Exception(
+            'Member does not belong to this gym.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // VERIFY PLAN BELONGS TO THIS GYM
+        // ----------------------------------------------------
+
+        final planGymId =
+        planData['gymId'] as String?;
+
+        if (planGymId != gymId) {
+          throw Exception(
+            'Membership plan does not belong '
+                'to this gym.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // VERIFY PLAN IS ACTIVE
+        // ----------------------------------------------------
+
+        final isActive =
+            planData['isActive'] as bool? ?? true;
+
+        if (!isActive) {
+          throw Exception(
+            'This membership plan is inactive.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // READ DURATION
+        // ----------------------------------------------------
+
+        final duration =
+            (planData['durationInDays'] as num?)
+                ?.toInt() ??
+                0;
+
+        if (duration <= 0) {
+          throw Exception(
+            'Membership plan has an invalid duration.',
+          );
+        }
+
+        // ----------------------------------------------------
+        // CALCULATE MEMBERSHIP PERIOD
+        // ----------------------------------------------------
+
+        final startedAt =
+        DateTime.now();
+
+        final expiresAt =
+        startedAt.add(
+          Duration(
+            days: duration,
+          ),
+        );
+
+        // ----------------------------------------------------
+        // UPDATE MEMBER
+        // ----------------------------------------------------
+
+        transaction.update(
+          memberReference,
+          {
+            'membershipPlanId':
+            planId,
+
+            'membershipStatus':
+            'active',
+
+            'membershipStartedAt':
+            Timestamp.fromDate(
+              startedAt,
+            ),
+
+            'membershipExpiresAt':
+            Timestamp.fromDate(
+              expiresAt,
+            ),
+          },
+        );
+      },
+    );
+  }
+
+// ----------------------------------------------------------
+// REMOVE MEMBERSHIP PLAN
+// ----------------------------------------------------------
+
+  Future<void> removeMembershipPlan(
+      String uid,
+      ) async {
+    final memberReference =
+    _firestore
+        .collection('users')
+        .doc(uid);
+
+    await memberReference.update({
+      'membershipPlanId':
+      FieldValue.delete(),
+
+      'membershipStatus':
+      FieldValue.delete(),
+
+      'membershipStartedAt':
+      FieldValue.delete(),
+
+      'membershipExpiresAt':
+      FieldValue.delete(),
+    });
+  }
+  // ----------------------------------------------------------
   // REMOVE MEMBER FROM GYM
   // ----------------------------------------------------------
 
@@ -371,8 +556,11 @@ class MemberManagementRemoteDataSource {
       'membershipStatus':
       FieldValue.delete(),
 
-      'updatedAt':
-      FieldValue.serverTimestamp(),
+      'membershipStartedAt':
+      FieldValue.delete(),
+
+      'membershipExpiresAt':
+      FieldValue.delete(),
     });
   }
 }

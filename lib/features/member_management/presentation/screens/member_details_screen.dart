@@ -7,8 +7,13 @@ import 'package:sweatsync/app/theme/app_text_styles.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../gym/presentation/providers/gym_provider.dart';
+
+import '../../../membership_plan/domain/entities/membership_plan.dart';
+import '../../domain/entities/managed_member.dart';
 import '../providers/member_management_provider.dart';
 import '../widgets/member_status_chip.dart';
+
+import '../../../membership_plan/presentation/providers/membership_plan_provider.dart';
 
 class MemberDetailsScreen
     extends ConsumerWidget {
@@ -31,13 +36,30 @@ class MemberDetailsScreen
       ),
     );
 
+    final ownerGymAsync =
+    ref.watch(
+      ownerGymProvider,
+    );
+
+    final plansAsync =
+    ref.watch(
+      ownerMembershipPlansProvider,
+    );
+
+    final controllerState =
+    ref.watch(
+      memberManagementControllerProvider,
+    );
+
+    final isBusy =
+        controllerState.isLoading;
+
     return Scaffold(
       backgroundColor:
       AppColors.background,
 
       appBar: AppBar(
-        title:
-        const Text(
+        title: const Text(
           'Member Details',
         ),
         backgroundColor:
@@ -51,23 +73,26 @@ class MemberDetailsScreen
           CircularProgressIndicator(),
         ),
 
-        error:
-            (error, stackTrace) =>
+        error: (
+            error,
+            stackTrace,
+            ) =>
             Center(
-              child:
-              Text(
-                'Unable to load member.\n$error',
-                textAlign:
-                TextAlign.center,
+              child: Padding(
+                padding:
+                const EdgeInsets.all(24),
+                child: Text(
+                  'Unable to load member.\n$error',
+                  textAlign:
+                  TextAlign.center,
+                ),
               ),
             ),
 
-        data:
-            (member) {
+        data: (member) {
           if (member == null) {
             return const Center(
-              child:
-              Text(
+              child: Text(
                 'Member not found.',
               ),
             );
@@ -78,63 +103,99 @@ class MemberDetailsScreen
               ?.trim()
               .isNotEmpty ==
               true
-              ? member
-              .displayName!
+              ? member.displayName!
               : 'Unnamed Member';
+
+          final ownerGym =
+              ownerGymAsync.value;
+
+          final belongsToOwnerGym =
+              ownerGym != null &&
+                  member.gymId ==
+                      ownerGym.id;
+
+          MembershipPlan?
+          currentPlan;
+
+          final availablePlans =
+              plansAsync.value
+                  ?.where(
+                    (plan) =>
+                plan.isActive,
+              )
+                  .toList() ??
+                  [];
+
+          final allPlans =
+              plansAsync.value ?? [];
+
+          if (member.membershipPlanId !=
+              null) {
+            for (final plan in allPlans) {
+              if (plan.id ==
+                  member.membershipPlanId) {
+                currentPlan = plan;
+                break;
+              }
+            }
+          }
 
           return SingleChildScrollView(
             padding:
-            const EdgeInsets.all(
+            const EdgeInsets.fromLTRB(
               22,
+              22,
+              22,
+              40,
             ),
-            child:
-            Column(
+            child: Column(
               children: [
+                // ------------------------------------------------
+                // MEMBER HEADER
+                // ------------------------------------------------
+
                 Container(
                   width:
                   double.infinity,
                   padding:
-                  const EdgeInsets.all(
-                    24,
-                  ),
+                  const EdgeInsets.all(24),
                   decoration:
                   BoxDecoration(
                     color:
                     AppColors.surface,
                     borderRadius:
-                    AppRadius
-                        .radiusLG,
+                    AppRadius.radiusLG,
                   ),
-                  child:
-                  Column(
+                  child: Column(
                     children: [
                       CircleAvatar(
-                        radius:
-                        42,
+                        radius: 42,
                         backgroundColor:
-                        AppColors
-                            .primary
+                        AppColors.primary
                             .withOpacity(
                           0.12,
                         ),
                         backgroundImage:
                         member.photoUrl !=
-                            null
+                            null &&
+                            member.photoUrl!
+                                .isNotEmpty
                             ? NetworkImage(
-                          member
-                              .photoUrl!,
+                          member.photoUrl!,
                         )
                             : null,
                         child:
                         member.photoUrl ==
-                            null
+                            null ||
+                            member.photoUrl!
+                                .isEmpty
                             ? const Icon(
                           Icons
                               .person_rounded,
-                          size:
-                          40,
+                          size: 40,
                           color:
-                          AppColors.primary,
+                          AppColors
+                              .primary,
                         )
                             : null,
                       ),
@@ -150,8 +211,7 @@ class MemberDetailsScreen
                             .headlineMedium
                             .copyWith(
                           fontWeight:
-                          FontWeight
-                              .w700,
+                          FontWeight.w700,
                         ),
                       ),
 
@@ -176,13 +236,14 @@ class MemberDetailsScreen
                       ),
 
                       MemberStatusChip(
-                        label:
-                        'Status',
+                        label: 'Membership',
                         selected:
-                        false,
-                        onTap:
-                            () {},
-                        status: member.membershipStatus,
+                        member
+                            .isMembershipActive,
+                        onTap: () {},
+                        status:
+                        member
+                            .effectiveMembershipStatus,
                       ),
                     ],
                   ),
@@ -192,11 +253,23 @@ class MemberDetailsScreen
                   height: 20,
                 ),
 
+                // ------------------------------------------------
+                // PERSONAL INFORMATION
+                // ------------------------------------------------
+
+                _SectionTitle(
+                  title:
+                  'PERSONAL INFORMATION',
+                ),
+
+                const SizedBox(
+                  height: 10,
+                ),
+
                 _InfoTile(
                   icon:
                   Icons.email_outlined,
-                  title:
-                  'Email',
+                  title: 'Email',
                   value:
                   member.email,
                 ),
@@ -204,19 +277,16 @@ class MemberDetailsScreen
                 _InfoTile(
                   icon:
                   Icons.phone_outlined,
-                  title:
-                  'Phone',
+                  title: 'Phone',
                   value:
                   member.phone ??
                       'Not provided',
                 ),
 
                 _InfoTile(
-                  icon:
-                  Icons
+                  icon: Icons
                       .verified_user_outlined,
-                  title:
-                  'Profile',
+                  title: 'Profile',
                   value:
                   member.profileCompleted
                       ? 'Completed'
@@ -224,44 +294,146 @@ class MemberDetailsScreen
                 ),
 
                 const SizedBox(
+                  height: 20,
+                ),
+
+                // ------------------------------------------------
+                // MEMBERSHIP
+                // ------------------------------------------------
+
+                _SectionTitle(
+                  title:
+                  'MEMBERSHIP',
+                ),
+
+                const SizedBox(
+                  height: 10,
+                ),
+
+                if (!member.isAssignedToGym)
+                  _MembershipEmptyCard(
+                    icon: Icons
+                        .person_add_alt_1_rounded,
+                    title:
+                    'Member is not assigned',
+                    message:
+                    'Assign this member to your gym before assigning a membership plan.',
+                  )
+                else if (!belongsToOwnerGym)
+                  _MembershipEmptyCard(
+                    icon: Icons
+                        .lock_outline_rounded,
+                    title:
+                    'Different gym',
+                    message:
+                    'This member is assigned to another gym.',
+                  )
+                else if (plansAsync.isLoading &&
+                      plansAsync.value == null)
+                    const Padding(
+                      padding:
+                      EdgeInsets.all(24),
+                      child: CircularProgressIndicator(),
+                    )
+                  else if (plansAsync.hasError)
+                      _MembershipEmptyCard(
+                        icon: Icons
+                            .error_outline_rounded,
+                        title:
+                        'Unable to load plans',
+                        message:
+                        'Membership plans could not be loaded.',
+                      )
+                    else if (!member.hasMembership)
+                        _NoMembershipCard(
+                          availablePlans:
+                          availablePlans,
+                          isBusy: isBusy,
+                          onAssign:
+                          availablePlans.isEmpty
+                              ? null
+                              : () =>
+                              _selectMembershipPlan(
+                                context,
+                                ref,
+                                availablePlans,
+                              ),
+                        )
+                      else
+                        _CurrentMembershipCard(
+                          member: member,
+                          plan: currentPlan,
+                          isBusy: isBusy,
+                          onChangePlan:
+                          availablePlans.isEmpty
+                              ? null
+                              : () =>
+                              _selectMembershipPlan(
+                                context,
+                                ref,
+                                availablePlans,
+                              ),
+                          onRemovePlan:
+                              () =>
+                              _removeMembership(
+                                context,
+                                ref,
+                              ),
+                        ),
+
+                const SizedBox(
                   height: 24,
                 ),
 
-                SizedBox(
-                  width:
-                  double.infinity,
-                  child:
-                  ElevatedButton.icon(
-                    onPressed:
-                    member.isAssignedToGym
-                        ? () =>
-                        _removeMember(
-                          context,
-                          ref,
-                        )
-                        : () =>
-                        _assignMember(
-                          context,
-                          ref,
-                        ),
+                // ------------------------------------------------
+                // GYM ACTION
+                // ------------------------------------------------
+
+                if (!belongsToOwnerGym &&
+                    member.isAssignedToGym)
+                  _MembershipEmptyCard(
                     icon:
-                    Icon(
-                      member
+                    Icons.info_outline_rounded,
+                    title:
+                    'Member cannot be managed',
+                    message:
+                    'This account is assigned to another gym.',
+                  )
+                else
+                  SizedBox(
+                    width:
+                    double.infinity,
+                    child:
+                    ElevatedButton.icon(
+                      onPressed:
+                      isBusy
+                          ? null
+                          : member
                           .isAssignedToGym
-                          ? Icons
-                          .person_remove_rounded
-                          : Icons
-                          .person_add_rounded,
-                    ),
-                    label:
-                    Text(
-                      member
-                          .isAssignedToGym
-                          ? 'Remove From Gym'
-                          : 'Assign To Gym',
+                          ? () =>
+                          _removeMember(
+                            context,
+                            ref,
+                          )
+                          : () =>
+                          _assignMember(
+                            context,
+                            ref,
+                          ),
+                      icon: Icon(
+                        member.isAssignedToGym
+                            ? Icons
+                            .person_remove_rounded
+                            : Icons
+                            .person_add_rounded,
+                      ),
+                      label: Text(
+                        member.isAssignedToGym
+                            ? 'Remove From Gym'
+                            : 'Assign To Gym',
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           );
@@ -269,6 +441,10 @@ class MemberDetailsScreen
       ),
     );
   }
+
+  // ==========================================================
+  // ASSIGN MEMBER TO GYM
+  // ==========================================================
 
   Future<void> _assignMember(
       BuildContext context,
@@ -282,6 +458,10 @@ class MemberDetailsScreen
             .currentUser;
 
     if (user == null) {
+      _showMessage(
+        context,
+        'You are not authenticated.',
+      );
       return;
     }
 
@@ -324,7 +504,8 @@ class MemberDetailsScreen
     if (state.hasError) {
       _showMessage(
         context,
-        'Failed to assign member: ${state.error}',
+        'Failed to assign member: '
+            '${state.error}',
       );
       return;
     }
@@ -335,10 +516,29 @@ class MemberDetailsScreen
     );
   }
 
+  // ==========================================================
+  // REMOVE MEMBER FROM GYM
+  // ==========================================================
+
   Future<void> _removeMember(
       BuildContext context,
       WidgetRef ref,
       ) async {
+    final confirmed =
+    await _confirmAction(
+      context,
+      title:
+      'Remove member?',
+      message:
+      'This will remove the member from your gym and clear their current membership.',
+      confirmText:
+      'Remove',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     await ref
         .read(
       memberManagementControllerProvider
@@ -360,7 +560,8 @@ class MemberDetailsScreen
     if (state.hasError) {
       _showMessage(
         context,
-        'Failed to remove member: ${state.error}',
+        'Failed to remove member: '
+            '${state.error}',
       );
       return;
     }
@@ -369,6 +570,171 @@ class MemberDetailsScreen
       context,
       'Member removed from gym.',
     );
+  }
+
+  // ==========================================================
+  // SELECT MEMBERSHIP PLAN
+  // ==========================================================
+
+  Future<void> _selectMembershipPlan(
+      BuildContext context,
+      WidgetRef ref,
+      List<MembershipPlan> plans,
+      ) async {
+    final selectedPlan =
+    await showModalBottomSheet<
+        MembershipPlan>(
+      context: context,
+      isScrollControlled:
+      true,
+      backgroundColor:
+      AppColors.background,
+      showDragHandle:
+      true,
+      builder: (_) {
+        return _MembershipPlanPicker(
+          plans: plans,
+        );
+      },
+    );
+
+    if (selectedPlan == null) {
+      return;
+    }
+
+    await ref
+        .read(
+      memberManagementControllerProvider
+          .notifier,
+    )
+        .assignMembershipPlan(
+      uid: memberId,
+      planId: selectedPlan.id,
+    );
+
+    if (!context.mounted) {
+      return;
+    }
+
+    final state =
+    ref.read(
+      memberManagementControllerProvider,
+    );
+
+    if (state.hasError) {
+      _showMessage(
+        context,
+        'Failed to assign membership: '
+            '${state.error}',
+      );
+      return;
+    }
+
+    _showMessage(
+      context,
+      '${selectedPlan.name} assigned successfully.',
+    );
+  }
+
+  // ==========================================================
+  // REMOVE MEMBERSHIP
+  // ==========================================================
+
+  Future<void> _removeMembership(
+      BuildContext context,
+      WidgetRef ref,
+      ) async {
+    final confirmed =
+    await _confirmAction(
+      context,
+      title:
+      'Remove membership?',
+      message:
+      'The member will remain in your gym, but their current membership plan will be removed.',
+      confirmText:
+      'Remove',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await ref
+        .read(
+      memberManagementControllerProvider
+          .notifier,
+    )
+        .removeMembershipPlan(
+      uid: memberId,
+    );
+
+    if (!context.mounted) {
+      return;
+    }
+
+    final state =
+    ref.read(
+      memberManagementControllerProvider,
+    );
+
+    if (state.hasError) {
+      _showMessage(
+        context,
+        'Failed to remove membership: '
+            '${state.error}',
+      );
+      return;
+    }
+
+    _showMessage(
+      context,
+      'Membership removed.',
+    );
+  }
+
+  // ==========================================================
+  // CONFIRMATION
+  // ==========================================================
+
+  Future<bool> _confirmAction(
+      BuildContext context, {
+        required String title,
+        required String message,
+        required String confirmText,
+      }) async {
+    final result =
+    await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(title),
+          content:
+          Text(message),
+          actions: [
+            TextButton(
+              onPressed: () =>
+                  Navigator.pop(
+                    dialogContext,
+                    false,
+                  ),
+              child:
+              const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () =>
+                  Navigator.pop(
+                    dialogContext,
+                    true,
+                  ),
+              child:
+              Text(confirmText),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
   }
 
   void _showMessage(
@@ -385,6 +751,668 @@ class MemberDetailsScreen
     );
   }
 }
+
+// ============================================================
+// MEMBERSHIP PLAN PICKER
+// ============================================================
+
+class _MembershipPlanPicker
+    extends StatelessWidget {
+  const _MembershipPlanPicker({
+    required this.plans,
+  });
+
+  final List<MembershipPlan> plans;
+
+  @override
+  Widget build(
+      BuildContext context,
+      ) {
+    return SafeArea(
+      child: Padding(
+        padding:
+        const EdgeInsets.fromLTRB(
+          20,
+          8,
+          20,
+          24,
+        ),
+        child: Column(
+          mainAxisSize:
+          MainAxisSize.min,
+          crossAxisAlignment:
+          CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Choose Membership Plan',
+              style:
+              AppTextStyles
+                  .headlineMedium
+                  .copyWith(
+                fontWeight:
+                FontWeight.w700,
+              ),
+            ),
+
+            const SizedBox(
+              height: 6,
+            ),
+
+            Text(
+              'Select an active plan for this member.',
+              style:
+              AppTextStyles
+                  .bodySmall
+                  .copyWith(
+                color:
+                AppColors
+                    .textSecondary,
+              ),
+            ),
+
+            const SizedBox(
+              height: 18,
+            ),
+
+            Flexible(
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount:
+                plans.length,
+                separatorBuilder:
+                    (_, _) =>
+                const SizedBox(
+                  height: 10,
+                ),
+                itemBuilder:
+                    (context, index) {
+                  final plan =
+                  plans[index];
+
+                  return Material(
+                    color:
+                    AppColors.surface,
+                    borderRadius:
+                    AppRadius.radiusMD,
+                    child: InkWell(
+                      borderRadius:
+                      AppRadius.radiusMD,
+                      onTap: () =>
+                          Navigator.pop(
+                            context,
+                            plan,
+                          ),
+                      child: Padding(
+                        padding:
+                        const EdgeInsets.all(
+                          16,
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration:
+                              BoxDecoration(
+                                color: AppColors
+                                    .primary
+                                    .withOpacity(
+                                  0.12,
+                                ),
+                                borderRadius:
+                                BorderRadius
+                                    .circular(
+                                  12,
+                                ),
+                              ),
+                              child:
+                              const Icon(
+                                Icons
+                                    .card_membership_rounded,
+                                color:
+                                AppColors.primary,
+                              ),
+                            ),
+
+                            const SizedBox(
+                              width: 14,
+                            ),
+
+                            Expanded(
+                              child:
+                              Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment
+                                    .start,
+                                children: [
+                                  Text(
+                                    plan.name,
+                                    style:
+                                    AppTextStyles
+                                        .titleMedium
+                                        .copyWith(
+                                      fontWeight:
+                                      FontWeight
+                                          .w700,
+                                    ),
+                                  ),
+
+                                  const SizedBox(
+                                    height: 4,
+                                  ),
+
+                                  Text(
+                                    '${plan.durationInDays} days',
+                                    style:
+                                    AppTextStyles
+                                        .bodySmall
+                                        .copyWith(
+                                      color:
+                                      AppColors
+                                          .textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            Text(
+                              '₹${plan.price.toStringAsFixed(0)}',
+                              style:
+                              AppTextStyles
+                                  .titleMedium
+                                  .copyWith(
+                                fontWeight:
+                                FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// CURRENT MEMBERSHIP CARD
+// ============================================================
+
+class _CurrentMembershipCard
+    extends StatelessWidget {
+  const _CurrentMembershipCard({
+    required this.member,
+    required this.plan,
+    required this.isBusy,
+    required this.onChangePlan,
+    required this.onRemovePlan,
+  });
+
+  final ManagedMember member;
+  final MembershipPlan? plan;
+  final bool isBusy;
+
+  final VoidCallback? onChangePlan;
+  final VoidCallback onRemovePlan;
+
+  @override
+  Widget build(
+      BuildContext context,
+      ) {
+    final status =
+        member.effectiveMembershipStatus;
+
+    return Container(
+      width: double.infinity,
+      padding:
+      const EdgeInsets.all(18),
+      decoration:
+      BoxDecoration(
+        color:
+        AppColors.surface,
+        borderRadius:
+        AppRadius.radiusLG,
+        border:
+        Border.all(
+          color:
+          AppColors.border,
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment:
+        CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons
+                    .card_membership_rounded,
+                color:
+                AppColors.primary,
+              ),
+
+              const SizedBox(
+                width: 10,
+              ),
+
+              Expanded(
+                child: Text(
+                  'Current Membership',
+                  style:
+                  AppTextStyles
+                      .titleMedium
+                      .copyWith(
+                    fontWeight:
+                    FontWeight.w700,
+                  ),
+                ),
+              ),
+
+              MemberStatusChip(
+                label:
+                status
+                    .toString()
+                    .toUpperCase(),
+                selected:
+                member
+                    .isMembershipActive,
+                onTap: () {},
+                status:
+                status,
+              ),
+            ],
+          ),
+
+          const SizedBox(
+            height: 18,
+          ),
+
+          _MembershipValue(
+            title: 'Plan',
+            value:
+            plan?.name ??
+                'Plan unavailable',
+          ),
+
+          _MembershipValue(
+            title: 'Price',
+            value: plan == null
+                ? '—'
+                : '₹${plan!.price.toStringAsFixed(0)}',
+          ),
+
+          _MembershipValue(
+            title: 'Duration',
+            value: plan == null
+                ? '—'
+                : '${plan!.durationInDays} days',
+          ),
+
+          _MembershipValue(
+            title: 'Started',
+            value:
+            _formatDate(
+              member
+                  .membershipStartedAt,
+            ),
+          ),
+
+          _MembershipValue(
+            title: 'Expires',
+            value:
+            _formatDate(
+              member
+                  .membershipExpiresAt,
+            ),
+          ),
+
+          const SizedBox(
+            height: 12,
+          ),
+
+          Row(
+            children: [
+              Expanded(
+                child:
+                OutlinedButton(
+                  onPressed:
+                  isBusy
+                      ? null
+                      : onChangePlan,
+                  child:
+                  const Text(
+                    'Change Plan',
+                  ),
+                ),
+              ),
+
+              const SizedBox(
+                width: 10,
+              ),
+
+              Expanded(
+                child:
+                ElevatedButton(
+                  onPressed:
+                  isBusy
+                      ? null
+                      : onRemovePlan,
+                  child:
+                  const Text(
+                    'Remove',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// NO MEMBERSHIP
+// ============================================================
+
+class _NoMembershipCard
+    extends StatelessWidget {
+  const _NoMembershipCard({
+    required this.availablePlans,
+    required this.isBusy,
+    required this.onAssign,
+  });
+
+  final List<MembershipPlan>
+  availablePlans;
+
+  final bool isBusy;
+  final VoidCallback? onAssign;
+
+  @override
+  Widget build(
+      BuildContext context,
+      ) {
+    return Container(
+      width: double.infinity,
+      padding:
+      const EdgeInsets.all(20),
+      decoration:
+      BoxDecoration(
+        color:
+        AppColors.surface,
+        borderRadius:
+        AppRadius.radiusLG,
+        border:
+        Border.all(
+          color:
+          AppColors.border,
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment:
+        CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons
+                .card_membership_outlined,
+            color:
+            AppColors.primary,
+            size: 30,
+          ),
+
+          const SizedBox(
+            height: 12,
+          ),
+
+          Text(
+            'No Membership',
+            style:
+            AppTextStyles
+                .titleMedium
+                .copyWith(
+              fontWeight:
+              FontWeight.w700,
+            ),
+          ),
+
+          const SizedBox(
+            height: 5,
+          ),
+
+          Text(
+            availablePlans.isEmpty
+                ? 'Create an active membership plan before assigning one to this member.'
+                : 'Assign an active membership plan to this member.',
+            style:
+            AppTextStyles
+                .bodySmall
+                .copyWith(
+              color:
+              AppColors
+                  .textSecondary,
+            ),
+          ),
+
+          const SizedBox(
+            height: 16,
+          ),
+
+          SizedBox(
+            width: double.infinity,
+            child:
+            ElevatedButton.icon(
+              onPressed:
+              isBusy
+                  ? null
+                  : onAssign,
+              icon:
+              const Icon(
+                Icons.add,
+              ),
+              label:
+              const Text(
+                'Assign Membership',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// EMPTY / WARNING CARD
+// ============================================================
+
+class _MembershipEmptyCard
+    extends StatelessWidget {
+  const _MembershipEmptyCard({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(
+      BuildContext context,
+      ) {
+    return Container(
+      width: double.infinity,
+      padding:
+      const EdgeInsets.all(20),
+      decoration:
+      BoxDecoration(
+        color:
+        AppColors.surface,
+        borderRadius:
+        AppRadius.radiusLG,
+        border:
+        Border.all(
+          color:
+          AppColors.border,
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            icon,
+            size: 34,
+            color:
+            AppColors.textSecondary,
+          ),
+
+          const SizedBox(
+            height: 10,
+          ),
+
+          Text(
+            title,
+            style:
+            AppTextStyles
+                .titleMedium
+                .copyWith(
+              fontWeight:
+              FontWeight.w700,
+            ),
+          ),
+
+          const SizedBox(
+            height: 5,
+          ),
+
+          Text(
+            message,
+            textAlign:
+            TextAlign.center,
+            style:
+            AppTextStyles
+                .bodySmall
+                .copyWith(
+              color:
+              AppColors
+                  .textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// SECTION TITLE
+// ============================================================
+
+class _SectionTitle
+    extends StatelessWidget {
+  const _SectionTitle({
+    required this.title,
+  });
+
+  final String title;
+
+  @override
+  Widget build(
+      BuildContext context,
+      ) {
+    return Align(
+      alignment:
+      Alignment.centerLeft,
+      child: Text(
+        title,
+        style:
+        AppTextStyles.labelMedium
+            .copyWith(
+          color:
+          AppColors
+              .textSecondary,
+          fontWeight:
+          FontWeight.w700,
+          letterSpacing:
+          0.8,
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// MEMBERSHIP VALUE
+// ============================================================
+
+class _MembershipValue
+    extends StatelessWidget {
+  const _MembershipValue({
+    required this.title,
+    required this.value,
+  });
+
+  final String title;
+  final String value;
+
+  @override
+  Widget build(
+      BuildContext context,
+      ) {
+    return Padding(
+      padding:
+      const EdgeInsets.only(
+        bottom: 10,
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 90,
+            child: Text(
+              title,
+              style:
+              AppTextStyles
+                  .labelMedium
+                  .copyWith(
+                color:
+                AppColors
+                    .textSecondary,
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: Text(
+              value,
+              style:
+              AppTextStyles
+                  .bodyMedium
+                  .copyWith(
+                fontWeight:
+                FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// INFO TILE
+// ============================================================
 
 class _InfoTile
     extends StatelessWidget {
@@ -408,9 +1436,7 @@ class _InfoTile
         bottom: 10,
       ),
       padding:
-      const EdgeInsets.all(
-        16,
-      ),
+      const EdgeInsets.all(16),
       decoration:
       BoxDecoration(
         color:
@@ -424,8 +1450,7 @@ class _InfoTile
           width: 0.5,
         ),
       ),
-      child:
-      Row(
+      child: Row(
         children: [
           Icon(
             icon,
@@ -438,11 +1463,9 @@ class _InfoTile
           ),
 
           Expanded(
-            child:
-            Column(
+            child: Column(
               crossAxisAlignment:
-              CrossAxisAlignment
-                  .start,
+              CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
@@ -473,4 +1496,20 @@ class _InfoTile
       ),
     );
   }
+}
+
+// ============================================================
+// DATE FORMATTER
+// ============================================================
+
+String _formatDate(
+    DateTime? date,
+    ) {
+  if (date == null) {
+    return 'Not available';
+  }
+
+  return '${date.day.toString().padLeft(2, '0')}/'
+      '${date.month.toString().padLeft(2, '0')}/'
+      '${date.year}';
 }

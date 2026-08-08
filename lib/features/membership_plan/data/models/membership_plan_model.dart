@@ -34,7 +34,9 @@ class MembershipPlanModel extends MembershipPlan {
       price:
       (data['price'] as num?)?.toDouble() ?? 0,
       durationInDays:
-      data['durationInDays'] as int? ?? 0,
+      (data['durationInDays'] as num?)
+          ?.toInt() ??
+          0,
       description:
       data['description'] as String?,
       isActive:

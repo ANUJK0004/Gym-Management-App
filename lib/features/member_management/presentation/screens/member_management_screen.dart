@@ -7,7 +7,9 @@ import 'package:sweatsync/app/theme/app_colors.dart';
 import 'package:sweatsync/app/theme/app_radius.dart';
 import 'package:sweatsync/app/theme/app_text_styles.dart';
 
+import '../../domain/entities/managed_member.dart';
 import '../providers/member_management_provider.dart';
+import '../widgets/add_member/add_member_sheet.dart';
 import '../widgets/member_card.dart';
 import '../widgets/member_search_bar.dart';
 import '../widgets/member_status_chip.dart';
@@ -288,7 +290,7 @@ class _MemberManagementScreenState
   // ----------------------------------------------------------
 
   Widget _buildGymMembers(
-      AsyncValue membersAsync,
+      AsyncValue<List<ManagedMember>> membersAsync,
       ) {
     return membersAsync.when(
       loading: () {
@@ -363,7 +365,7 @@ class _MemberManagementScreenState
   // ----------------------------------------------------------
 
   Widget _buildSearchResults(
-      AsyncValue? searchAsync,
+      AsyncValue<List<ManagedMember>>? searchAsync,
       ) {
     if (searchAsync == null) {
       return const SizedBox();
@@ -440,8 +442,8 @@ class _MemberManagementScreenState
   // FILTER
   // ----------------------------------------------------------
 
-  List<dynamic> _filterMembers(
-      List<dynamic> members,
+  List<ManagedMember> _filterMembers(
+      List<ManagedMember> members,
       ) {
     if (_selectedStatus == 'All') {
       return members;
@@ -450,17 +452,26 @@ class _MemberManagementScreenState
     return members.where(
           (member) {
         final status =
-        member.status
-            .toString()
+        member.effectiveMembershipStatus
             .toLowerCase();
 
-        return status ==
-            _selectedStatus
-                .toLowerCase();
+        switch (_selectedStatus) {
+          case 'Active':
+            return status == 'active';
+
+          case 'Expired':
+            return status == 'expired';
+
+          case 'Inactive':
+            return status == 'inactive' ||
+                status == 'pending';
+
+          default:
+            return true;
+        }
       },
     ).toList();
   }
-
   // ----------------------------------------------------------
   // ADD MEMBER
   // ----------------------------------------------------------
@@ -472,9 +483,15 @@ class _MemberManagementScreenState
       _searchQuery = '';
     });
 
-    FocusScope.of(context)
-        .requestFocus(
-      FocusNode(),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor:
+      Colors.transparent,
+      showDragHandle: false,
+      builder: (_) {
+        return const AddMemberSheet();
+      },
     );
   }
 }

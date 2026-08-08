@@ -13,6 +13,8 @@ class MemberManagementModel extends ManagedMember {
     super.profileCompleted,
     super.membershipPlanId,
     super.membershipStatus,
+    super.membershipStartedAt,
+    super.membershipExpiresAt,
     super.joinedAt,
   });
 
@@ -52,8 +54,20 @@ class MemberManagementModel extends ManagedMember {
       membershipStatus:
       data['membershipStatus'] as String?,
 
+      membershipStartedAt:
+      _parseDate(
+        data['membershipStartedAt'],
+      ),
+
+      membershipExpiresAt:
+      _parseDate(
+        data['membershipExpiresAt'],
+      ),
+
       joinedAt:
-      _parseDate(data['joinedAt']),
+      _parseDate(
+        data['joinedAt'],
+      ),
     );
   }
 
@@ -66,10 +80,32 @@ class MemberManagementModel extends ManagedMember {
       'photoUrl': photoUrl,
       'phone': phone,
       'profileCompleted': profileCompleted,
-      'membershipPlanId': membershipPlanId,
-      'membershipStatus': membershipStatus,
-      'joinedAt': joinedAt != null
-          ? Timestamp.fromDate(joinedAt!)
+
+      'membershipPlanId':
+      membershipPlanId,
+
+      'membershipStatus':
+      membershipStatus,
+
+      'membershipStartedAt':
+      membershipStartedAt != null
+          ? Timestamp.fromDate(
+        membershipStartedAt!,
+      )
+          : null,
+
+      'membershipExpiresAt':
+      membershipExpiresAt != null
+          ? Timestamp.fromDate(
+        membershipExpiresAt!,
+      )
+          : null,
+
+      'joinedAt':
+      joinedAt != null
+          ? Timestamp.fromDate(
+        joinedAt!,
+      )
           : null,
     };
   }
@@ -79,6 +115,10 @@ class MemberManagementModel extends ManagedMember {
       ) {
     if (value is Timestamp) {
       return value.toDate();
+    }
+
+    if (value is DateTime) {
+      return value;
     }
 
     return null;
