@@ -17,26 +17,42 @@ class MemberManagementRepositoryImpl
   getMembersByGymId(
       String gymId,
       ) {
-    return _dataSource
-        .getMembersByGymId(gymId);
+    return _dataSource.getMembersByGymId(
+      gymId,
+    );
+  }
+
+  @override
+  Future<ManagedMember?> getMemberById(
+      String uid,
+      ) {
+    return _dataSource.getMemberById(
+      uid,
+    );
+  }
+
+  @override
+  Future<List<ManagedMember>> searchMembers({
+    required String query,
+    required String gymId,
+  }) {
+    return _dataSource.searchMembers(
+      query: query,
+      gymId: gymId,
+    );
   }
 
   @override
   Future<ManagedMember?>
-  getMemberById(
-      String uid,
-      ) {
+  findEligibleMemberByEmail({
+    required String email,
+    required String gymId,
+  }) {
     return _dataSource
-        .getMemberById(uid);
-  }
-
-  @override
-  Future<List<ManagedMember>>
-  searchMembers(
-      String query,
-      ) {
-    return _dataSource
-        .searchMembers(query);
+        .findEligibleMemberByEmail(
+      email: email,
+      gymId: gymId,
+    );
   }
 
   @override
@@ -44,8 +60,7 @@ class MemberManagementRepositoryImpl
     required String uid,
     required String gymId,
   }) {
-    return _dataSource
-        .assignMemberToGym(
+    return _dataSource.assignMemberToGym(
       uid: uid,
       gymId: gymId,
     );
@@ -55,7 +70,8 @@ class MemberManagementRepositoryImpl
   Future<void> removeMemberFromGym(
       String uid,
       ) {
-    return _dataSource
-        .removeMemberFromGym(uid);
+    return _dataSource.removeMemberFromGym(
+      uid,
+    );
   }
 }

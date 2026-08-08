@@ -175,4 +175,13 @@ class FinanceRepositoryImpl
             ),
       );
   }
+
+  @override
+  Future<void> createTransaction(
+      FinanceTransaction transaction,
+      ) {
+    return _dataSource.createTransaction(
+      transaction,
+    );
+  }
 }

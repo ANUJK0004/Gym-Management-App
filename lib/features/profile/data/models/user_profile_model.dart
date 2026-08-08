@@ -10,6 +10,7 @@ class UserProfileModel extends UserProfile {
     super.gymId,
     super.displayName,
     super.photoUrl,
+    super.phone,
     super.dateOfBirth,
     super.gender,
     super.height,
@@ -22,12 +23,14 @@ class UserProfileModel extends UserProfile {
   });
 
   factory UserProfileModel.fromFirestore(
-    DocumentSnapshot<Map<String, dynamic>> document,
-  ) {
+      DocumentSnapshot<Map<String, dynamic>> document,
+      ) {
     final data = document.data();
 
     if (data == null) {
-      throw Exception('User profile document does not exist.');
+      throw Exception(
+        'User profile document does not exist.',
+      );
     }
 
     return UserProfileModel(
@@ -35,31 +38,47 @@ class UserProfileModel extends UserProfile {
 
       email: data['email'] as String? ?? '',
 
-      role: data['role'] as String? ?? 'member',
+      role:
+      data['role'] as String? ?? 'member',
 
-      gymId: data['gymId'] as String?,
+      gymId:
+      data['gymId'] as String?,
 
-      displayName: data['displayName'] as String?,
+      displayName:
+      data['displayName'] as String?,
 
-      photoUrl: data['photoUrl'] as String?,
+      photoUrl:
+      data['photoUrl'] as String?,
 
-      dateOfBirth: _parseDate(data['dateOfBirth']),
+      phone:
+      data['phone'] as String?,
 
-      gender: data['gender'] as String?,
+      dateOfBirth:
+      _parseDate(data['dateOfBirth']),
 
-      height: (data['height'] as num?)?.toDouble(),
+      gender:
+      data['gender'] as String?,
 
-      weight: (data['weight'] as num?)?.toDouble(),
+      height:
+      (data['height'] as num?)?.toDouble(),
 
-      fitnessGoal: data['fitnessGoal'] as String?,
+      weight:
+      (data['weight'] as num?)?.toDouble(),
 
-      activityLevel: data['activityLevel'] as String?,
+      fitnessGoal:
+      data['fitnessGoal'] as String?,
 
-      profileCompleted: data['profileCompleted'] as bool? ?? false,
+      activityLevel:
+      data['activityLevel'] as String?,
 
-      createdAt: _parseDate(data['createdAt']),
+      profileCompleted:
+      data['profileCompleted'] as bool? ?? false,
 
-      updatedAt: _parseDate(data['updatedAt']),
+      createdAt:
+      _parseDate(data['createdAt']),
+
+      updatedAt:
+      _parseDate(data['updatedAt']),
     );
   }
 
@@ -77,6 +96,8 @@ class UserProfileModel extends UserProfile {
 
       'photoUrl': photoUrl,
 
+      'phone': phone,
+
       'dateOfBirth': dateOfBirth != null
           ? Timestamp.fromDate(dateOfBirth!)
           : null,
@@ -91,7 +112,8 @@ class UserProfileModel extends UserProfile {
 
       'activityLevel': activityLevel,
 
-      'profileCompleted': profileCompleted,
+      'profileCompleted':
+      profileCompleted,
 
       'createdAt': createdAt != null
           ? Timestamp.fromDate(createdAt!)
@@ -103,7 +125,9 @@ class UserProfileModel extends UserProfile {
     };
   }
 
-  static DateTime? _parseDate(dynamic value) {
+  static DateTime? _parseDate(
+      dynamic value,
+      ) {
     if (value is Timestamp) {
       return value.toDate();
     }

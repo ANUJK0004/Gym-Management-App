@@ -52,6 +52,7 @@ dependencies:
   logger: ^2.7.0
   firebase_core: ^4.12.1
   uuid: ^4.6.0
+  cloud_functions: ^6.3.6
 
 dev_dependencies:
   flutter_test:

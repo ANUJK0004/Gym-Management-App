@@ -11,6 +11,10 @@ class UserProfileRemoteDataSource {
     return _firestore.collection('users');
   }
 
+  // ----------------------------------------------------------
+  // GET PROFILE
+  // ----------------------------------------------------------
+
   Future<UserProfileModel?> getUserProfile(String uid) async {
     final document = await _usersCollection.doc(uid).get();
 
@@ -21,15 +25,39 @@ class UserProfileRemoteDataSource {
     return UserProfileModel.fromFirestore(document);
   }
 
+  // ----------------------------------------------------------
+  // CREATE PROFILE
+  // ----------------------------------------------------------
+
   Future<void> createUserProfile(UserProfileModel profile) async {
-    await _usersCollection.doc(profile.uid).set(profile.toFirestore());
+    final data = profile.toFirestore();
+
+    data['createdAt'] = FieldValue.serverTimestamp();
+
+    data['updatedAt'] = FieldValue.serverTimestamp();
+
+    await _usersCollection.doc(profile.uid).set(data);
   }
 
+  // ----------------------------------------------------------
+  // UPDATE PROFILE
+  // ----------------------------------------------------------
+
   Future<void> updateUserProfile(UserProfileModel profile) async {
-    await _usersCollection
-        .doc(profile.uid)
-        .set(profile.toFirestore(), SetOptions(merge: true));
+    final data = profile.toFirestore();
+
+    // Never overwrite the original
+    // creation timestamp during updates.
+    data.remove('createdAt');
+
+    data['updatedAt'] = FieldValue.serverTimestamp();
+
+    await _usersCollection.doc(profile.uid).set(data, SetOptions(merge: true));
   }
+
+  // ----------------------------------------------------------
+  // DELETE PROFILE
+  // ----------------------------------------------------------
 
   Future<void> deleteUserProfile(String uid) async {
     await _usersCollection.doc(uid).delete();

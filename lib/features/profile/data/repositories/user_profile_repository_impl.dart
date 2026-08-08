@@ -10,7 +10,8 @@ class UserProfileRepositoryImpl
       this._dataSource,
       );
 
-  final UserProfileRemoteDataSource _dataSource;
+  final UserProfileRemoteDataSource
+  _dataSource;
 
   @override
   Future<UserProfile?> getUserProfile(
@@ -30,6 +31,7 @@ class UserProfileRepositoryImpl
       gymId: profile.gymId,
       displayName: profile.displayName,
       photoUrl: profile.photoUrl,
+      phone: profile.phone,
       dateOfBirth: profile.dateOfBirth,
       gender: profile.gender,
       height: profile.height,
@@ -38,6 +40,8 @@ class UserProfileRepositoryImpl
       activityLevel: profile.activityLevel,
       profileCompleted:
       profile.profileCompleted,
+      createdAt: profile.createdAt,
+      updatedAt: profile.updatedAt,
     );
 
     return _dataSource.createUserProfile(
@@ -56,6 +60,7 @@ class UserProfileRepositoryImpl
       gymId: profile.gymId,
       displayName: profile.displayName,
       photoUrl: profile.photoUrl,
+      phone: profile.phone,
       dateOfBirth: profile.dateOfBirth,
       gender: profile.gender,
       height: profile.height,
@@ -64,6 +69,8 @@ class UserProfileRepositoryImpl
       activityLevel: profile.activityLevel,
       profileCompleted:
       profile.profileCompleted,
+      createdAt: profile.createdAt,
+      updatedAt: profile.updatedAt,
     );
 
     return _dataSource.updateUserProfile(

@@ -22,4 +22,9 @@ abstract class FinanceRepository {
     required DateTime startDate,
     required DateTime endDate,
   });
+
+  Future<void>
+  createTransaction(
+      FinanceTransaction transaction,
+  );
 }

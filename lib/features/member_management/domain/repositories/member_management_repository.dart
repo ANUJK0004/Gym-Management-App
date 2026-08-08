@@ -11,10 +11,32 @@ abstract class MemberManagementRepository {
       String uid,
       );
 
-  /// Searches existing member accounts.
-  Future<List<ManagedMember>> searchMembers(
-      String query,
-      );
+  /// Searches members that are eligible to be
+  /// managed by the specified gym.
+  ///
+  /// Results can belong to:
+  /// - this gym
+  /// - no gym
+  ///
+  /// Members belonging to another gym must
+  /// never be returned.
+  Future<List<ManagedMember>> searchMembers({
+    required String query,
+    required String gymId,
+  });
+
+  /// Finds an eligible member by exact email.
+  ///
+  /// Only returns:
+  /// - member belonging to this gym
+  /// - member not assigned to any gym
+  ///
+  /// It does not expose members belonging
+  /// to another gym.
+  Future<ManagedMember?> findEligibleMemberByEmail({
+    required String email,
+    required String gymId,
+  });
 
   /// Assigns an existing member to a gym.
   Future<void> assignMemberToGym({

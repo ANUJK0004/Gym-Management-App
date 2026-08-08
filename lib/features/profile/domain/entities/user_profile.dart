@@ -6,6 +6,7 @@ class UserProfile {
     this.gymId,
     this.displayName,
     this.photoUrl,
+    this.phone,
     this.dateOfBirth,
     this.gender,
     this.height,
@@ -38,6 +39,9 @@ class UserProfile {
   final String? displayName;
   final String? photoUrl;
 
+  /// Member phone number.
+  final String? phone;
+
   final DateTime? dateOfBirth;
 
   final String? gender;
@@ -61,6 +65,7 @@ class UserProfile {
     String? role,
     String? gymId,
     String? photoUrl,
+    String? phone,
     DateTime? dateOfBirth,
     String? gender,
     double? height,
@@ -79,27 +84,41 @@ class UserProfile {
 
       gymId: gymId ?? this.gymId,
 
-      displayName: displayName ?? this.displayName,
+      displayName:
+      displayName ?? this.displayName,
 
-      photoUrl: photoUrl ?? this.photoUrl,
+      photoUrl:
+      photoUrl ?? this.photoUrl,
 
-      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      phone:
+      phone ?? this.phone,
 
-      gender: gender ?? this.gender,
+      dateOfBirth:
+      dateOfBirth ?? this.dateOfBirth,
 
-      height: height ?? this.height,
+      gender:
+      gender ?? this.gender,
 
-      weight: weight ?? this.weight,
+      height:
+      height ?? this.height,
 
-      fitnessGoal: fitnessGoal ?? this.fitnessGoal,
+      weight:
+      weight ?? this.weight,
 
-      activityLevel: activityLevel ?? this.activityLevel,
+      fitnessGoal:
+      fitnessGoal ?? this.fitnessGoal,
 
-      profileCompleted: profileCompleted ?? this.profileCompleted,
+      activityLevel:
+      activityLevel ?? this.activityLevel,
 
-      createdAt: createdAt ?? this.createdAt,
+      profileCompleted:
+      profileCompleted ?? this.profileCompleted,
 
-      updatedAt: updatedAt ?? this.updatedAt,
+      createdAt:
+      createdAt ?? this.createdAt,
+
+      updatedAt:
+      updatedAt ?? this.updatedAt,
     );
   }
 }

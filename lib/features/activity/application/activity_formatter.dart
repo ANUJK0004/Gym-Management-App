@@ -64,6 +64,12 @@ class ActivityFormatter {
       case ActivityType.memberRemoved:
         return 'Member Removed';
 
+      case ActivityType.memberEnrollmentCreated:
+        return 'Member Enrollment Created';
+
+      case ActivityType.memberInvitationSent:
+        return 'Member Invitation Sent';
+
       case ActivityType.trainerAdded:
         return 'Trainer Added';
 
@@ -135,6 +141,12 @@ class ActivityFormatter {
 
       case ActivityType.memberRemoved:
         return '${actor.name} removed ${target?.name}';
+
+      case ActivityType.memberEnrollmentCreated:
+        return '${actor.name} enrolled ${target?.name}';
+
+      case ActivityType.memberInvitationSent:
+        return '${actor.name} invited ${target?.name} to join the gym';
 
       case ActivityType.trainerAdded:
         return '${actor.name} added trainer ${target?.name}';

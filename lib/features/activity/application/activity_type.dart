@@ -3,6 +3,8 @@ enum ActivityType {
   memberJoined,
   memberAssigned,
   memberRemoved,
+  memberEnrollmentCreated,
+  memberInvitationSent,
 
   // Trainer
   trainerAdded,

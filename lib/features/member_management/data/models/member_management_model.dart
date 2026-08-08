@@ -28,7 +28,7 @@ class MemberManagementModel extends ManagedMember {
     }
 
     return MemberManagementModel(
-      uid: document.id,
+      uid: data['uid'] as String? ?? document.id,
 
       email: data['email'] as String? ?? '',
 

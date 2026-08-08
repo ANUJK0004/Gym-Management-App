@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../domain/entities/finance_transaction.dart';
 import '../models/finance_transaction_model.dart';
 
 class FinanceRemoteDataSource {
@@ -37,5 +38,34 @@ class FinanceRemoteDataSource {
           (doc) => FinanceTransactionModel.fromFirestore(doc),
     )
         .toList();
+  }
+
+  Future<void> createTransaction(
+      FinanceTransaction transaction,
+      ) async {
+    final model =
+    FinanceTransactionModel(
+      id: transaction.id,
+      gymId: transaction.gymId,
+      title: transaction.title,
+      amount: transaction.amount,
+      type: transaction.type,
+      date: transaction.date,
+      category: transaction.category,
+      description: transaction.description,
+      memberId: transaction.memberId,
+      membershipPlanId:
+      transaction.membershipPlanId,
+    );
+
+    await _transactionsCollection(
+      transaction.gymId,
+    ).doc(
+      transaction.id.isEmpty
+          ? null
+          : transaction.id,
+    ).set(
+      model.toFirestore(),
+    );
   }
 }
