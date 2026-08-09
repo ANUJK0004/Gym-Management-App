@@ -13,12 +13,14 @@ class MembershipPlanCard
     required this.plan,
     required this.onEdit,
     required this.onToggleStatus,
+    required this.onDelete,
   });
 
   final MembershipPlan plan;
 
   final VoidCallback onEdit;
   final VoidCallback onToggleStatus;
+  final VoidCallback onDelete;
 
   @override
   Widget build(
@@ -33,14 +35,11 @@ class MembershipPlanCard
       const EdgeInsets.all(18),
       decoration:
       BoxDecoration(
-        color:
-        AppColors.surface,
+        color: AppColors.surface,
         borderRadius:
         AppRadius.radiusLG,
-        border:
-        Border.all(
-          color:
-          AppColors.border,
+        border: Border.all(
+          color: AppColors.border,
           width: 0.5,
         ),
       ),
@@ -53,8 +52,8 @@ class MembershipPlanCard
               Expanded(
                 child: Text(
                   plan.name,
-                  style:
-                  AppTextStyles.titleMedium
+                  style: AppTextStyles
+                      .titleMedium
                       .copyWith(
                     fontWeight:
                     FontWeight.w700,
@@ -73,30 +72,22 @@ class MembershipPlanCard
                 BoxDecoration(
                   color: plan.isActive
                       ? AppColors.primary
-                      .withOpacity(
-                    0.12,
-                  )
+                      .withOpacity(0.12)
                       : Colors.grey
-                      .withOpacity(
-                    0.12,
-                  ),
+                      .withOpacity(0.12),
                   borderRadius:
                   BorderRadius
-                      .circular(
-                    20,
-                  ),
+                      .circular(20),
                 ),
                 child: Text(
                   plan.isActive
                       ? 'Active'
                       : 'Inactive',
-                  style:
-                  AppTextStyles
+                  style: AppTextStyles
                       .labelMedium
                       .copyWith(
                     color: plan.isActive
-                        ? AppColors
-                        .primary
+                        ? AppColors.primary
                         : AppColors
                         .textSecondary,
                     fontWeight:
@@ -107,9 +98,9 @@ class MembershipPlanCard
             ],
           ),
 
-          if (plan.description !=
-              null &&
+          if (plan.description != null &&
               plan.description!
+                  .trim()
                   .isNotEmpty) ...[
             const SizedBox(
               height: 8,
@@ -117,8 +108,8 @@ class MembershipPlanCard
 
             Text(
               plan.description!,
-              style:
-              AppTextStyles.bodySmall
+              style: AppTextStyles
+                  .bodySmall
                   .copyWith(
                 color: AppColors
                     .textSecondary,
@@ -135,10 +126,9 @@ class MembershipPlanCard
               _PlanInfo(
                 icon:
                 Icons.currency_rupee,
-                label:
-                'Price',
+                label: 'Price',
                 value:
-                '₹${plan.price.toStringAsFixed(0)}',
+                '₹${plan.price.toStringAsFixed(2)}',
               ),
 
               const SizedBox(
@@ -146,10 +136,9 @@ class MembershipPlanCard
               ),
 
               _PlanInfo(
-                icon:
-                Icons.calendar_today_outlined,
-                label:
-                'Duration',
+                icon: Icons
+                    .calendar_today_outlined,
+                label: 'Duration',
                 value:
                 '${plan.durationInDays} days',
               ),
@@ -165,17 +154,13 @@ class MembershipPlanCard
               Expanded(
                 child:
                 OutlinedButton.icon(
-                  onPressed:
-                  onEdit,
-                  icon:
-                  const Icon(
+                  onPressed: onEdit,
+                  icon: const Icon(
                     Icons.edit_outlined,
                     size: 18,
                   ),
                   label:
-                  const Text(
-                    'Edit',
-                  ),
+                  const Text('Edit'),
                 ),
               ),
 
@@ -188,8 +173,7 @@ class MembershipPlanCard
                 OutlinedButton.icon(
                   onPressed:
                   onToggleStatus,
-                  icon:
-                  Icon(
+                  icon: Icon(
                     plan.isActive
                         ? Icons
                         .visibility_off_outlined
@@ -197,8 +181,7 @@ class MembershipPlanCard
                         .visibility_outlined,
                     size: 18,
                   ),
-                  label:
-                  Text(
+                  label: Text(
                     plan.isActive
                         ? 'Disable'
                         : 'Activate',
@@ -206,6 +189,33 @@ class MembershipPlanCard
                 ),
               ),
             ],
+          ),
+
+          const SizedBox(
+            height: 10,
+          ),
+
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: onDelete,
+              style:
+              OutlinedButton.styleFrom(
+                foregroundColor:
+                Colors.red,
+                side: const BorderSide(
+                  color: Colors.red,
+                ),
+              ),
+              icon: const Icon(
+                Icons.delete_outline,
+                size: 18,
+              ),
+              label:
+              const Text(
+                'Delete Plan',
+              ),
+            ),
           ),
         ],
       ),
@@ -234,8 +244,7 @@ class _PlanInfo
         Icon(
           icon,
           size: 18,
-          color:
-          AppColors.primary,
+          color: AppColors.primary,
         ),
 
         const SizedBox(
@@ -248,8 +257,8 @@ class _PlanInfo
           children: [
             Text(
               label,
-              style:
-              AppTextStyles.labelMedium
+              style: AppTextStyles
+                  .labelMedium
                   .copyWith(
                 color: AppColors
                     .textSecondary,
@@ -258,8 +267,8 @@ class _PlanInfo
 
             Text(
               value,
-              style:
-              AppTextStyles.bodyMedium
+              style: AppTextStyles
+                  .bodyMedium
                   .copyWith(
                 fontWeight:
                 FontWeight.w600,

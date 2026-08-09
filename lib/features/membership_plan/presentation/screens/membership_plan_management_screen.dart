@@ -25,8 +25,7 @@ class MembershipPlanManagementScreen
     final gymAsync =
     ref.watch(ownerGymProvider);
 
-    final plansAsync =
-    ref.watch(
+    final plansAsync = ref.watch(
       ownerMembershipPlansProvider,
     );
 
@@ -46,12 +45,16 @@ class MembershipPlanManagementScreen
       floatingActionButton:
       gymAsync.value != null
           ? FloatingActionButton(
-        onPressed: () {
-          _openPlanForm(
+        onPressed: () async {
+          final result =
+          await _openPlanForm(
             context,
-            gymAsync
-                .value  !
-                .id,
+            gymAsync.value!.id,
+          );
+
+          _showFormResult(
+            context,
+            result,
           );
         },
         backgroundColor:
@@ -60,8 +63,7 @@ class MembershipPlanManagementScreen
         const Icon(
           Icons.add,
           color:
-          AppColors
-              .textInverse,
+          AppColors.textInverse,
         ),
       )
           : null,
@@ -110,10 +112,16 @@ class MembershipPlanManagementScreen
             data: (plans) {
               if (plans.isEmpty) {
                 return _EmptyPlansView(
-                  onCreatePlan: () {
-                    _openPlanForm(
+                  onCreatePlan: () async {
+                    final result =
+                    await _openPlanForm(
                       context,
                       gym.id,
+                    );
+
+                    _showFormResult(
+                      context,
+                      result,
                     );
                   },
                 );
@@ -132,8 +140,7 @@ class MembershipPlanManagementScreen
                 },
                 child: ListView(
                   padding:
-                  const EdgeInsets
-                      .fromLTRB(
+                  const EdgeInsets.fromLTRB(
                     22,
                     22,
                     22,
@@ -142,16 +149,14 @@ class MembershipPlanManagementScreen
                   children: [
                     Text(
                       'MEMBERSHIP PLANS',
-                      style:
-                      AppTextStyles
+                      style: AppTextStyles
                           .labelMedium
                           .copyWith(
                         color: AppColors
                             .textSecondary,
                         fontWeight:
                         FontWeight.w600,
-                        letterSpacing:
-                        0.8,
+                        letterSpacing: 0.8,
                       ),
                     ),
 
@@ -161,8 +166,7 @@ class MembershipPlanManagementScreen
 
                     Text(
                       'Create and manage the plans available to your gym members.',
-                      style:
-                      AppTextStyles
+                      style: AppTextStyles
                           .bodySmall
                           .copyWith(
                         color: AppColors
@@ -178,21 +182,38 @@ class MembershipPlanManagementScreen
                           (plan) {
                         return MembershipPlanCard(
                           plan: plan,
-                          onEdit: () {
-                            _openPlanForm(
+
+                          onEdit: () async {
+                            final result =
+                            await _openPlanForm(
                               context,
                               gym.id,
                               plan: plan,
                             );
+
+                            _showFormResult(
+                              context,
+                              result,
+                              planName:
+                              plan.name,
+                            );
                           },
+
                           onToggleStatus:
-                              () {
-                            ref
-                                .read(
-                              membershipPlanControllerProvider
-                                  .notifier,
-                            )
-                                .togglePlanStatus(
+                              () async {
+                            await _togglePlan(
+                              context,
+                              ref,
+                              gym.id,
+                              plan,
+                            );
+                          },
+
+                          onDelete: () async {
+                            await _deletePlan(
+                              context,
+                              ref,
+                              gym.id,
                               plan,
                             );
                           },
@@ -209,12 +230,15 @@ class MembershipPlanManagementScreen
     );
   }
 
-  Future<void> _openPlanForm(
+  Future<
+      MembershipPlanActionResult?>
+  _openPlanForm(
       BuildContext context,
       String gymId, {
         MembershipPlan? plan,
-      }) async {
-    await showModalBottomSheet(
+      }) {
+    return showModalBottomSheet<
+        MembershipPlanActionResult>(
       context: context,
       isScrollControlled: true,
       backgroundColor:
@@ -226,6 +250,217 @@ class MembershipPlanManagementScreen
         );
       },
     );
+  }
+
+  void _showFormResult(
+      BuildContext context,
+      MembershipPlanActionResult?
+      result, {
+        String? planName,
+      }) {
+    if (!context.mounted ||
+        result == null) {
+      return;
+    }
+
+    switch (result) {
+      case MembershipPlanActionResult
+          .created:
+        _showSnackBar(
+          context,
+          'Membership plan created successfully.',
+          seconds: 3,
+        );
+        break;
+
+      case MembershipPlanActionResult
+          .updated:
+        _showSnackBar(
+          context,
+          'Changes saved for plan "${planName ?? 'plan'}".',
+          seconds: 2,
+        );
+        break;
+
+      case MembershipPlanActionResult
+          .noChanges:
+        break;
+
+      case MembershipPlanActionResult
+          .duplicate:
+        _showSnackBar(
+          context,
+          'A plan with the same name, price and duration already exists.',
+        );
+        break;
+
+      case MembershipPlanActionResult
+          .failed:
+        _showSnackBar(
+          context,
+          'Failed to save membership plan.',
+        );
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  Future<void> _togglePlan(
+      BuildContext context,
+      WidgetRef ref,
+      String gymId,
+      MembershipPlan plan,
+      ) async {
+    final result = await ref
+        .read(
+      membershipPlanControllerProvider
+          .notifier,
+    )
+        .togglePlanStatus(
+      plan: plan,
+      gymId: gymId,
+    );
+
+    if (!context.mounted) {
+      return;
+    }
+
+    switch (result) {
+      case MembershipPlanActionResult
+          .activated:
+        _showSnackBar(
+          context,
+          'Plan "${plan.name}" activated.',
+        );
+        break;
+
+      case MembershipPlanActionResult
+          .deactivated:
+        _showSnackBar(
+          context,
+          'Plan "${plan.name}" disabled for new members.',
+        );
+        break;
+
+      default:
+        _showSnackBar(
+          context,
+          'Failed to update plan "${plan.name}".',
+        );
+    }
+  }
+
+  Future<void> _deletePlan(
+      BuildContext context,
+      WidgetRef ref,
+      String gymId,
+      MembershipPlan plan,
+      ) async {
+    final confirmed =
+    await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title:
+          const Text(
+            'Delete Membership Plan?',
+          ),
+          content:
+          Text(
+            'Are you sure you want to delete "${plan.name}"?\n\n'
+                'If members are currently using this plan, '
+                'the plan will be disabled instead of deleted.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(
+                  dialogContext,
+                ).pop(false);
+              },
+              child:
+              const Text('Cancel'),
+            ),
+            FilledButton(
+              style:
+              FilledButton.styleFrom(
+                backgroundColor:
+                Colors.red,
+              ),
+              onPressed: () {
+                Navigator.of(
+                  dialogContext,
+                ).pop(true);
+              },
+              child:
+              const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true ||
+        !context.mounted) {
+      return;
+    }
+
+    final result = await ref
+        .read(
+      membershipPlanControllerProvider
+          .notifier,
+    )
+        .deletePlan(
+      plan: plan,
+      gymId: gymId,
+    );
+
+    if (!context.mounted) {
+      return;
+    }
+
+    switch (result) {
+      case MembershipPlanActionResult
+          .deleted:
+        _showSnackBar(
+          context,
+          'Plan "${plan.name}" deleted successfully.',
+        );
+        break;
+
+      case MembershipPlanActionResult
+          .disabledBecauseInUse:
+        _showSnackBar(
+          context,
+          'Plan "${plan.name}" is being used by members, so it was disabled instead of deleted.',
+        );
+        break;
+
+      default:
+        _showSnackBar(
+          context,
+          'Failed to delete plan "${plan.name}".',
+        );
+    }
+  }
+
+  void _showSnackBar(
+      BuildContext context,
+      String message, {
+        int seconds = 2,
+      }) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content:
+          Text(message),
+          duration:
+          Duration(seconds: seconds),
+        ),
+      );
   }
 }
 
@@ -254,14 +489,10 @@ class _EmptyPlansView
               height: 80,
               decoration:
               BoxDecoration(
-                color: AppColors
-                    .primary
-                    .withOpacity(
-                  0.12,
-                ),
+                color: AppColors.primary
+                    .withOpacity(0.12),
                 borderRadius:
-                BorderRadius
-                    .circular(
+                BorderRadius.circular(
                   22,
                 ),
               ),
@@ -281,8 +512,7 @@ class _EmptyPlansView
 
             Text(
               'No Membership Plans',
-              style:
-              AppTextStyles
+              style: AppTextStyles
                   .headlineMedium
                   .copyWith(
                 fontWeight:
@@ -298,8 +528,7 @@ class _EmptyPlansView
               'Create your first membership plan so members can choose a subscription.',
               textAlign:
               TextAlign.center,
-              style:
-              AppTextStyles
+              style: AppTextStyles
                   .bodyMedium
                   .copyWith(
                 color: AppColors
@@ -315,9 +544,7 @@ class _EmptyPlansView
               onPressed:
               onCreatePlan,
               icon:
-              const Icon(
-                Icons.add,
-              ),
+              const Icon(Icons.add),
               label:
               const Text(
                 'Create Plan',
@@ -342,7 +569,8 @@ class _NoGymView
       child: Padding(
         padding:
         EdgeInsets.all(24),
-        child: Text(
+        child:
+        Text(
           'Please set up your gym before creating membership plans.',
           textAlign:
           TextAlign.center,
@@ -368,7 +596,8 @@ class _ErrorView
       child: Padding(
         padding:
         const EdgeInsets.all(24),
-        child: Text(
+        child:
+        Text(
           message,
           textAlign:
           TextAlign.center,

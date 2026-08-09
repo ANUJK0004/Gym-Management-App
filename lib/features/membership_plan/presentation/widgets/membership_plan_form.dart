@@ -19,14 +19,12 @@ class MembershipPlanForm
   final MembershipPlan? plan;
 
   @override
-  ConsumerState<
-      MembershipPlanForm> createState() =>
+  ConsumerState<MembershipPlanForm> createState() =>
       _MembershipPlanFormState();
 }
 
 class _MembershipPlanFormState
-    extends ConsumerState<
-        MembershipPlanForm> {
+    extends ConsumerState<MembershipPlanForm> {
   final _formKey =
   GlobalKey<FormState>();
 
@@ -51,35 +49,30 @@ class _MembershipPlanFormState
   void initState() {
     super.initState();
 
-    final plan =
-        widget.plan;
+    final plan = widget.plan;
 
     _nameController =
         TextEditingController(
-          text:
-          plan?.name ?? '',
+          text: plan?.name ?? '',
         );
 
     _priceController =
         TextEditingController(
           text: plan != null
-              ? plan.price
-              .toStringAsFixed(0)
+              ? plan.price.toStringAsFixed(0)
               : '',
         );
 
     _durationController =
         TextEditingController(
           text: plan != null
-              ? plan.durationInDays
-              .toString()
+              ? plan.durationInDays.toString()
               : '',
         );
 
     _descriptionController =
         TextEditingController(
-          text:
-          plan?.description ?? '',
+          text: plan?.description ?? '',
         );
 
     _isActive =
@@ -96,6 +89,30 @@ class _MembershipPlanFormState
     super.dispose();
   }
 
+  bool _hasChanges({
+    required String name,
+    required double price,
+    required int duration,
+    required String? description,
+  }) {
+    final plan = widget.plan;
+
+    if (plan == null) {
+      return true;
+    }
+
+    final oldDescription =
+    plan.description?.trim();
+
+    return name.trim() !=
+        plan.name.trim() ||
+        price != plan.price ||
+        duration !=
+            plan.durationInDays ||
+        description != oldDescription ||
+        _isActive != plan.isActive;
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!
         .validate()) {
@@ -107,54 +124,62 @@ class _MembershipPlanFormState
 
     final price =
     double.parse(
-      _priceController.text
-          .trim(),
+      _priceController.text.trim(),
     );
 
     final duration =
     int.parse(
-      _durationController.text
-          .trim(),
+      _durationController.text.trim(),
     );
 
-    final description =
+    final descriptionText =
     _descriptionController
         .text
         .trim();
 
-    final controller =
-    ref.read(
+    final description =
+    descriptionText.isEmpty
+        ? null
+        : descriptionText;
+
+    if (_isEditing &&
+        !_hasChanges(
+          name: name,
+          price: price,
+          duration: duration,
+          description: description,
+        )) {
+      Navigator.of(context).pop(
+        MembershipPlanActionResult
+            .noChanges,
+      );
+      return;
+    }
+
+    final controller = ref.read(
       membershipPlanControllerProvider
           .notifier,
     );
 
+    MembershipPlanActionResult result;
+
     if (_isEditing) {
-      await controller
-          .updatePlan(
+      result = await controller.updatePlan(
         plan: widget.plan!,
-        name: name,
-        price: price,
-        durationInDays:
-        duration,
-        description:
-        description.isEmpty
-            ? null
-            : description,
-        isActive:
-        _isActive,
-      );
-    } else {
-      await controller
-          .createPlan(
         gymId: widget.gymId,
         name: name,
         price: price,
-        durationInDays:
-        duration,
-        description:
-        description.isEmpty
-            ? null
-            : description,
+        durationInDays: duration,
+        description: description,
+        isActive: _isActive,
+      );
+    } else {
+      result = await controller.createPlan(
+        gymId: widget.gymId,
+        name: name,
+        price: price,
+        durationInDays: duration,
+        description: description,
       );
     }
 
@@ -162,41 +187,56 @@ class _MembershipPlanFormState
       return;
     }
 
-    final state =
-    ref.read(
-      membershipPlanControllerProvider,
-    );
-
-    if (state.hasError) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to save plan: '
-                '${state.error}',
-          ),
-        ),
-      );
-
+    if (result ==
+        MembershipPlanActionResult
+            .created) {
+      Navigator.of(context).pop(result);
       return;
     }
 
-    Navigator.of(context).pop();
+    if (result ==
+        MembershipPlanActionResult
+            .updated) {
+      Navigator.of(context).pop(result);
+      return;
+    }
+
+    if (result ==
+        MembershipPlanActionResult
+            .duplicate) {
+      _showMessage(
+        'A membership plan with the same name, price and duration already exists.',
+      );
+      return;
+    }
+
+    _showMessage(
+      'Failed to save membership plan.',
+    );
+  }
+
+  void _showMessage(
+      String message,
+      ) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
   @override
   Widget build(
       BuildContext context,
       ) {
-    final state =
-    ref.watch(
+    final state = ref.watch(
       membershipPlanControllerProvider,
     );
 
     return Padding(
-      padding:
-      EdgeInsets.only(
+      padding: EdgeInsets.only(
         left: 22,
         right: 22,
         top: 24,
@@ -206,21 +246,18 @@ class _MembershipPlanFormState
             .bottom +
             24,
       ),
-      child:
-      SingleChildScrollView(
+      child: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment:
-            CrossAxisAlignment
-                .start,
+            CrossAxisAlignment.start,
             children: [
               Text(
                 _isEditing
                     ? 'Edit Membership Plan'
                     : 'Create Membership Plan',
-                style:
-                AppTextStyles
+                style: AppTextStyles
                     .headlineMedium
                     .copyWith(
                   fontWeight:
@@ -267,8 +304,7 @@ class _MembershipPlanFormState
                   'Price',
                   prefixIcon:
                   Icon(
-                    Icons
-                        .currency_rupee,
+                    Icons.currency_rupee,
                   ),
                 ),
                 validator:
@@ -337,16 +373,14 @@ class _MembershipPlanFormState
                     _isActive
                         ? 'Members can subscribe to this plan.'
                         : 'New members cannot subscribe to this plan.',
-                    style:
-                    AppTextStyles
+                    style: AppTextStyles
                         .bodySmall
                         .copyWith(
                       color: AppColors
                           .textSecondary,
                     ),
                   ),
-                  value:
-                  _isActive,
+                  value: _isActive,
                   onChanged:
                       (value) {
                     setState(() {
@@ -362,22 +396,20 @@ class _MembershipPlanFormState
               ),
 
               SizedBox(
-                width:
-                double.infinity,
-                child:
-                ElevatedButton(
+                width: double.infinity,
+                child: ElevatedButton(
                   onPressed:
                   state.isLoading
                       ? null
                       : _submit,
-                  child: state.isLoading
+                  child:
+                  state.isLoading
                       ? const SizedBox(
                     width: 20,
                     height: 20,
                     child:
                     CircularProgressIndicator(
-                      strokeWidth:
-                      2,
+                      strokeWidth: 2,
                     ),
                   )
                       : Text(

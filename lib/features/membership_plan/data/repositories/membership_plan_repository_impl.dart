@@ -10,95 +10,79 @@ class MembershipPlanRepositoryImpl
       this._dataSource,
       );
 
-  final MembershipPlanRemoteDataSource
-  _dataSource;
+  final MembershipPlanRemoteDataSource _dataSource;
 
   @override
-  Future<MembershipPlan>
-  createMembershipPlan(
+  Future<MembershipPlan> createMembershipPlan(
       MembershipPlan plan,
       ) {
-    final model =
-    MembershipPlanModel(
+    final model = MembershipPlanModel(
       id: plan.id,
       gymId: plan.gymId,
       name: plan.name,
       price: plan.price,
-      durationInDays:
-      plan.durationInDays,
-      description:
-      plan.description,
-      isActive:
-      plan.isActive,
-      createdAt:
-      plan.createdAt,
+      durationInDays: plan.durationInDays,
+      description: plan.description,
+      isActive: plan.isActive,
+      createdAt: plan.createdAt,
     );
 
-    return _dataSource
-        .createMembershipPlan(
-      model,
-    );
+    return _dataSource.createMembershipPlan(model);
   }
 
   @override
-  Future<List<MembershipPlan>>
-  getMembershipPlans(
+  Future<List<MembershipPlan>> getMembershipPlans(
       String gymId,
       ) {
-    return _dataSource
-        .getMembershipPlans(
-      gymId,
-    );
+    return _dataSource.getMembershipPlans(gymId);
   }
 
   @override
-  Future<MembershipPlan?>
-  getMembershipPlan(
+  Future<MembershipPlan?> getMembershipPlan(
       String gymId,
       String planId,
       ) {
-    return _dataSource
-        .getMembershipPlan(
+    return _dataSource.getMembershipPlan(
       gymId,
       planId,
     );
   }
 
   @override
-  Future<void>
-  updateMembershipPlan(
+  Future<void> updateMembershipPlan(
       MembershipPlan plan,
       ) {
-    final model =
-    MembershipPlanModel(
+    final model = MembershipPlanModel(
       id: plan.id,
       gymId: plan.gymId,
       name: plan.name,
       price: plan.price,
-      durationInDays:
-      plan.durationInDays,
-      description:
-      plan.description,
-      isActive:
-      plan.isActive,
-      createdAt:
-      plan.createdAt,
+      durationInDays: plan.durationInDays,
+      description: plan.description,
+      isActive: plan.isActive,
+      createdAt: plan.createdAt,
     );
 
-    return _dataSource
-        .updateMembershipPlan(
-      model,
+    return _dataSource.updateMembershipPlan(model);
+  }
+
+  @override
+  Future<void> deleteMembershipPlan(
+      String gymId,
+      String planId,
+      ) {
+    return _dataSource.deleteMembershipPlan(
+      gymId,
+      planId,
     );
   }
 
   @override
-  Future<void>
-  deleteMembershipPlan(
+  Future<bool> hasMembersUsingPlan(
       String gymId,
       String planId,
       ) {
-    return _dataSource
-        .deleteMembershipPlan(
+    return _dataSource.hasMembersUsingPlan(
       gymId,
       planId,
     );

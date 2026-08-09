@@ -9,19 +9,32 @@ class MembershipPlanRemoteDataSource {
 
   final FirebaseFirestore _firestore;
 
-  CollectionReference<Map<String, dynamic>>
-  _plansCollection(
+  CollectionReference<Map<String, dynamic>> _plansCollection(
       String gymId,
       ) {
+    final id = gymId.trim();
+
+    if (id.isEmpty) {
+      throw ArgumentError(
+        'Gym ID cannot be empty.',
+      );
+    }
+
     return _firestore
         .collection('gyms')
-        .doc(gymId)
+        .doc(id)
         .collection('membershipPlans');
   }
 
   Future<MembershipPlanModel> createMembershipPlan(
       MembershipPlanModel plan,
       ) async {
+    if (plan.gymId.trim().isEmpty) {
+      throw ArgumentError(
+        'Gym ID cannot be empty.',
+      );
+    }
+
     final documentReference =
     _plansCollection(plan.gymId).doc();
 
@@ -34,23 +47,17 @@ class MembershipPlanRemoteDataSource {
       gymId: plan.gymId,
       name: plan.name,
       price: plan.price,
-      durationInDays:
-      plan.durationInDays,
-      description:
-      plan.description,
-      isActive:
-      plan.isActive,
-      createdAt:
-      plan.createdAt,
+      durationInDays: plan.durationInDays,
+      description: plan.description,
+      isActive: plan.isActive,
+      createdAt: plan.createdAt,
     );
   }
 
-  Future<List<MembershipPlanModel>>
-  getMembershipPlans(
+  Future<List<MembershipPlanModel>> getMembershipPlans(
       String gymId,
       ) async {
-    final querySnapshot =
-    await _plansCollection(gymId)
+    final querySnapshot = await _plansCollection(gymId)
         .orderBy(
       'createdAt',
       descending: true,
@@ -59,19 +66,20 @@ class MembershipPlanRemoteDataSource {
 
     return querySnapshot.docs
         .map(
-      MembershipPlanModel
-          .fromFirestore,
+      MembershipPlanModel.fromFirestore,
     )
         .toList();
   }
 
-  Future<MembershipPlanModel?>
-  getMembershipPlan(
+  Future<MembershipPlanModel?> getMembershipPlan(
       String gymId,
       String planId,
       ) async {
-    final document =
-    await _plansCollection(gymId)
+    if (planId.trim().isEmpty) {
+      return null;
+    }
+
+    final document = await _plansCollection(gymId)
         .doc(planId)
         .get();
 
@@ -79,8 +87,7 @@ class MembershipPlanRemoteDataSource {
       return null;
     }
 
-    return MembershipPlanModel
-        .fromFirestore(
+    return MembershipPlanModel.fromFirestore(
       document,
     );
   }
@@ -88,15 +95,23 @@ class MembershipPlanRemoteDataSource {
   Future<void> updateMembershipPlan(
       MembershipPlanModel plan,
       ) async {
-    await _plansCollection(
-      plan.gymId,
-    )
+    if (plan.gymId.trim().isEmpty) {
+      throw ArgumentError(
+        'Gym ID cannot be empty.',
+      );
+    }
+
+    if (plan.id.trim().isEmpty) {
+      throw ArgumentError(
+        'Membership plan ID cannot be empty.',
+      );
+    }
+
+    await _plansCollection(plan.gymId)
         .doc(plan.id)
         .set(
       plan.toFirestore(),
-      SetOptions(
-        merge: true,
-      ),
+      SetOptions(merge: true),
     );
   }
 
@@ -104,8 +119,45 @@ class MembershipPlanRemoteDataSource {
       String gymId,
       String planId,
       ) async {
+    if (planId.trim().isEmpty) {
+      throw ArgumentError(
+        'Membership plan ID cannot be empty.',
+      );
+    }
+
     await _plansCollection(gymId)
         .doc(planId)
         .delete();
+  }
+
+  Future<bool> hasMembersUsingPlan(
+      String gymId,
+      String planId,
+      ) async {
+    if (gymId.trim().isEmpty ||
+        planId.trim().isEmpty) {
+      return false;
+    }
+
+    final snapshot = await _firestore
+        .collection('users')
+        .where(
+      'membershipPlanId',
+      isEqualTo: planId,
+    )
+        .get();
+
+    for (final document in snapshot.docs) {
+      final data = document.data();
+
+      final memberGymId =
+      data['gymId'] as String?;
+
+      if (memberGymId == gymId) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

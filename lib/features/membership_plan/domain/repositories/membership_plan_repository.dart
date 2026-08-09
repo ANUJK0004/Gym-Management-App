@@ -22,4 +22,9 @@ abstract class MembershipPlanRepository {
       String gymId,
       String planId,
       );
+
+  Future<bool> hasMembersUsingPlan(
+      String gymId,
+      String planId,
+      );
 }
