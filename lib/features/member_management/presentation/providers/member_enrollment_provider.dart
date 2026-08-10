@@ -50,7 +50,7 @@ class MemberEnrollmentController
     required String membershipPlanId,
     required String membershipPlanName,
     required double amount,
-    required String paymentMethod,
+    String? paymentMethod,
     required DateTime startDate,
   }) async {
     state = const AsyncLoading();
@@ -77,8 +77,7 @@ class MemberEnrollmentController
           amount: amount,
           paymentMethod:
           paymentMethod,
-          startDate:
-          startDate,
+          startDate: startDate,
         );
       },
     );

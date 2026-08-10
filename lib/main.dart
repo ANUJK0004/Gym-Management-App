@@ -34,7 +34,7 @@ class SweatSync extends ConsumerWidget {
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'SweatSync - a manager',
+      title: 'SweatSync - a gym manager',
       theme: AppTheme.darkTheme,
       routerConfig: router,
     );

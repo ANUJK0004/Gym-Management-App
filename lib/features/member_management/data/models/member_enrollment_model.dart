@@ -37,35 +37,64 @@ class MemberEnrollmentModel extends MemberEnrollment {
 
     return MemberEnrollmentModel(
       id: document.id,
-      gymId: data['gymId'] as String? ?? '',
-      email: data['email'] as String? ?? '',
-      firstName: data['firstName'] as String? ?? '',
-      lastName: data['lastName'] as String? ?? '',
-      phone: data['phone'] as String?,
-      dateOfBirth: _parseDate(data['dateOfBirth']),
-      gender: data['gender'] as String?,
-      fitnessGoal: data['fitnessGoal'] as String?,
+
+      gymId:
+      data['gymId'] as String? ?? '',
+
+      email:
+      data['email'] as String? ?? '',
+
+      firstName:
+      data['firstName'] as String? ?? '',
+
+      lastName:
+      data['lastName'] as String? ?? '',
+
+      phone:
+      data['phone'] as String?,
+
+      dateOfBirth:
+      _parseDate(data['dateOfBirth']),
+
+      gender:
+      data['gender'] as String?,
+
+      fitnessGoal:
+      data['fitnessGoal'] as String?,
+
       membershipPlanId:
       data['membershipPlanId'] as String? ?? '',
+
       membershipPlanName:
       data['membershipPlanName'] as String? ?? '',
+
       amount:
       (data['amount'] as num?)?.toDouble() ?? 0,
+
       paymentMethod:
-      data['paymentMethod'] as String? ?? '',
+      data['paymentMethod'] as String?,
+
       startDate:
       _parseDate(data['startDate']),
+
       status:
       _parseStatus(data['status']),
+
       accountStatus:
-      _parseAccountStatus(data['accountStatus']),
+      _parseAccountStatus(
+        data['accountStatus'],
+      ),
+
       memberId:
       data['memberId'] as String?,
+
       createdAt:
       _parseDate(data['createdAt']) ??
           DateTime.now(),
+
       invitationSentAt:
       _parseDate(data['invitationSentAt']),
+
       completedAt:
       _parseDate(data['completedAt']),
     );
@@ -77,28 +106,55 @@ class MemberEnrollmentModel extends MemberEnrollment {
       'email': email,
       'firstName': firstName,
       'lastName': lastName,
+
       'phone': phone,
+
       'dateOfBirth': dateOfBirth != null
           ? Timestamp.fromDate(dateOfBirth!)
           : null,
+
       'gender': gender,
       'fitnessGoal': fitnessGoal,
-      'membershipPlanId': membershipPlanId,
-      'membershipPlanName': membershipPlanName,
+
+      'membershipPlanId':
+      membershipPlanId,
+
+      'membershipPlanName':
+      membershipPlanName,
+
       'amount': amount,
-      'paymentMethod': paymentMethod,
+
+      'paymentMethod':
+      paymentMethod,
+
       'startDate': startDate != null
           ? Timestamp.fromDate(startDate!)
           : null,
-      'status': status.name,
-      'accountStatus': accountStatus.name,
-      'memberId': memberId,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'invitationSentAt': invitationSentAt != null
-          ? Timestamp.fromDate(invitationSentAt!)
+
+      'status':
+      status.name,
+
+      'accountStatus':
+      accountStatus.name,
+
+      'memberId':
+      memberId,
+
+      'createdAt':
+      Timestamp.fromDate(createdAt),
+
+      'invitationSentAt':
+      invitationSentAt != null
+          ? Timestamp.fromDate(
+        invitationSentAt!,
+      )
           : null,
-      'completedAt': completedAt != null
-          ? Timestamp.fromDate(completedAt!)
+
+      'completedAt':
+      completedAt != null
+          ? Timestamp.fromDate(
+        completedAt!,
+      )
           : null,
     };
   }
@@ -128,7 +184,9 @@ class MemberEnrollmentModel extends MemberEnrollment {
     return MemberAccountStatus.invitationRequired;
   }
 
-  static DateTime? _parseDate(dynamic value) {
+  static DateTime? _parseDate(
+      dynamic value,
+      ) {
     if (value is Timestamp) {
       return value.toDate();
     }

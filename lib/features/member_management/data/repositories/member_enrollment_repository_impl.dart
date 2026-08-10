@@ -24,7 +24,7 @@ class MemberEnrollmentRepositoryImpl
     required String membershipPlanId,
     required String membershipPlanName,
     required double amount,
-    required String paymentMethod,
+    String? paymentMethod,
     required DateTime startDate,
   }) {
     return _dataSource.createEnrollment(

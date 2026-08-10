@@ -9,16 +9,19 @@ class AddMemberMembershipPlan {
     required this.id,
     required this.name,
     required this.amount,
+    this.durationInDays = 0,
     this.features = const [],
   });
 
   final String id;
   final String name;
   final double amount;
+  final int durationInDays;
   final List<String> features;
 }
 
-class AddMemberMembershipStep extends StatelessWidget {
+class AddMemberMembershipStep
+    extends StatelessWidget {
   const AddMemberMembershipStep({
     super.key,
     required this.plans,
@@ -37,7 +40,7 @@ class AddMemberMembershipStep extends StatelessWidget {
   final DateTime? startDate;
 
   final ValueChanged<String> onPlanChanged;
-  final ValueChanged<String> onFitnessGoalChanged;
+  final ValueChanged<String?> onFitnessGoalChanged;
   final ValueChanged<DateTime?> onStartDateChanged;
 
   static const fitnessGoals = [
@@ -53,61 +56,88 @@ class AddMemberMembershipStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(
+      padding:
+      const EdgeInsets.fromLTRB(
         16,
         4,
         16,
         20,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+        CrossAxisAlignment.start,
         children: [
-          _sectionLabel('MEMBERSHIP PLAN'),
+          _sectionLabel(
+            'MEMBERSHIP PLAN',
+          ),
 
           const SizedBox(height: 10),
 
           ...plans.map(
                 (plan) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding:
+              const EdgeInsets.only(
+                bottom: 10,
+              ),
               child: _planCard(plan),
             ),
           ),
 
           const SizedBox(height: 5),
 
-          _sectionLabel('FITNESS GOAL'),
+          _sectionLabel(
+            'FITNESS GOAL',
+          ),
 
           const SizedBox(height: 9),
 
           Wrap(
             spacing: 7,
             runSpacing: 7,
-            children: fitnessGoals.map(
+            children:
+            fitnessGoals.map(
                   (goal) {
                 final selected =
-                    selectedFitnessGoal == goal;
+                    selectedFitnessGoal ==
+                        goal;
 
                 return InkWell(
                   onTap: () =>
-                      onFitnessGoalChanged(goal),
+                      onFitnessGoalChanged(
+                        selected
+                            ? null
+                            : goal,
+                      ),
                   borderRadius:
-                  BorderRadius.circular(20),
+                  BorderRadius.circular(
+                    20,
+                  ),
                   child: Container(
                     padding:
-                    const EdgeInsets.symmetric(
+                    const EdgeInsets
+                        .symmetric(
                       horizontal: 12,
                       vertical: 8,
                     ),
-                    decoration: BoxDecoration(
+                    decoration:
+                    BoxDecoration(
                       color: selected
-                          ? AppColors.primary
-                          : AppColors.background,
+                          ? AppColors
+                          .primary
+                          : AppColors
+                          .background,
                       borderRadius:
-                      BorderRadius.circular(20),
-                      border: Border.all(
+                      BorderRadius
+                          .circular(
+                        20,
+                      ),
+                      border:
+                      Border.all(
                         color: selected
-                            ? AppColors.primary
-                            : AppColors.border,
+                            ? AppColors
+                            .primary
+                            : AppColors
+                            .border,
                       ),
                     ),
                     child: Text(
@@ -115,7 +145,8 @@ class AddMemberMembershipStep extends StatelessWidget {
                       style: TextStyle(
                         color: selected
                             ? Colors.black
-                            : AppColors.textSecondary,
+                            : AppColors
+                            .textSecondary,
                         fontSize: 10,
                         fontWeight:
                         FontWeight.w600,
@@ -129,7 +160,9 @@ class AddMemberMembershipStep extends StatelessWidget {
 
           const SizedBox(height: 18),
 
-          _sectionLabel('START DATE'),
+          _sectionLabel(
+            'START DATE',
+          ),
 
           const SizedBox(height: 8),
 
@@ -146,17 +179,26 @@ class AddMemberMembershipStep extends StatelessWidget {
         selectedPlanId == plan.id;
 
     return InkWell(
-      onTap: () => onPlanChanged(plan.id),
-      borderRadius: AppRadius.radiusLG,
+      onTap: () =>
+          onPlanChanged(plan.id),
+      borderRadius:
+      AppRadius.radiusLG,
       child: AnimatedContainer(
         duration:
-        const Duration(milliseconds: 150),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
+        const Duration(
+          milliseconds: 150,
+        ),
+        padding:
+        const EdgeInsets.all(14),
+        decoration:
+        BoxDecoration(
           color: selected
-              ? const Color(0xFF1D2A1B)
+              ? const Color(
+            0xFF1D2A1B,
+          )
               : AppColors.background,
-          borderRadius: AppRadius.radiusLG,
+          borderRadius:
+          AppRadius.radiusLG,
           border: Border.all(
             color: selected
                 ? AppColors.primary
@@ -171,35 +213,45 @@ class AddMemberMembershipStep extends StatelessWidget {
               children: [
                 Icon(
                   selected
-                      ? Icons.radio_button_checked
-                      : Icons.radio_button_off,
+                      ? Icons
+                      .radio_button_checked
+                      : Icons
+                      .radio_button_off,
                   size: 17,
                   color: selected
                       ? AppColors.primary
-                      : AppColors.textSecondary,
+                      : AppColors
+                      .textSecondary,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     plan.name,
-                    style: AppTextStyles.bodyMedium
+                    style: AppTextStyles
+                        .bodyMedium
                         .copyWith(
-                      fontWeight: FontWeight.w700,
+                      fontWeight:
+                      FontWeight.w700,
                     ),
                   ),
                 ),
                 Text(
                   '₱${_money(plan.amount)}',
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style:
+                  const TextStyle(
+                    color:
+                    AppColors.primary,
                     fontSize: 14,
-                    fontWeight: FontWeight.w800,
+                    fontWeight:
+                    FontWeight.w800,
                   ),
                 ),
                 const Text(
                   '/mo',
                   style: TextStyle(
-                    color: AppColors.textSecondary,
+                    color:
+                    AppColors
+                        .textSecondary,
                     fontSize: 9,
                   ),
                 ),
@@ -211,24 +263,32 @@ class AddMemberMembershipStep extends StatelessWidget {
               Wrap(
                 spacing: 5,
                 runSpacing: 5,
-                children: plan.features.map(
+                children:
+                plan.features.map(
                       (feature) {
                     return Container(
                       padding:
-                      const EdgeInsets.symmetric(
+                      const EdgeInsets
+                          .symmetric(
                         horizontal: 8,
                         vertical: 5,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.black26,
+                      decoration:
+                      BoxDecoration(
+                        color:
+                        Colors.black26,
                         borderRadius:
-                        BorderRadius.circular(10),
+                        BorderRadius
+                            .circular(
+                          10,
+                        ),
                       ),
                       child: Text(
                         '✓ $feature',
-                        style: const TextStyle(
-                          color:
-                          AppColors.textSecondary,
+                        style:
+                        const TextStyle(
+                          color: AppColors
+                              .textSecondary,
                           fontSize: 8,
                         ),
                       ),
@@ -243,34 +303,67 @@ class AddMemberMembershipStep extends StatelessWidget {
     );
   }
 
-  Widget _startDateField(BuildContext context) {
+  Widget _startDateField(
+      BuildContext context,
+      ) {
     return InkWell(
       onTap: () async {
-        final selected = await showDatePicker(
+        final selected =
+        await showDatePicker(
           context: context,
           initialDate:
-          startDate ?? DateTime.now(),
-          firstDate: DateTime(2020),
+          startDate ??
+              DateTime.now(),
+          firstDate:
+          DateTime(
+            DateTime.now().year,
+            DateTime.now().month,
+            DateTime.now().day,
+          ),
           lastDate:
           DateTime.now().add(
-            const Duration(days: 3650),
+            const Duration(
+              days: 3650,
+            ),
           ),
+          builder:
+              (context, child) {
+            return Theme(
+              data:
+              Theme.of(context)
+                  .copyWith(
+                colorScheme:
+                const ColorScheme
+                    .dark(
+                  primary:
+                  AppColors.primary,
+                ),
+              ),
+              child: child!,
+            );
+          },
         );
 
         if (selected != null) {
-          onStartDateChanged(selected);
+          onStartDateChanged(
+            selected,
+          );
         }
       },
-      borderRadius: AppRadius.radiusMD,
+      borderRadius:
+      AppRadius.radiusMD,
       child: Container(
         height: 48,
         padding:
         const EdgeInsets.symmetric(
           horizontal: 12,
         ),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: AppRadius.radiusMD,
+        decoration:
+        BoxDecoration(
+          color:
+          AppColors.background,
+          borderRadius:
+          AppRadius.radiusMD,
           border: Border.all(
             color: AppColors.border,
           ),
@@ -281,19 +374,27 @@ class AddMemberMembershipStep extends StatelessWidget {
               child: Text(
                 startDate == null
                     ? 'dd-mm-yyyy'
-                    : _formatDate(startDate!),
+                    : _formatDate(
+                  startDate!,
+                ),
                 style: TextStyle(
-                  color: startDate == null
-                      ? AppColors.textSecondary
-                      : AppColors.textPrimary,
+                  color: startDate ==
+                      null
+                      ? AppColors
+                      .textSecondary
+                      : AppColors
+                      .textPrimary,
                   fontSize: 12,
                 ),
               ),
             ),
             const Icon(
-              Icons.calendar_today_outlined,
+              Icons
+                  .calendar_today_outlined,
               size: 15,
-              color: AppColors.textSecondary,
+              color:
+              AppColors
+                  .textSecondary,
             ),
           ],
         ),
@@ -301,28 +402,41 @@ class AddMemberMembershipStep extends StatelessWidget {
     );
   }
 
-  Widget _sectionLabel(String text) {
+  Widget _sectionLabel(
+      String text,
+      ) {
     return Text(
       text,
-      style: AppTextStyles.labelMedium.copyWith(
+      style: AppTextStyles
+          .labelMedium
+          .copyWith(
         fontSize: 9,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textSecondary,
+        fontWeight:
+        FontWeight.w700,
+        color:
+        AppColors.textSecondary,
         letterSpacing: 0.5,
       ),
     );
   }
 
-  String _money(double amount) {
+  String _money(
+      double amount,
+      ) {
     return amount
         .toStringAsFixed(0)
         .replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-          (match) => '${match[1]},',
+      RegExp(
+        r'(\d)(?=(\d{3})+(?!\d))',
+      ),
+          (match) =>
+      '${match[1]},',
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(
+      DateTime date,
+      ) {
     return '${date.day.toString().padLeft(2, '0')}-'
         '${date.month.toString().padLeft(2, '0')}-'
         '${date.year}';

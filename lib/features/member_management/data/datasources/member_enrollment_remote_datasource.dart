@@ -10,15 +10,16 @@ class MemberEnrollmentRemoteDataSource {
   })  : _firestore =
       firestore ?? FirebaseFirestore.instance,
         _functions =
-            functions ??
-                FirebaseFunctions.instance;
+            functions ?? FirebaseFunctions.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseFunctions _functions;
 
   CollectionReference<Map<String, dynamic>>
   get _collection {
-    return _firestore.collection('memberEnrollments');
+    return _firestore.collection(
+      'memberEnrollments',
+    );
   }
 
   Future<MemberEnrollmentModel>
@@ -34,7 +35,7 @@ class MemberEnrollmentRemoteDataSource {
     required String membershipPlanId,
     required String membershipPlanName,
     required double amount,
-    required String paymentMethod,
+    String? paymentMethod,
     required DateTime startDate,
   }) async {
     final callable =
@@ -42,23 +43,31 @@ class MemberEnrollmentRemoteDataSource {
       'createMemberEnrollment',
     );
 
-    final result = await callable.call({
+    final result =
+    await callable.call({
       'gymId': gymId,
       'firstName': firstName,
       'lastName': lastName,
       'email': email,
       'phone': phone,
+
       'dateOfBirth':
       dateOfBirth?.toIso8601String(),
+
       'gender': gender,
       'fitnessGoal': fitnessGoal,
+
       'membershipPlanId':
       membershipPlanId,
+
       'membershipPlanName':
       membershipPlanName,
+
       'amount': amount,
+
       'paymentMethod':
       paymentMethod,
+
       'startDate':
       startDate.toIso8601String(),
     });
@@ -67,11 +76,12 @@ class MemberEnrollmentRemoteDataSource {
     result.data['enrollmentId'] as String;
 
     final document =
-    await _collection.doc(enrollmentId).get();
+    await _collection
+        .doc(enrollmentId)
+        .get();
 
-    return MemberEnrollmentModel.fromFirestore(
-      document,
-    );
+    return MemberEnrollmentModel
+        .fromFirestore(document);
   }
 
   Future<MemberEnrollmentModel?>
@@ -87,9 +97,8 @@ class MemberEnrollmentRemoteDataSource {
       return null;
     }
 
-    return MemberEnrollmentModel.fromFirestore(
-      document,
-    );
+    return MemberEnrollmentModel
+        .fromFirestore(document);
   }
 
   Future<void> cancelEnrollment(

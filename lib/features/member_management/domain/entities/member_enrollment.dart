@@ -34,43 +34,32 @@ class MemberEnrollment {
   });
 
   final String id;
-
   final String gymId;
-
   final String email;
-
   final String firstName;
-
   final String lastName;
 
   final String? phone;
-
   final DateTime? dateOfBirth;
-
   final String? gender;
-
   final String? fitnessGoal;
 
   final String membershipPlanId;
-
   final String membershipPlanName;
-
   final double amount;
 
-  final String paymentMethod;
+  /// null means payment is pending.
+  final String? paymentMethod;
 
   final DateTime? startDate;
 
   final MemberEnrollmentStatus status;
-
   final MemberAccountStatus accountStatus;
 
   final String? memberId;
 
   final DateTime createdAt;
-
   final DateTime? invitationSentAt;
-
   final DateTime? completedAt;
 
   String get fullName {
@@ -80,5 +69,10 @@ class MemberEnrollment {
   bool get requiresInvitation {
     return accountStatus ==
         MemberAccountStatus.invitationRequired;
+  }
+
+  bool get isPaymentPending {
+    return paymentMethod == null ||
+        paymentMethod!.trim().isEmpty;
   }
 }

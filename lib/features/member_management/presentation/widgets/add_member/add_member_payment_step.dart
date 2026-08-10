@@ -6,43 +6,40 @@ import 'package:sweatsync/app/theme/app_radius.dart';
 class AddMemberPaymentStep extends StatelessWidget {
   const AddMemberPaymentStep({
     super.key,
-    required this.amount,
+    required this.memberName,
     required this.planName,
+    required this.fitnessGoal,
+    required this.amount,
     required this.selectedPaymentMethod,
     required this.onPaymentMethodChanged,
   });
 
-  final double amount;
+  final String memberName;
   final String planName;
+  final String? fitnessGoal;
+  final double amount;
+
+  /// null means that no payment method has been selected yet.
+  /// In that state the UI shows "Payment Pending".
   final String? selectedPaymentMethod;
 
-  final ValueChanged<String> onPaymentMethodChanged;
+  final ValueChanged<String?> onPaymentMethodChanged;
 
   static const paymentMethods = [
+    _PaymentOption(
+      id: 'upi',
+      label: 'UPI',
+      icon: Icons.account_balance_wallet_outlined,
+    ),
     _PaymentOption(
       id: 'cash',
       label: 'Cash',
       icon: Icons.payments_outlined,
     ),
     _PaymentOption(
-      id: 'gcash',
-      label: 'GCash',
-      icon: Icons.account_balance_wallet_outlined,
-    ),
-    _PaymentOption(
-      id: 'maya',
-      label: 'Maya',
-      icon: Icons.favorite,
-    ),
-    _PaymentOption(
-      id: 'credit_card',
-      label: 'Credit Card',
+      id: 'card',
+      label: 'Card',
       icon: Icons.credit_card,
-    ),
-    _PaymentOption(
-      id: 'bank_transfer',
-      label: 'Bank Transfer',
-      icon: Icons.account_balance,
     ),
   ];
 
@@ -58,7 +55,7 @@ class AddMemberPaymentStep extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _totalCard(),
+          _summaryCard(),
 
           const SizedBox(height: 20),
 
@@ -76,17 +73,26 @@ class AddMemberPaymentStep extends StatelessWidget {
 
           ...paymentMethods.map(
                 (option) => Padding(
-              padding:
-              const EdgeInsets.only(bottom: 9),
+              padding: const EdgeInsets.only(
+                bottom: 9,
+              ),
               child: _paymentCard(option),
             ),
           ),
+
+          // null means no payment method has been selected.
+          // This is displayed as a status rather than another
+          // selectable payment option.
+          if (selectedPaymentMethod == null) ...[
+            const SizedBox(height: 2),
+            _paymentPendingIndicator(),
+          ],
         ],
       ),
     );
   }
 
-  Widget _totalCard() {
+  Widget _summaryCard() {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -96,41 +102,103 @@ class AddMemberPaymentStep extends StatelessWidget {
           color: AppColors.border,
         ),
       ),
+      child: Column(
+        children: [
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'ENROLLMENT SUMMARY',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          _summaryRow(
+            'Member',
+            memberName,
+          ),
+
+          _summaryRow(
+            'Plan',
+            planName,
+          ),
+
+          _summaryRow(
+            'Goal',
+            fitnessGoal ?? 'Not specified',
+          ),
+
+          _summaryRow(
+            'Amount',
+            '₱${_money(amount)}/month',
+          ),
+
+          const Divider(
+            color: AppColors.border,
+            height: 20,
+          ),
+
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Total Due Today',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Text(
+                '₱${_money(amount)}',
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _summaryRow(
+      String label,
+      String value,
+      ) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        bottom: 7,
+      ),
       child: Row(
         children: [
           Expanded(
-            child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Total Due Today',
-                  style: TextStyle(
-                    color:
-                    AppColors.textSecondary,
-                    fontSize: 11,
-                    fontWeight:
-                    FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  planName,
-                  style: const TextStyle(
-                    color:
-                    AppColors.textSecondary,
-                    fontSize: 9,
-                  ),
-                ),
-              ],
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 10,
+              ),
             ),
           ),
-          Text(
-            '₱${_money(amount)}',
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
@@ -145,13 +213,13 @@ class AddMemberPaymentStep extends StatelessWidget {
         selectedPaymentMethod == option.id;
 
     return InkWell(
-      onTap: () =>
-          onPaymentMethodChanged(option.id),
+      onTap: () {
+        onPaymentMethodChanged(option.id);
+      },
       borderRadius: AppRadius.radiusMD,
       child: Container(
         height: 52,
-        padding:
-        const EdgeInsets.symmetric(
+        padding: const EdgeInsets.symmetric(
           horizontal: 14,
         ),
         decoration: BoxDecoration(
@@ -174,7 +242,9 @@ class AddMemberPaymentStep extends StatelessWidget {
                   ? AppColors.primary
                   : AppColors.textSecondary,
             ),
+
             const SizedBox(width: 12),
+
             Expanded(
               child: Text(
                 option.label,
@@ -185,6 +255,7 @@ class AddMemberPaymentStep extends StatelessWidget {
                 ),
               ),
             ),
+
             Icon(
               selected
                   ? Icons.radio_button_checked
@@ -200,11 +271,52 @@ class AddMemberPaymentStep extends StatelessWidget {
     );
   }
 
-  String _money(double amount) {
+  Widget _paymentPendingIndicator() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 10,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1D2A1B),
+        borderRadius: AppRadius.radiusMD,
+        border: Border.all(
+          color: AppColors.primary,
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.schedule_outlined,
+            size: 16,
+            color: AppColors.primary,
+          ),
+          const SizedBox(width: 9),
+          const Expanded(
+            child: Text(
+              'Payment Pending',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _money(
+      double amount,
+      ) {
     return amount
         .toStringAsFixed(0)
         .replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      RegExp(
+        r'(\d)(?=(\d{3})+(?!\d))',
+      ),
           (match) => '${match[1]},',
     );
   }
