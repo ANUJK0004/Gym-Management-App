@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
-import 'package:sweatsync/features/gym/presentation/providers/gym_provider.dart';
-
 import '../../../activity/application/activity_actor.dart';
 import '../../../activity/application/activity_target.dart';
 import '../../../activity/application/activity_type.dart';
 import '../../../activity/presentation/providers/activity_provider.dart';
+
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../gym/presentation/providers/gym_provider.dart';
 
 import '../../data/datasources/trainer_management_remote_datasource.dart';
 import '../../data/repositories/trainer_management_repository_impl.dart';
@@ -44,9 +44,9 @@ Provider<TrainerManagementRepository>(
   },
 );
 
-/// ------------------------------------------------------------
-/// GYM TRAINERS
-/// ------------------------------------------------------------
+// ------------------------------------------------------------
+// GYM TRAINERS
+// ------------------------------------------------------------
 
 final gymTrainersProvider =
 FutureProvider<List<ManagedTrainer>>(
@@ -60,71 +60,113 @@ FutureProvider<List<ManagedTrainer>>(
       return [];
     }
 
-    final repository =
-    ref.watch(
+    return ref
+        .read(
       trainerManagementRepositoryProvider,
-    );
-
-    return repository.getGymTrainers(
-      gym.id,
-    );
+    )
+        .getGymTrainers(gym.id);
   },
 );
 
-/// ------------------------------------------------------------
-/// SINGLE TRAINER
-/// ------------------------------------------------------------
+// ------------------------------------------------------------
+// SINGLE TRAINER
+// ------------------------------------------------------------
 
 final trainerDetailsProvider =
 FutureProvider.family<
     ManagedTrainer?,
     String>(
-      (ref, trainerUid) async {
-    final repository =
-    ref.watch(
+      (ref, trainerUid) {
+    return ref
+        .read(
       trainerManagementRepositoryProvider,
-    );
-
-    return repository.getTrainer(
-      trainerUid,
-    );
+    )
+        .getTrainer(trainerUid);
   },
 );
 
-/// ------------------------------------------------------------
-/// SEARCH TRAINERS
-/// ------------------------------------------------------------
+// ------------------------------------------------------------
+// SEARCH TRAINERS
+// ------------------------------------------------------------
 
 final trainerSearchProvider =
 FutureProvider.family<
     List<ManagedTrainer>,
     String>(
       (ref, query) async {
+    final normalizedQuery =
+    query.trim();
+
+    if (normalizedQuery.isEmpty) {
+      return [];
+    }
+
     final gym =
     await ref.watch(
       ownerGymProvider.future,
     );
 
-    if (gym == null ||
-        query.trim().isEmpty) {
+    if (gym == null) {
       return [];
     }
 
-    final repository =
-    ref.watch(
+    return ref
+        .read(
       trainerManagementRepositoryProvider,
-    );
-
-    return repository.searchTrainers(
-      gym.id,
-      query.trim(),
+    )
+        .searchTrainers(
+      gymId: gym.id,
+      query: normalizedQuery,
     );
   },
 );
 
-/// ------------------------------------------------------------
-/// CONTROLLER
-/// ------------------------------------------------------------
+// ------------------------------------------------------------
+// EXACT EMAIL LOOKUP
+// ------------------------------------------------------------
+
+final trainerEmailLookupProvider =
+FutureProvider.family<
+    ManagedTrainer?,
+    String>(
+      (ref, email) async {
+    final normalizedEmail =
+    email.trim().toLowerCase();
+
+    if (normalizedEmail.isEmpty) {
+      return null;
+    }
+
+    final gym =
+    await ref.watch(
+      ownerGymProvider.future,
+    );
+
+    if (gym == null) {
+      return null;
+    }
+
+    return ref
+        .read(
+      trainerManagementRepositoryProvider,
+    )
+        .findEligibleTrainerByEmail(
+      email: normalizedEmail,
+      gymId: gym.id,
+    );
+  },
+);
+
+// ------------------------------------------------------------
+// CONTROLLER
+// ------------------------------------------------------------
+
+final trainerManagementControllerProvider =
+AsyncNotifierProvider<
+    TrainerManagementController,
+    void>(
+  TrainerManagementController.new,
+);
 
 class TrainerManagementController
     extends AsyncNotifier<void> {
@@ -139,7 +181,44 @@ class TrainerManagementController
 
     state = await AsyncValue.guard(
           () async {
-        final repository = ref.read(
+        final owner =
+            ref
+                .read(firebaseAuthProvider)
+                .currentUser;
+
+        if (owner == null) {
+          throw Exception(
+            'No authenticated owner found.',
+          );
+        }
+
+        final ownerGym =
+        await ref.watch(
+          ownerGymProvider.future,
+        );
+
+        if (ownerGym == null ||
+            ownerGym.id != gymId) {
+          throw Exception(
+            'You are not authorized to manage this gym.',
+          );
+        }
+
+        if (trainer.gymId != null &&
+            trainer.gymId!.isNotEmpty) {
+          if (trainer.gymId == gymId) {
+            throw Exception(
+              'This trainer is already assigned to your gym.',
+            );
+          }
+
+          throw Exception(
+            'This trainer belongs to another gym.',
+          );
+        }
+
+        final repository =
+        ref.read(
           trainerManagementRepositoryProvider,
         );
 
@@ -148,10 +227,7 @@ class TrainerManagementController
           gymId: gymId,
         );
 
-        final owner =
-            ref.read(firebaseAuthProvider).currentUser;
-
-        if (owner != null) {
+        try {
           await ref
               .read(activityServiceProvider)
               .log(
@@ -160,8 +236,7 @@ class TrainerManagementController
             actor: ActivityActor(
               id: owner.uid,
               name:
-              owner.displayName ??
-                  'Owner',
+              owner.displayName ?? 'Owner',
               role: 'owner',
             ),
             target: ActivityTarget(
@@ -172,7 +247,7 @@ class TrainerManagementController
               type: 'trainer',
             ),
           );
-        }
+        } catch (_) {}
 
         ref.invalidate(
           gymTrainersProvider,
@@ -181,6 +256,16 @@ class TrainerManagementController
         ref.invalidate(
           trainerDetailsProvider(
             trainer.uid,
+          ),
+        );
+
+        ref.invalidate(
+          trainerSearchProvider,
+        );
+
+        ref.invalidate(
+          trainerEmailLookupProvider(
+            trainer.email,
           ),
         );
 
@@ -198,7 +283,37 @@ class TrainerManagementController
 
     state = await AsyncValue.guard(
           () async {
-        final repository = ref.read(
+        if (!trainer.isAssignedToGym) {
+          throw Exception(
+            'Trainer is not assigned to a gym.',
+          );
+        }
+
+        final owner =
+            ref
+                .read(firebaseAuthProvider)
+                .currentUser;
+
+        if (owner == null) {
+          throw Exception(
+            'No authenticated owner found.',
+          );
+        }
+
+        final ownerGym =
+        await ref.watch(
+          ownerGymProvider.future,
+        );
+
+        if (ownerGym == null ||
+            trainer.gymId != ownerGym.id) {
+          throw Exception(
+            'This trainer does not belong to your gym.',
+          );
+        }
+
+        final repository =
+        ref.read(
           trainerManagementRepositoryProvider,
         );
 
@@ -206,22 +321,16 @@ class TrainerManagementController
           trainer,
         );
 
-        final owner =
-            ref.read(firebaseAuthProvider).currentUser;
-
-        if (owner != null &&
-            trainer.gymId != null) {
+        try {
           await ref
               .read(activityServiceProvider)
               .log(
-            gymId: trainer.gymId!,
-            type:
-            ActivityType.profileUpdated,
+            gymId: ownerGym.id,
+            type: ActivityType.profileUpdated,
             actor: ActivityActor(
               id: owner.uid,
               name:
-              owner.displayName ??
-                  'Owner',
+              owner.displayName ?? 'Owner',
               role: 'owner',
             ),
             target: ActivityTarget(
@@ -232,7 +341,7 @@ class TrainerManagementController
               type: 'trainer',
             ),
           );
-        }
+        } catch (_) {}
 
         ref.invalidate(
           gymTrainersProvider,
@@ -258,7 +367,31 @@ class TrainerManagementController
 
     state = await AsyncValue.guard(
           () async {
-        final repository = ref.read(
+        final owner =
+            ref
+                .read(firebaseAuthProvider)
+                .currentUser;
+
+        if (owner == null) {
+          throw Exception(
+            'No authenticated owner found.',
+          );
+        }
+
+        final ownerGym =
+        await ref.watch(
+          ownerGymProvider.future,
+        );
+
+        if (ownerGym == null ||
+            trainer.gymId != ownerGym.id) {
+          throw Exception(
+            'This trainer does not belong to your gym.',
+          );
+        }
+
+        final repository =
+        ref.read(
           trainerManagementRepositoryProvider,
         );
 
@@ -266,22 +399,17 @@ class TrainerManagementController
           trainer.uid,
         );
 
-        final owner =
-            ref.read(firebaseAuthProvider).currentUser;
-
-        if (owner != null &&
-            trainer.gymId != null) {
+        try {
           await ref
               .read(activityServiceProvider)
               .log(
-            gymId: trainer.gymId!,
+            gymId: ownerGym.id,
             type:
             ActivityType.trainerRemoved,
             actor: ActivityActor(
               id: owner.uid,
               name:
-              owner.displayName ??
-                  'Owner',
+              owner.displayName ?? 'Owner',
               role: 'owner',
             ),
             target: ActivityTarget(
@@ -292,7 +420,7 @@ class TrainerManagementController
               type: 'trainer',
             ),
           );
-        }
+        } catch (_) {}
 
         ref.invalidate(
           gymTrainersProvider,
@@ -305,16 +433,19 @@ class TrainerManagementController
         );
 
         ref.invalidate(
+          trainerSearchProvider,
+        );
+
+        ref.invalidate(
+          trainerEmailLookupProvider(
+            trainer.email,
+          ),
+        );
+
+        ref.invalidate(
           recentActivityProvider,
         );
       },
     );
   }
 }
-
-final trainerManagementControllerProvider =
-AsyncNotifierProvider<
-    TrainerManagementController,
-    void>(
-  TrainerManagementController.new,
-);

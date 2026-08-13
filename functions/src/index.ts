@@ -1,5 +1,3 @@
-// functions/src/index.ts
-
 import { initializeApp } from "firebase-admin/app";
 
 initializeApp();
@@ -7,3 +5,7 @@ initializeApp();
 export {
   createMemberEnrollment,
 } from "./memberEnrollment";
+
+export {
+  createTrainerEnrollment,
+} from "./trainerEnrollment";

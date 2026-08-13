@@ -7,7 +7,14 @@ import 'package:sweatsync/app/theme/app_colors.dart';
 import 'package:sweatsync/app/theme/app_radius.dart';
 import 'package:sweatsync/app/theme/app_text_styles.dart';
 
+import '../../domain/entities/managed_trainer.dart';
+import '../../domain/entities/trainer_enrollment.dart';
+
 import '../providers/trainer_management_provider.dart';
+
+import '../widgets/add_trainer/add_trainer_sheet.dart';
+import '../widgets/add_trainer/trainer_enrollment_success_sheet.dart';
+
 import '../widgets/trainer_card.dart';
 import '../widgets/trainer_search_bar.dart';
 import '../widgets/trainer_status_chip.dart';
@@ -20,8 +27,7 @@ class TrainerManagementScreen
 
   @override
   ConsumerState<
-      TrainerManagementScreen>
-  createState() =>
+      TrainerManagementScreen> createState() =>
       _TrainerManagementScreenState();
 }
 
@@ -60,26 +66,23 @@ class _TrainerManagementScreenState
         ? null
         : ref.watch(
       trainerSearchProvider(
-        _searchQuery,
+        _searchQuery.trim(),
       ),
     );
 
     return Scaffold(
       backgroundColor:
       AppColors.background,
-
       body: SafeArea(
         bottom: false,
-        child:
-        RefreshIndicator(
+        child: RefreshIndicator(
           onRefresh: () async {
             ref.invalidate(
               gymTrainersProvider,
             );
 
             await ref.read(
-              gymTrainersProvider
-                  .future,
+              gymTrainersProvider.future,
             );
           },
           child:
@@ -87,15 +90,13 @@ class _TrainerManagementScreenState
             slivers: [
               SliverPadding(
                 padding:
-                const EdgeInsets
-                    .fromLTRB(
+                const EdgeInsets.fromLTRB(
                   10,
                   18,
                   10,
                   100,
                 ),
-                sliver:
-                SliverList(
+                sliver: SliverList(
                   delegate:
                   SliverChildListDelegate(
                     [
@@ -104,7 +105,15 @@ class _TrainerManagementScreenState
                       ),
 
                       const SizedBox(
-                        height: 18,
+                        height: 14,
+                      ),
+
+                      _buildStats(
+                        trainersAsync,
+                      ),
+
+                      const SizedBox(
+                        height: 14,
                       ),
 
                       TrainerSearchBar(
@@ -156,61 +165,51 @@ class _TrainerManagementScreenState
     return Row(
       children: [
         Material(
-          color:
-          AppColors.surface,
+          color: AppColors.surface,
           shape:
           const CircleBorder(),
           child: InkWell(
             customBorder:
             const CircleBorder(),
-            onTap: () {
-              context.pop();
-            },
+            onTap: () =>
+                context.pop(),
             child:
             const SizedBox(
               width: 38,
               height: 38,
               child: Icon(
-                Icons
-                    .chevron_left_rounded,
+                Icons.chevron_left_rounded,
                 size: 22,
+                color:
+                AppColors.textPrimary,
               ),
             ),
           ),
         ),
 
-        const SizedBox(
-          width: 12,
-        ),
+        const SizedBox(width: 12),
 
         Expanded(
-          child:
-          Column(
+          child: Column(
             crossAxisAlignment:
-            CrossAxisAlignment
-                .start,
+            CrossAxisAlignment.start,
             children: [
               Text(
                 'Trainers',
-                style:
-                AppTextStyles
+                style: AppTextStyles
                     .headlineMedium
                     .copyWith(
                   fontWeight:
-                  FontWeight
-                      .w800,
+                  FontWeight.w800,
                 ),
               ),
-
               Text(
                 'Manage your gym trainers',
-                style:
-                AppTextStyles
+                style: AppTextStyles
                     .labelMedium
                     .copyWith(
                   color:
-                  AppColors
-                      .textSecondary,
+                  AppColors.textSecondary,
                 ),
               ),
             ],
@@ -218,19 +217,14 @@ class _TrainerManagementScreenState
         ),
 
         Material(
-          color:
-          AppColors.primary,
+          color: AppColors.primary,
           borderRadius:
-          BorderRadius.circular(
-            10,
-          ),
+          BorderRadius.circular(10),
           child: InkWell(
             borderRadius:
-            BorderRadius.circular(
-              10,
-            ),
+            BorderRadius.circular(10),
             onTap:
-            _openTrainerSearch,
+            _openAddTrainerSheet,
             child:
             const Padding(
               padding:
@@ -244,22 +238,16 @@ class _TrainerManagementScreenState
                     Icons
                         .person_add_rounded,
                     size: 16,
-                    color:
-                    Colors.black,
+                    color: Colors.black,
                   ),
-                  SizedBox(
-                    width: 4,
-                  ),
+                  SizedBox(width: 4),
                   Text(
                     'Add',
-                    style:
-                    TextStyle(
-                      color:
-                      Colors.black,
+                    style: TextStyle(
+                      color: Colors.black,
                       fontSize: 12,
                       fontWeight:
-                      FontWeight
-                          .w700,
+                      FontWeight.w700,
                     ),
                   ),
                 ],
@@ -271,17 +259,91 @@ class _TrainerManagementScreenState
     );
   }
 
+  Widget _buildStats(
+      AsyncValue<List<ManagedTrainer>>
+      trainersAsync,
+      ) {
+    final trainers =
+        trainersAsync.value ?? [];
+
+    final active =
+        trainers
+            .where(
+              (trainer) =>
+          trainer.isActive,
+        )
+            .length;
+
+    final totalClients =
+    trainers.fold<int>(
+      0,
+          (sum, trainer) =>
+      sum + trainer.clientCount,
+    );
+
+    final rated =
+    trainers
+        .where(
+          (trainer) =>
+      trainer.rating > 0,
+    )
+        .toList();
+
+    final averageRating =
+    rated.isEmpty
+        ? 0.0
+        : rated.fold<double>(
+      0,
+          (sum, trainer) =>
+      sum + trainer.rating,
+    ) /
+        rated.length;
+
+    return Row(
+      children: [
+        Expanded(
+          child: _StatCard(
+            value:
+            '${trainers.length}',
+            label: 'Trainers',
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _StatCard(
+            value:
+            '$totalClients',
+            label: 'Clients',
+            accent:
+            const Color(0xFF2CC8FF),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _StatCard(
+            value:
+            averageRating == 0
+                ? '—'
+                : '${averageRating.toStringAsFixed(1)}★',
+            label: 'Avg Rating',
+            accent:
+            const Color(0xFFFFA23A),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildFilters() {
     return SizedBox(
       height: 32,
-      child:
-      ListView.separated(
+      child: ListView.separated(
         scrollDirection:
         Axis.horizontal,
         itemCount:
         _statuses.length,
         separatorBuilder:
-            (_, __) =>
+            (_, _) =>
         const SizedBox(
           width: 8,
         ),
@@ -308,7 +370,8 @@ class _TrainerManagementScreenState
   }
 
   Widget _buildTrainers(
-      AsyncValue trainersAsync,
+      AsyncValue<List<ManagedTrainer>>
+      trainersAsync,
       ) {
     return trainersAsync.when(
       loading: () =>
@@ -327,9 +390,7 @@ class _TrainerManagementScreenState
           (error, stackTrace) =>
           Padding(
             padding:
-            const EdgeInsets.all(
-              24,
-            ),
+            const EdgeInsets.all(24),
             child: Text(
               'Unable to load trainers.\n$error',
               textAlign:
@@ -339,19 +400,9 @@ class _TrainerManagementScreenState
 
       data: (trainers) {
         final filtered =
-        trainers.where(
-              (trainer) {
-            if (_selectedStatus ==
-                'All') {
-              return true;
-            }
-
-            return trainer.status
-                .toLowerCase() ==
-                _selectedStatus
-                    .toLowerCase();
-          },
-        ).toList();
+        _applyStatusFilter(
+          trainers,
+        );
 
         if (filtered.isEmpty) {
           return _EmptyTrainerView(
@@ -366,14 +417,11 @@ class _TrainerManagementScreenState
                 (trainer) {
               return Padding(
                 padding:
-                const EdgeInsets
-                    .only(
+                const EdgeInsets.only(
                   bottom: 10,
                 ),
-                child:
-                TrainerCard(
-                  trainer:
-                  trainer,
+                child: TrainerCard(
+                  trainer: trainer,
                   onTap: () {
                     context.push(
                       AppRoutes
@@ -392,7 +440,9 @@ class _TrainerManagementScreenState
   }
 
   Widget _buildSearchResults(
-      AsyncValue? searchAsync,
+      AsyncValue<
+          List<ManagedTrainer>>?
+      searchAsync,
       ) {
     if (searchAsync == null) {
       return const SizedBox();
@@ -400,32 +450,30 @@ class _TrainerManagementScreenState
 
     return searchAsync.when(
       loading: () =>
-      const Center(
-        child:
-        CircularProgressIndicator(),
+      const Padding(
+        padding:
+        EdgeInsets.only(top: 40),
+        child: Center(
+          child:
+          CircularProgressIndicator(),
+        ),
       ),
 
       error:
           (error, stackTrace) =>
-          Text(
-            'Search failed: $error',
+          Padding(
+            padding:
+            const EdgeInsets.all(20),
+            child: Text(
+              'Search failed: $error',
+            ),
           ),
 
       data: (trainers) {
         final filtered =
-        trainers.where(
-              (trainer) {
-            if (_selectedStatus ==
-                'All') {
-              return true;
-            }
-
-            return trainer.status
-                .toLowerCase() ==
-                _selectedStatus
-                    .toLowerCase();
-          },
-        ).toList();
+        _applyStatusFilter(
+          trainers,
+        );
 
         if (filtered.isEmpty) {
           return const Padding(
@@ -445,14 +493,11 @@ class _TrainerManagementScreenState
                 (trainer) {
               return Padding(
                 padding:
-                const EdgeInsets
-                    .only(
+                const EdgeInsets.only(
                   bottom: 10,
                 ),
-                child:
-                TrainerCard(
-                  trainer:
-                  trainer,
+                child: TrainerCard(
+                  trainer: trainer,
                   onTap: () {
                     context.push(
                       AppRoutes
@@ -470,12 +515,128 @@ class _TrainerManagementScreenState
     );
   }
 
-  void _openTrainerSearch() {
-    _searchController.clear();
+  List<ManagedTrainer>
+  _applyStatusFilter(
+      List<ManagedTrainer> trainers,
+      ) {
+    if (_selectedStatus ==
+        'All') {
+      return trainers;
+    }
 
-    setState(() {
-      _searchQuery = '';
-    });
+    return trainers
+        .where(
+          (trainer) =>
+      trainer.status
+          .toLowerCase() ==
+          _selectedStatus
+              .toLowerCase(),
+    )
+        .toList();
+  }
+
+  Future<void>
+  _openAddTrainerSheet() async {
+    final result =
+    await showModalBottomSheet<
+        TrainerEnrollment>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor:
+      Colors.transparent,
+      useSafeArea: true,
+      builder: (_) {
+        return const AddTrainerSheet();
+      },
+    );
+
+    if (!mounted ||
+        result == null) {
+      return;
+    }
+
+    ref.invalidate(
+      gymTrainersProvider,
+    );
+
+    // The management sheet has already closed.
+    // Show a separate success sheet and allow it
+    // to auto-close after 3 seconds.
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor:
+      Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) {
+        return TrainerEnrollmentSuccessSheet(
+          enrollment: result,
+        );
+      },
+    );
+  }
+}
+
+class _StatCard
+    extends StatelessWidget {
+  const _StatCard({
+    required this.value,
+    required this.label,
+    this.accent =
+        AppColors.primary,
+  });
+
+  final String value;
+  final String label;
+  final Color accent;
+
+  @override
+  Widget build(
+      BuildContext context,
+      ) {
+    return Container(
+      height: 52,
+      decoration:
+      BoxDecoration(
+        color:
+        AppColors.surface,
+        borderRadius:
+        BorderRadius.circular(
+          10,
+        ),
+        border:
+        Border.all(
+          color:
+          AppColors.border,
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment:
+        MainAxisAlignment.center,
+        children: [
+          Text(
+            value,
+            style:
+            TextStyle(
+              color: accent,
+              fontSize: 14,
+              fontWeight:
+              FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style:
+            const TextStyle(
+              color:
+              AppColors.textSecondary,
+              fontSize: 7,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -495,70 +656,56 @@ class _EmptyTrainerView
       width:
       double.infinity,
       padding:
-      const EdgeInsets.all(
-        30,
-      ),
+      const EdgeInsets.all(30),
       decoration:
       BoxDecoration(
         color:
         AppColors.surface,
         borderRadius:
         AppRadius.radiusLG,
-        border: Border.all(
+        border:
+        Border.all(
           color:
           AppColors.border,
           width: 0.5,
         ),
       ),
-      child:
-      Column(
+      child: Column(
         children: [
           const Icon(
             Icons
                 .sports_gymnastics_rounded,
             size: 42,
             color:
-            AppColors
-                .textSecondary,
+            AppColors.textSecondary,
           ),
-
-          const SizedBox(
-            height: 12,
-          ),
-
+          const SizedBox(height: 12),
           Text(
             status == 'All'
                 ? 'No trainers yet'
                 : 'No $status trainers',
-            style:
-            AppTextStyles
+            style: AppTextStyles
                 .titleMedium
                 .copyWith(
               fontWeight:
-              FontWeight
-                  .w700,
+              FontWeight.w700,
             ),
           ),
-
-          const SizedBox(
-            height: 5,
-          ),
-
+          const SizedBox(height: 5),
           Text(
             'Trainers assigned to your gym will appear here.',
             textAlign:
             TextAlign.center,
-            style:
-            AppTextStyles
+            style: AppTextStyles
                 .bodySmall
                 .copyWith(
               color:
-              AppColors
-                  .textSecondary,
+              AppColors.textSecondary,
             ),
           ),
         ],
       ),
     );
   }
-}   
+}
+// git commit -m "trainer management UI developed and connected to firestore"

@@ -2,13 +2,17 @@ class ManagedTrainer {
   const ManagedTrainer({
     required this.uid,
     required this.email,
-    required this.gymId,
+    this.gymId,
     this.displayName,
     this.photoUrl,
     this.phone,
     this.specialization,
     this.bio,
     this.experienceYears,
+    this.monthlySalary,
+    this.clientCount = 0,
+    this.sessionCount = 0,
+    this.rating = 0,
     this.status = 'active',
     this.joinedAt,
   });
@@ -17,32 +21,34 @@ class ManagedTrainer {
   final String email;
 
   /// Gym currently assigned to this trainer.
+  ///
+  /// Null means the trainer is not assigned
+  /// to any gym.
   final String? gymId;
 
   final String? displayName;
   final String? photoUrl;
   final String? phone;
 
-  /// Example:
-  /// Personal Trainer
-  /// Strength Coach
-  /// Yoga Instructor
   final String? specialization;
-
   final String? bio;
 
   final int? experienceYears;
 
-  /// Example: active, inactive.
+  final double? monthlySalary;
+
+  final int clientCount;
+  final int sessionCount;
+  final double rating;
+
+  /// active / inactive
   final String status;
 
   final DateTime? joinedAt;
 
   bool get isAssignedToGym =>
-      gymId != null &&
-          gymId!.isNotEmpty;
+      gymId != null && gymId!.isNotEmpty;
 
   bool get isActive =>
-      status.toLowerCase() ==
-          'active';
+      status.toLowerCase() == 'active';
 }
