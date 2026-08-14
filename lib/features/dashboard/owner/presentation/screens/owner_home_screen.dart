@@ -715,23 +715,23 @@ class _ManagementGrid extends StatelessWidget {
         ),
 
         _ManagementCard(
-          icon: Icons.fitness_center_rounded,
-          title: 'Gym Management',
-          subtitle: 'Gym profile',
-          onTap: () {
-            context.push(
-              AppRoutes.ownerGymManagement,
-            );
-          },
-        ),
-
-        _ManagementCard(
           icon: Icons.workspace_premium_rounded,
           title: 'Membership Plans',
           subtitle: 'Plans & Pricing',
           onTap: () {
             context.push(
               AppRoutes.ownerMembershipPlans,
+            );
+          },
+        ),
+
+        _ManagementCard(
+          icon: Icons.bar_chart_rounded,
+          title: 'Reports',
+          subtitle: 'Analytics & reports',
+          onTap: () {
+            context.push(
+              AppRoutes.ownerReports,
             );
           },
         ),

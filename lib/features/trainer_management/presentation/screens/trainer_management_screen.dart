@@ -708,4 +708,3 @@ class _EmptyTrainerView
     );
   }
 }
-// git commit -m "trainer management UI developed and connected to firestore"

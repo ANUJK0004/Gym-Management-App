@@ -25,6 +25,7 @@ import '../../features/owner/presentation/screens/owner_setup_screen.dart';
 import '../../features/profile/domain/entities/user_profile.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/progress/presentation/screens/progress_screen.dart';
+import '../../features/report/presentation/screens/report_screen.dart';
 import '../../features/role_selection/presentation/screens/role_selection_screen.dart';
 import '../../features/trainer_management/presentation/screens/trainer_details_screen.dart';
 import '../../features/trainer_management/presentation/screens/trainer_management_screen.dart';
@@ -458,6 +459,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return TrainerDetailsScreen(
             trainerUid: trainerUid,
           );
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.ownerReports,
+        builder: (
+            context,
+            state,
+            ) {
+          return const ReportScreen();
         },
       ),
     ],
