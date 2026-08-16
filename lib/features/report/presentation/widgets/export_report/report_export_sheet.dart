@@ -1,8 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
 import '../../../../../app/theme/app_text_styles.dart';
+
+import '../../../domain/entities/report_export_request.dart';
+import '../../providers/report_provider.dart';
 
 import 'report_export_content_step.dart';
 import 'report_export_format_step.dart';
@@ -10,26 +17,27 @@ import 'report_export_step_indicator.dart';
 import 'report_export_success_sheet.dart';
 import 'report_export_type_step.dart';
 
-enum ReportExportType {
-  finance,
-  members,
-  staff,
-  operations,
-  fullReport,
-}
-
-extension ReportExportTypeData on ReportExportType {
+/// UI metadata for each export type.
+///
+/// The actual enum comes from the domain entity:
+/// ReportExportType.
+extension ReportExportTypeData
+on ReportExportType {
   String get label {
     switch (this) {
       case ReportExportType.finance:
         return 'Finance';
+
       case ReportExportType.members:
         return 'Members';
+
       case ReportExportType.staff:
         return 'Staff';
+
       case ReportExportType.operations:
         return 'Operations';
-      case ReportExportType.fullReport:
+
+      case ReportExportType.full:
         return 'Full Report';
     }
   }
@@ -38,13 +46,17 @@ extension ReportExportTypeData on ReportExportType {
     switch (this) {
       case ReportExportType.finance:
         return '💰';
+
       case ReportExportType.members:
         return '👥';
+
       case ReportExportType.staff:
         return '🏆';
+
       case ReportExportType.operations:
         return '🗓️';
-      case ReportExportType.fullReport:
+
+      case ReportExportType.full:
         return '📊';
     }
   }
@@ -52,15 +64,24 @@ extension ReportExportTypeData on ReportExportType {
   String get description {
     switch (this) {
       case ReportExportType.finance:
-        return 'Revenue, expenses, profit & membership billing';
+        return
+          'Revenue, expenses, profit & membership billing';
+
       case ReportExportType.members:
-        return 'Enrollment, retention, churn and plan distribution';
+        return
+          'Enrollment, retention, churn and plan distribution';
+
       case ReportExportType.staff:
-        return 'Trainer sessions, ratings and performance scores';
+        return
+          'Trainer sessions, ratings and performance scores';
+
       case ReportExportType.operations:
-        return 'Gym attendance, peak hours and capacity data';
-      case ReportExportType.fullReport:
-        return 'All sections combined into one comprehensive report';
+        return
+          'Gym attendance, peak hours and capacity data';
+
+      case ReportExportType.full:
+        return
+          'All sections combined into one comprehensive report';
     }
   }
 
@@ -142,7 +163,7 @@ extension ReportExportTypeData on ReportExportType {
           ),
         ];
 
-      case ReportExportType.fullReport:
+      case ReportExportType.full:
         return const [
           ReportExportSection(
             id: 'finance_summary',
@@ -175,19 +196,17 @@ class ReportExportSection {
   final String label;
 }
 
-enum ReportExportFormat {
-  pdf,
-  excel,
-  csv,
-}
-
-extension ReportExportFormatData on ReportExportFormat {
+/// UI metadata for the domain ReportExportFormat.
+extension ReportExportFormatData
+on ReportExportFormat {
   String get label {
     switch (this) {
       case ReportExportFormat.pdf:
         return 'PDF';
+
       case ReportExportFormat.excel:
         return 'Excel';
+
       case ReportExportFormat.csv:
         return 'CSV';
     }
@@ -197,8 +216,10 @@ extension ReportExportFormatData on ReportExportFormat {
     switch (this) {
       case ReportExportFormat.pdf:
         return 'Print-ready';
+
       case ReportExportFormat.excel:
         return 'Editable';
+
       case ReportExportFormat.csv:
         return 'Raw data';
     }
@@ -208,42 +229,44 @@ extension ReportExportFormatData on ReportExportFormat {
     switch (this) {
       case ReportExportFormat.pdf:
         return '📄';
+
       case ReportExportFormat.excel:
         return '📊';
+
       case ReportExportFormat.csv:
         return '📋';
     }
   }
 }
 
-enum ReportExportPeriod {
-  thisWeek,
-  thisMonth,
-  lastMonth,
-  thisQuarter,
-  lastQuarter,
-  thisYear,
-}
-
-extension ReportExportPeriodData on ReportExportPeriod {
+/// UI metadata for the domain ReportExportPeriod.
+extension ReportExportPeriodData
+on ReportExportPeriod {
   String get label {
     switch (this) {
       case ReportExportPeriod.thisWeek:
         return 'This Week';
+
       case ReportExportPeriod.thisMonth:
         return 'This Month';
+
       case ReportExportPeriod.lastMonth:
         return 'Last Month';
+
       case ReportExportPeriod.thisQuarter:
         return 'This Quarter';
+
       case ReportExportPeriod.lastQuarter:
         return 'Last Quarter';
+
       case ReportExportPeriod.thisYear:
         return 'This Year';
     }
   }
 }
 
+/// Used only by the success sheet.
+/// It describes what the owner requested.
 class ReportExportResult {
   const ReportExportResult({
     required this.reportType,
@@ -260,18 +283,20 @@ class ReportExportResult {
   final String email;
 }
 
-class ReportExportSheet extends StatefulWidget {
+class ReportExportSheet
+    extends ConsumerStatefulWidget {
   const ReportExportSheet({
     super.key,
   });
 
   @override
-  State<ReportExportSheet> createState() =>
+  ConsumerState<ReportExportSheet>
+  createState() =>
       _ReportExportSheetState();
 }
 
 class _ReportExportSheetState
-    extends State<ReportExportSheet> {
+    extends ConsumerState<ReportExportSheet> {
   int _currentStep = 0;
 
   ReportExportType? _selectedType;
@@ -284,27 +309,31 @@ class _ReportExportSheetState
   ReportExportPeriod _selectedPeriod =
       ReportExportPeriod.thisYear;
 
-  final TextEditingController _emailController =
+  final TextEditingController
+  _emailController =
   TextEditingController();
 
   bool _isExporting = false;
 
   ReportExportResult? _result;
 
+  Timer? _successTimer;
+
   @override
   void dispose() {
+    _successTimer?.cancel();
     _emailController.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     if (_result != null) {
       return ReportExportSuccessSheet(
         result: _result!,
-        onDone: () {
-          Navigator.of(context).pop();
-        },
+        onDone: _finishSuccess,
       );
     }
 
@@ -312,7 +341,8 @@ class _ReportExportSheetState
       top: false,
       child: Material(
         color: AppColors.surface,
-        borderRadius: const BorderRadius.vertical(
+        borderRadius:
+        const BorderRadius.vertical(
           top: Radius.circular(24),
         ),
         child: SizedBox(
@@ -321,24 +351,42 @@ class _ReportExportSheetState
               0.82,
           child: Column(
             children: [
-              const SizedBox(height: 12),
+              const SizedBox(
+                height: 12,
+              ),
+
               _handle(),
-              const SizedBox(height: 14),
+
+              const SizedBox(
+                height: 14,
+              ),
+
               _header(),
-              const SizedBox(height: 10),
+
+              const SizedBox(
+                height: 10,
+              ),
+
               Padding(
                 padding:
                 const EdgeInsets.symmetric(
                   horizontal: 16,
                 ),
-                child: ReportExportStepIndicator(
-                  currentStep: _currentStep,
+                child:
+                ReportExportStepIndicator(
+                  currentStep:
+                  _currentStep,
                 ),
               ),
-              const SizedBox(height: 10),
+
+              const SizedBox(
+                height: 10,
+              ),
+
               Expanded(
                 child: _buildStep(),
               ),
+
               _footer(),
             ],
           ),
@@ -383,38 +431,48 @@ class _ReportExportSheetState
               children: [
                 Text(
                   'Export Report',
-                  style:
-                  AppTextStyles.headlineMedium
+                  style: AppTextStyles
+                      .headlineMedium
                       .copyWith(
                     fontWeight:
                     FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 3),
+
+                const SizedBox(
+                  height: 3,
+                ),
+
                 Text(
                   'Step ${_currentStep + 1} of 3 — $title',
-                  style:
-                  AppTextStyles.bodySmall
+                  style: AppTextStyles
+                      .bodySmall
                       .copyWith(
                     color:
-                    AppColors.textSecondary,
+                    AppColors
+                        .textSecondary,
                   ),
                 ),
               ],
             ),
           ),
+
           InkWell(
             onTap: _isExporting
                 ? null
                 : () =>
-                Navigator.of(context).pop(),
+                Navigator.of(
+                  context,
+                ).pop(),
             borderRadius:
             BorderRadius.circular(30),
             child: Container(
               width: 32,
               height: 32,
-              decoration: const BoxDecoration(
-                color: AppColors.background,
+              decoration:
+              const BoxDecoration(
+                color:
+                AppColors.background,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -434,8 +492,10 @@ class _ReportExportSheetState
     switch (_currentStep) {
       case 0:
         return ReportExportTypeStep(
-          selectedType: _selectedType,
-          onTypeSelected: _selectType,
+          selectedType:
+          _selectedType,
+          onTypeSelected:
+          _selectType,
         );
 
       case 1:
@@ -444,31 +504,47 @@ class _ReportExportSheetState
         }
 
         return ReportExportContentStep(
-          reportType: _selectedType!,
-          selectedSections: _selectedSections,
-          onSelectionChanged: (value) {
+          reportType:
+          _selectedType!,
+          selectedSections:
+          _selectedSections,
+          onSelectionChanged:
+              (value) {
             setState(() {
-              _selectedSections = value;
+              _selectedSections =
+                  value;
             });
           },
         );
 
       case 2:
+        if (_selectedType == null) {
+          return const SizedBox.shrink();
+        }
+
         return ReportExportFormatStep(
-          reportType: _selectedType!,
+          reportType:
+          _selectedType!,
           selectedSectionCount:
           _selectedSections.length,
-          selectedFormat: _selectedFormat,
-          selectedPeriod: _selectedPeriod,
-          emailController: _emailController,
-          onFormatChanged: (format) {
+          selectedFormat:
+          _selectedFormat,
+          selectedPeriod:
+          _selectedPeriod,
+          emailController:
+          _emailController,
+          onFormatChanged:
+              (format) {
             setState(() {
-              _selectedFormat = format;
+              _selectedFormat =
+                  format;
             });
           },
-          onPeriodChanged: (period) {
+          onPeriodChanged:
+              (period) {
             setState(() {
-              _selectedPeriod = period;
+              _selectedPeriod =
+                  period;
             });
           },
         );
@@ -504,14 +580,17 @@ class _ReportExportSheetState
 
     return _navigation(
       backEnabled: true,
-      nextLabel:
-      _isExporting
+      nextLabel: _isExporting
           ? 'Exporting...'
           : '↓ Export as ${_selectedFormat.label}',
       onBack:
-      _isExporting ? null : _goBack,
+      _isExporting
+          ? null
+          : _goBack,
       onNext:
-      _isExporting ? null : _export,
+      _isExporting
+          ? null
+          : _export,
       loading: _isExporting,
     );
   }
@@ -524,7 +603,8 @@ class _ReportExportSheetState
     bool loading = false,
   }) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(
+      padding:
+      const EdgeInsets.fromLTRB(
         16,
         10,
         16,
@@ -548,21 +628,27 @@ class _ReportExportSheetState
                 child: ElevatedButton(
                   onPressed: onBack,
                   style:
-                  ElevatedButton.styleFrom(
+                  ElevatedButton
+                      .styleFrom(
                     backgroundColor:
-                    AppColors.background,
+                    AppColors
+                        .background,
                     foregroundColor:
-                    AppColors.textPrimary,
+                    AppColors
+                        .textPrimary,
                     elevation: 0,
                     shape:
                     RoundedRectangleBorder(
                       borderRadius:
-                      AppRadius.radiusMD,
+                      AppRadius
+                          .radiusMD,
                     ),
                   ),
-                  child: const Text(
+                  child:
+                  const Text(
                     '← Back',
-                    style: TextStyle(
+                    style:
+                    TextStyle(
                       fontWeight:
                       FontWeight.w700,
                     ),
@@ -570,8 +656,12 @@ class _ReportExportSheetState
                 ),
               ),
             ),
-            const SizedBox(width: 10),
+
+            const SizedBox(
+              width: 10,
+            ),
           ],
+
           Expanded(
             child: SizedBox(
               height: 48,
@@ -585,12 +675,15 @@ class _ReportExportSheetState
                   Colors.black,
                   disabledBackgroundColor:
                   AppColors.primary
-                      .withOpacity(0.35),
+                      .withOpacity(
+                    0.35,
+                  ),
                   elevation: 0,
                   shape:
                   RoundedRectangleBorder(
                     borderRadius:
-                    AppRadius.radiusMD,
+                    AppRadius
+                        .radiusMD,
                   ),
                 ),
                 child: loading
@@ -600,7 +693,8 @@ class _ReportExportSheetState
                   child:
                   CircularProgressIndicator(
                     strokeWidth: 2.3,
-                    color: Colors.black,
+                    color:
+                    Colors.black,
                   ),
                 )
                     : Text(
@@ -624,6 +718,7 @@ class _ReportExportSheetState
       ) {
     setState(() {
       _selectedType = type;
+
       _selectedSections = {};
     });
   }
@@ -638,7 +733,8 @@ class _ReportExportSheetState
           _selectedType!
               .sections
               .map(
-                (section) => section.id,
+                (section) =>
+            section.id,
           )
               .toSet();
 
@@ -667,8 +763,15 @@ class _ReportExportSheetState
   }
 
   Future<void> _export() async {
-    if (_selectedType == null ||
+    final selectedType =
+        _selectedType;
+
+    if (selectedType == null ||
         _selectedSections.isEmpty) {
+      return;
+    }
+
+    if (_isExporting) {
       return;
     }
 
@@ -676,32 +779,150 @@ class _ReportExportSheetState
       _isExporting = true;
     });
 
-    // Backend generation/download will be
-    // connected after the UI layer is complete.
-    await Future<void>.delayed(
-      const Duration(
-        milliseconds: 450,
-      ),
-    );
+    final email =
+    _emailController.text.trim();
 
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _isExporting = false;
-
-      _result = ReportExportResult(
-        reportType: _selectedType!,
+    try {
+      final request =
+      ReportExportRequest(
+        type: selectedType,
         sections:
-        Set<String>.from(
+        List<String>.from(
           _selectedSections,
         ),
         format: _selectedFormat,
         period: _selectedPeriod,
         email:
-        _emailController.text.trim(),
+        email.isEmpty
+            ? null
+            : email,
       );
-    });
+
+      final result = await ref
+          .read(
+        reportExportControllerProvider
+            .notifier,
+      )
+          .export(request);
+
+      if (!mounted) {
+        return;
+      }
+
+      await _openDownloadUrl(
+        result.downloadUrl,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _isExporting = false;
+
+        _result =
+            ReportExportResult(
+              reportType:
+              selectedType,
+              sections:
+              Set<String>.from(
+                _selectedSections,
+              ),
+              format: _selectedFormat,
+              period: _selectedPeriod,
+              email: email,
+            );
+      });
+
+      _startSuccessAutoClose();
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _isExporting = false;
+      });
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            duration:
+            const Duration(
+              seconds: 3,
+            ),
+            content: Text(
+              _friendlyExportError(
+                error,
+              ),
+            ),
+          ),
+        );
+    }
+  }
+
+  Future<void> _openDownloadUrl(
+      String url,
+      ) async {
+    final uri = Uri.tryParse(url);
+
+    if (uri == null) {
+      throw Exception(
+        'The generated report returned an invalid download URL.',
+      );
+    }
+
+    final opened = await launchUrl(
+      uri,
+      mode:
+      LaunchMode.externalApplication,
+    );
+
+    if (!opened) {
+      throw Exception(
+        'Unable to open the generated report.',
+      );
+    }
+  }
+
+  void _startSuccessAutoClose() {
+    _successTimer?.cancel();
+
+    _successTimer = Timer(
+      const Duration(
+        seconds: 3,
+      ),
+      _finishSuccess,
+    );
+  }
+
+  void _finishSuccess() {
+    if (!mounted) {
+      return;
+    }
+
+    Navigator.of(context).pop();
+  }
+
+  String _friendlyExportError(
+      Object error,
+      ) {
+    final message = error.toString();
+
+    if (message.contains('email')) {
+      return 'Report was not exported because the email address could not be processed.';
+    }
+
+    if (message.contains('permission-denied') ||
+        message.contains('permission')) {
+      return 'You do not have permission to export this report.';
+    }
+
+    if (message.contains('unauthenticated')) {
+      return 'Your session has expired. Please sign in again.';
+    }
+
+    return 'Unable to export report. Please try again.';
   }
 }

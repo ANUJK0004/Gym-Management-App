@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math' as math;
 
 import '../../domain/entities/downloadable_report.dart';
+import '../../domain/entities/report_export_request.dart';
+import '../../domain/entities/report_export_result.dart';
 import '../../domain/entities/report_membership_breakdown.dart';
 import '../../domain/entities/report_peak_hour.dart';
 import '../../domain/entities/report_summary.dart';
@@ -386,6 +388,15 @@ class ReportRepositoryImpl implements ReportRepository {
           endDate,
         );
     }
+  }
+
+  @override
+  Future<ReportExportResult> exportReport({
+    required ReportExportRequest request,
+  }) {
+    return _dataSource.exportReport(
+      request: request,
+    );
   }
 
   double _calculateChurnRate(

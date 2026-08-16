@@ -4,6 +4,7 @@ import 'package:sweatsync/features/report/presentation/widgets/export_report/rep
 import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
 import '../../../../../app/theme/app_text_styles.dart';
+import '../../../domain/entities/report_export_request.dart';
 
 class ReportExportTypeStep extends StatelessWidget {
   const ReportExportTypeStep({

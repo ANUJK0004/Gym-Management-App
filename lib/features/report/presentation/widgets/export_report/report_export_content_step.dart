@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
 import '../../../../../app/theme/app_text_styles.dart';
+import '../../../domain/entities/report_export_request.dart';
 import 'report_export_sheet.dart';
 
 class ReportExportContentStep extends StatelessWidget {

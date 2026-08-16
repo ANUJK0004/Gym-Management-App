@@ -9,3 +9,7 @@ export {
 export {
   createTrainerEnrollment,
 } from "./trainerEnrollment";
+
+export {
+  exportReport,
+} from "./reportExport";

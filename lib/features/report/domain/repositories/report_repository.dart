@@ -1,4 +1,6 @@
 import '../entities/downloadable_report.dart';
+import '../entities/report_export_request.dart';
+import '../entities/report_export_result.dart';
 import '../entities/report_membership_breakdown.dart';
 import '../entities/report_peak_hour.dart';
 import '../entities/report_summary.dart';
@@ -24,16 +26,23 @@ abstract class ReportRepository {
   });
 
   Future<List<ReportMembershipBreakdown>>
-      getMembershipBreakdown({
+  getMembershipBreakdown({
     required String gymId,
   });
 
-  Future<List<DownloadableReport>> getDownloadableReports();
+  Future<List<DownloadableReport>>
+  getDownloadableReports();
 
+  /// Legacy method can remain for now if other UI still uses it.
   Future<String> exportReportCsv({
     required DownloadableReportType type,
     required String gymId,
     required DateTime startDate,
     required DateTime endDate,
+  });
+
+  /// New real export pipeline.
+  Future<ReportExportResult> exportReport({
+    required ReportExportRequest request,
   });
 }
