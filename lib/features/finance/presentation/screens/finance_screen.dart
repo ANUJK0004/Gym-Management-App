@@ -12,68 +12,135 @@ import '../widgets/revenue_breakdown_card.dart';
 import '../widgets/revenue_trend_card.dart';
 import '../widgets/transaction_card.dart';
 
-class FinanceScreen
-    extends ConsumerStatefulWidget {
+import '../widgets/export_finance/finance_export_format_selector.dart';
+import '../widgets/export_finance/finance_export_sheet.dart';
+import '../widgets/export_finance/finance_export_success_sheet.dart';
+
+class FinanceScreen extends ConsumerStatefulWidget {
   const FinanceScreen({
     super.key,
   });
 
   @override
-  ConsumerState<
-      FinanceScreen>
-  createState() =>
+  ConsumerState<FinanceScreen> createState() =>
       _FinanceScreenState();
 }
 
 class _FinanceScreenState
-    extends ConsumerState<
-        FinanceScreen> {
+    extends ConsumerState<FinanceScreen> {
   late DateTime _selectedPeriod;
 
-  RevenueTrendPeriod
-  _trendPeriod =
+  RevenueTrendPeriod _trendPeriod =
       RevenueTrendPeriod.month;
 
   @override
   void initState() {
     super.initState();
 
-    final now =
-    DateTime.now();
+    final now = DateTime.now();
 
-    _selectedPeriod =
-        DateTime(
-          now.year,
-          now.month,
+    _selectedPeriod = DateTime(
+      now.year,
+      now.month,
+    );
+  }
+
+  Future<void> _openExportSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.70),
+      useSafeArea: true,
+      builder: (sheetContext) {
+        return FinanceExportSheet(
+          onExport: (
+              format,
+              period,
+              sections,
+              ) async {
+            /*
+             * UI PHASE ONLY
+             *
+             * Backend connection will be added later.
+             *
+             * For now we simulate a successful export so that
+             * the complete UI flow can be tested.
+             */
+            await Future.delayed(
+              const Duration(milliseconds: 500),
+            );
+
+            if (!mounted) {
+              return;
+            }
+
+            Navigator.of(sheetContext).pop();
+
+            await Future.delayed(
+              const Duration(milliseconds: 150),
+            );
+
+            if (!mounted) {
+              return;
+            }
+
+            await _showExportSuccess(
+              format,
+            );
+          },
         );
+      },
+    );
+  }
+
+  Future<void> _showExportSuccess(
+      FinanceExportFormat format,
+      ) async {
+    String label;
+
+    switch (format) {
+      case FinanceExportFormat.pdf:
+        label = 'PDF';
+        break;
+      case FinanceExportFormat.excel:
+        label = 'Excel';
+        break;
+      case FinanceExportFormat.csv:
+        label = 'CSV';
+        break;
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.70),
+      isDismissible: false,
+      enableDrag: false,
+      useSafeArea: true,
+      builder: (_) {
+        return FinanceExportSuccessSheet(
+          format: label,
+        );
+      },
+    );
   }
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     final transactionsAsync =
-    ref.watch(
-      financeTransactionsProvider,
-    );
+    ref.watch(financeTransactionsProvider);
 
     final breakdownAsync =
-    ref.watch(
-      revenueBreakdownProvider,
-    );
+    ref.watch(revenueBreakdownProvider);
 
     final trendAsync =
-    ref.watch(
-      revenueTrendProvider,
-    );
+    ref.watch(revenueTrendProvider);
 
     return Scaffold(
-      backgroundColor:
-      AppColors.background,
-
+      backgroundColor: AppColors.background,
       body: SafeArea(
-        child:
-        RefreshIndicator(
+        child: RefreshIndicator(
           onRefresh: () async {
             ref.invalidate(
               financeTransactionsProvider,
@@ -88,46 +155,25 @@ class _FinanceScreenState
             );
 
             await ref.read(
-              financeTransactionsProvider
-                  .future,
+              financeTransactionsProvider.future,
             );
           },
-
-          child:
-          CustomScrollView(
+          child: CustomScrollView(
             physics:
             const AlwaysScrollableScrollPhysics(),
-
             slivers: [
               SliverPadding(
-                padding:
-                const EdgeInsets.fromLTRB(
+                padding: const EdgeInsets.fromLTRB(
                   14,
                   18,
                   14,
                   30,
                 ),
-
-                sliver:
-                SliverList(
-                  delegate:
-                  SliverChildListDelegate(
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate(
                     [
                       FinanceHeader(
-                        onExport:
-                            () {
-                          ScaffoldMessenger
-                              .of(
-                            context,
-                          ).showSnackBar(
-                            const SnackBar(
-                              content:
-                              Text(
-                                'Finance export will be connected next.',
-                              ),
-                            ),
-                          );
-                        },
+                        onExport: _openExportSheet,
                       ),
 
                       const SizedBox(
@@ -137,11 +183,9 @@ class _FinanceScreenState
                       FinancePeriodSelector(
                         selectedPeriod:
                         _selectedPeriod,
-                        onChanged:
-                            (period) {
+                        onChanged: (period) {
                           setState(() {
-                            _selectedPeriod =
-                                period;
+                            _selectedPeriod = period;
                           });
                         },
                       ),
@@ -151,12 +195,10 @@ class _FinanceScreenState
                       ),
 
                       trendAsync.when(
-                        loading:
-                            () =>
+                        loading: () =>
                         const _LoadingCard(),
 
-                        error:
-                            (
+                        error: (
                             error,
                             stack,
                             ) =>
@@ -165,18 +207,14 @@ class _FinanceScreenState
                           'Unable to load revenue trend.',
                         ),
 
-                        data:
-                            (trends) =>
+                        data: (trends) =>
                             RevenueTrendCard(
-                              trends:
-                              trends,
-                              period:
-                              _trendPeriod,
+                              trends: trends,
+                              period: _trendPeriod,
                               onPeriodChanged:
                                   (period) {
                                 setState(() {
-                                  _trendPeriod =
-                                      period;
+                                  _trendPeriod = period;
                                 });
                               },
                             ),
@@ -187,8 +225,7 @@ class _FinanceScreenState
                       ),
 
                       const _SectionTitle(
-                        title:
-                        'REVENUE BREAKDOWN',
+                        title: 'REVENUE BREAKDOWN',
                       ),
 
                       const SizedBox(
@@ -196,12 +233,10 @@ class _FinanceScreenState
                       ),
 
                       breakdownAsync.when(
-                        loading:
-                            () =>
+                        loading: () =>
                         const _LoadingCard(),
 
-                        error:
-                            (
+                        error: (
                             error,
                             stack,
                             ) =>
@@ -210,10 +245,8 @@ class _FinanceScreenState
                           'Unable to load revenue breakdown.',
                         ),
 
-                        data:
-                            (breakdown) {
-                          if (breakdown
-                              .isEmpty) {
+                        data: (breakdown) {
+                          if (breakdown.isEmpty) {
                             return const _EmptyCard(
                               message:
                               'No revenue recorded for this period.',
@@ -221,15 +254,11 @@ class _FinanceScreenState
                           }
 
                           return Column(
-                            children:
-                            breakdown
+                            children: breakdown
                                 .map(
-                                  (
-                                  item,
-                                  ) =>
+                                  (item) =>
                                   RevenueBreakdownCard(
-                                    breakdown:
-                                    item,
+                                    breakdown: item,
                                   ),
                             )
                                 .toList(),
@@ -244,13 +273,11 @@ class _FinanceScreenState
                       Row(
                         children: [
                           const Expanded(
-                            child:
-                            _SectionTitle(
+                            child: _SectionTitle(
                               title:
                               'RECENT TRANSACTIONS',
                             ),
                           ),
-
                           Text(
                             'See all',
                             style:
@@ -258,11 +285,9 @@ class _FinanceScreenState
                                 .labelMedium
                                 .copyWith(
                               color:
-                              AppColors
-                                  .primary,
+                              AppColors.primary,
                               fontWeight:
-                              FontWeight
-                                  .w600,
+                              FontWeight.w600,
                             ),
                           ),
                         ],
@@ -273,12 +298,10 @@ class _FinanceScreenState
                       ),
 
                       transactionsAsync.when(
-                        loading:
-                            () =>
+                        loading: () =>
                         const _LoadingCard(),
 
-                        error:
-                            (
+                        error: (
                             error,
                             stack,
                             ) =>
@@ -287,10 +310,8 @@ class _FinanceScreenState
                           'Unable to load transactions.',
                         ),
 
-                        data:
-                            (transactions) {
-                          if (transactions
-                              .isEmpty) {
+                        data: (transactions) {
+                          if (transactions.isEmpty) {
                             return const _EmptyCard(
                               message:
                               'No transactions found.',
@@ -298,12 +319,9 @@ class _FinanceScreenState
                           }
 
                           return Column(
-                            children:
-                            transactions
+                            children: transactions
                                 .map(
-                                  (
-                                  transaction,
-                                  ) =>
+                                  (transaction) =>
                                   TransactionCard(
                                     transaction:
                                     transaction,
@@ -325,8 +343,7 @@ class _FinanceScreenState
   }
 }
 
-class _SectionTitle
-    extends StatelessWidget {
+class _SectionTitle extends StatelessWidget {
   const _SectionTitle({
     required this.title,
   });
@@ -334,47 +351,33 @@ class _SectionTitle
   final String title;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Text(
       title,
-      style:
-      AppTextStyles
-          .labelMedium
-          .copyWith(
-        color:
-        AppColors
-            .textSecondary,
-        fontWeight:
-        FontWeight.w600,
-        letterSpacing:
-        0.8,
+      style: AppTextStyles.labelMedium.copyWith(
+        color: AppColors.textSecondary,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.8,
       ),
     );
   }
 }
 
-class _LoadingCard
-    extends StatelessWidget {
+class _LoadingCard extends StatelessWidget {
   const _LoadingCard();
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return const SizedBox(
       height: 120,
       child: Center(
-        child:
-        CircularProgressIndicator(),
+        child: CircularProgressIndicator(),
       ),
     );
   }
 }
 
-class _EmptyCard
-    extends StatelessWidget {
+class _EmptyCard extends StatelessWidget {
   const _EmptyCard({
     required this.message,
   });
@@ -382,44 +385,26 @@ class _EmptyCard
   final String message;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return Container(
-      width:
-      double.infinity,
-      padding:
-      const EdgeInsets.all(
-        24,
-      ),
-      decoration:
-      BoxDecoration(
-        color:
-        AppColors.surface,
-        borderRadius:
-        BorderRadius.circular(
-          12,
-        ),
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         message,
-        textAlign:
-        TextAlign.center,
-        style:
-        AppTextStyles
-            .bodyMedium
-            .copyWith(
-          color:
-          AppColors
-              .textSecondary,
+        textAlign: TextAlign.center,
+        style: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textSecondary,
         ),
       ),
     );
   }
 }
 
-class _ErrorCard
-    extends StatelessWidget {
+class _ErrorCard extends StatelessWidget {
   const _ErrorCard({
     required this.message,
   });
@@ -427,9 +412,7 @@ class _ErrorCard
   final String message;
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return _EmptyCard(
       message: message,
     );
