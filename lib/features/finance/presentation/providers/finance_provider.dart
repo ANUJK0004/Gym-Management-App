@@ -6,6 +6,8 @@ import 'package:sweatsync/features/gym/presentation/providers/gym_provider.dart'
 import '../../data/datasources/finance_remote_datasources.dart';
 import '../../data/repositories/finance_repository_impl.dart';
 
+import '../../domain/entities/finance_export_request.dart';
+import '../../domain/entities/finance_export_result.dart';
 import '../../domain/entities/finance_transaction.dart';
 import '../../domain/entities/revenue_breakdown.dart';
 import '../../domain/entities/revenue_trend.dart';
@@ -15,7 +17,7 @@ final financeRemoteDataSourceProvider =
 Provider<FinanceRemoteDataSource>(
       (ref) {
     return FinanceRemoteDataSource(
-      FirebaseFirestore.instance,
+      firestore: FirebaseFirestore.instance,
     );
   },
 );
@@ -32,8 +34,7 @@ Provider<FinanceRepository>(
 );
 
 final financeTransactionsProvider =
-FutureProvider<
-    List<FinanceTransaction>>(
+FutureProvider<List<FinanceTransaction>>(
       (ref) async {
     final gym =
     await ref.watch(
@@ -45,9 +46,7 @@ FutureProvider<
     }
 
     return ref
-        .watch(
-      financeRepositoryProvider,
-    )
+        .watch(financeRepositoryProvider)
         .getTransactions(
       gymId: gym.id,
     );
@@ -55,8 +54,7 @@ FutureProvider<
 );
 
 final revenueBreakdownProvider =
-FutureProvider<
-    List<RevenueBreakdown>>(
+FutureProvider<List<RevenueBreakdown>>(
       (ref) async {
     final gym =
     await ref.watch(
@@ -67,8 +65,7 @@ FutureProvider<
       return [];
     }
 
-    final now =
-    DateTime.now();
+    final now = DateTime.now();
 
     final startDate =
     DateTime(
@@ -85,9 +82,7 @@ FutureProvider<
     );
 
     return ref
-        .watch(
-      financeRepositoryProvider,
-    )
+        .watch(financeRepositoryProvider)
         .getRevenueBreakdown(
       gymId: gym.id,
       startDate: startDate,
@@ -97,8 +92,7 @@ FutureProvider<
 );
 
 final revenueTrendProvider =
-FutureProvider<
-    List<RevenueTrend>>(
+FutureProvider<List<RevenueTrend>>(
       (ref) async {
     final gym =
     await ref.watch(
@@ -109,8 +103,7 @@ FutureProvider<
       return [];
     }
 
-    final now =
-    DateTime.now();
+    final now = DateTime.now();
 
     final startDate =
     DateTime(
@@ -127,9 +120,7 @@ FutureProvider<
     );
 
     return ref
-        .watch(
-      financeRepositoryProvider,
-    )
+        .watch(financeRepositoryProvider)
         .getRevenueTrend(
       gymId: gym.id,
       startDate: startDate,
@@ -137,3 +128,74 @@ FutureProvider<
     );
   },
 );
+
+final financeExportControllerProvider =
+AsyncNotifierProvider<
+    FinanceExportController,
+    FinanceExportResult?>(
+  FinanceExportController.new,
+);
+
+class FinanceExportController
+    extends AsyncNotifier<FinanceExportResult?> {
+  @override
+  Future<FinanceExportResult?> build() async {
+    return null;
+  }
+
+  Future<FinanceExportResult>
+  export({
+    required FinanceExportFormat format,
+    required FinanceExportPeriod period,
+    required List<FinanceExportSection> sections,
+    String? email,
+  }) async {
+    final gym =
+    await ref.read(
+      ownerGymProvider.future,
+    );
+
+    if (gym == null) {
+      throw Exception(
+        'Owner gym not found.',
+      );
+    }
+
+    if (sections.isEmpty) {
+      throw Exception(
+        'Select at least one finance section.',
+      );
+    }
+
+    state = const AsyncLoading();
+
+    final result = await AsyncValue.guard(
+          () {
+        final request =
+        FinanceExportRequest(
+          gymId: gym.id,
+          format: format,
+          period: period,
+          sections: sections,
+          email: email,
+        );
+
+        return ref
+            .read(
+          financeRepositoryProvider,
+        )
+            .exportFinanceReport(
+          request,
+        );
+      },
+    );
+
+    state = result;
+
+    if (result.hasError) {
+      throw result.error!;
+    }
+
+    return result.requireValue;
+  }
+}

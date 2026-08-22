@@ -4,12 +4,7 @@ import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
 import '../../../../../app/theme/app_text_styles.dart';
 
-enum FinanceExportPeriod {
-  thisMonth,
-  lastMonth,
-  thisQuarter,
-  thisYear,
-}
+import '../../../domain/entities/finance_export_request.dart';
 
 class FinanceExportPeriodSelector extends StatelessWidget {
   const FinanceExportPeriodSelector({

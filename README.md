@@ -1,17 +1,22 @@
-# sweatsync
+Project: SweatSync
+Technology: Flutter + Dart + Firebase
 
-A new Flutter project.
+Flutter:
+Dart:
 
-## Getting Started
+How to run:
+1. flutter pub get
+2. cd functions
+3. npm install
+4. cd ..
+5. flutter run
 
-This project is a starting point for a Flutter application.
+Backend:
+Firebase Authentication
+Cloud Firestore
+Cloud Functions
+Cloud Storage
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Important:
+The Firebase project configuration must be available for the application
+and Cloud Functions to work correctly.

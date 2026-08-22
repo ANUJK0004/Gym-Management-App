@@ -1,18 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
+import '../../domain/entities/finance_export_request.dart';
 import '../../domain/entities/finance_transaction.dart';
+
+import '../models/finance_export_result_model.dart';
 import '../models/finance_transaction_model.dart';
 
 class FinanceRemoteDataSource {
-  FinanceRemoteDataSource(
-      this._firestore,
-      );
+  FinanceRemoteDataSource({
+    FirebaseFirestore? firestore,
+    FirebaseFunctions? functions,
+  })  : _firestore =
+      firestore ?? FirebaseFirestore.instance,
+        _functions =
+            functions ?? FirebaseFunctions.instance;
 
   final FirebaseFirestore _firestore;
+  final FirebaseFunctions _functions;
 
-  /// Returns the financeTransactions subcollection
-  /// inside a particular gym document.
-  CollectionReference<Map<String, dynamic>> _transactionsCollection(
+  CollectionReference<Map<String, dynamic>>
+  _transactionsCollection(
       String gymId,
       ) {
     return _firestore
@@ -21,11 +29,13 @@ class FinanceRemoteDataSource {
         .collection('financeTransactions');
   }
 
-  Future<List<FinanceTransactionModel>> getTransactions({
+  Future<List<FinanceTransactionModel>>
+  getTransactions({
     required String gymId,
     int limit = 20,
   }) async {
-    final snapshot = await _transactionsCollection(gymId)
+    final snapshot =
+    await _transactionsCollection(gymId)
         .orderBy(
       'date',
       descending: true,
@@ -35,7 +45,9 @@ class FinanceRemoteDataSource {
 
     return snapshot.docs
         .map(
-          (doc) => FinanceTransactionModel.fromFirestore(doc),
+          (doc) =>
+          FinanceTransactionModel
+              .fromFirestore(doc),
     )
         .toList();
   }
@@ -60,12 +72,57 @@ class FinanceRemoteDataSource {
 
     await _transactionsCollection(
       transaction.gymId,
-    ).doc(
+    )
+        .doc(
       transaction.id.isEmpty
           ? null
           : transaction.id,
-    ).set(
+    )
+        .set(
       model.toFirestore(),
     );
+  }
+
+  Future<FinanceExportResultModel>
+  exportFinanceReport(
+      FinanceExportRequest request,
+      ) async {
+    final callable =
+    _functions.httpsCallable(
+      'exportFinanceReport',
+    );
+
+    final result =
+    await callable.call({
+      'gymId': request.gymId,
+
+      'format':
+      request.format.name,
+
+      'period':
+      request.period.name,
+
+      'sections': request.sections
+          .map(
+            (section) =>
+        section.name,
+      )
+          .toList(),
+
+      'email':
+      request.hasEmail
+          ? request.email!
+          .trim()
+          .toLowerCase()
+          : null,
+    });
+
+    final data =
+    Map<String, dynamic>.from(
+      result.data as Map,
+    );
+
+    return FinanceExportResultModel
+        .fromMap(data);
   }
 }

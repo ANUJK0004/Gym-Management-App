@@ -13,3 +13,7 @@ export {
 export {
   exportReport,
 } from "./reportExport";
+
+export {
+  exportFinanceReport,
+} from "./financeExport";

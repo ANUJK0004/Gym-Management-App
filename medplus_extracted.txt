@@ -1,0 +1,1345 @@
+
+===PAGE 1===
+ 
+ 
+1 
+ 
+MedPluz 
+ONLINE MEDICINE DELIVERY APPLICATION  
+USING FLUTTER & DART  
+ 
+ 
+A Internship/Project Report 
+ 
+In partial fulfillment of the requirements for the degree of  
+ 
+BSc. Computer Science 
+ 
+under 
+ 
+Academy of Skill Development 
+ 
+ 
+Submitted by 
+ 
+Suba Sri V 
+ 
+VIT Vellore 
+Vellore Institute of Technology  
+Vellore – 632014, Tamil Nadu, India 
+
+===PAGE 2===
+ 
+ 
+2 
+ 
+ 
+ 
+ 
+Certificate from the Mentor 
+ 
+This is to certify that Suba Sri V  has completed the project titled MEDPLUZ – 
+ONLINE MEDICINE E-COMMERCE APPLICATION USING FLUTTER & DART 
+under my supervision during the period from June 2026  to August 2026, which 
+is in partial fulfillment of the requirements for the award of the BSc. Computer 
+Science and submitted to Department SCORE of VIT-Vellore 
+ 
+ 
+ 
+ 
+ 
+                                                                                                      
+____________________ 
+  Signature of the Mentor 
+ 
+ 
+ 
+Date: 
+ 
+ 
+ 
+
+===PAGE 3===
+ 
+ 
+3 
+ 
+Acknowledgment 
+ 
+ 
+I take this opportunity to express my deep gratitude and sincerest thanks to my 
+project mentor,  ANINDYA MUKHERJEE , for giving the most valuable 
+suggestions, helpful guidance, and encouragement in the execution of this 
+project work. 
+ 
+I would like to give a special mention to my colleagues. Last but not least I am 
+grateful to all the faculty members of the Academy of Skill Development for 
+their support. 
+  
+===PAGE 4===
+ 
+ 
+4 
+ 
+ABSTRACT 
+The Online Medicine App is a Flutter-based mobile and web application designed to provide 
+a convenient platform for browsing and purchasing medicines online. The application allows 
+users to register and log in securely, browse medicines by category, search for products, view 
+individual medicine details, select quantities, add products to a cart and proceed with 
+checkout. 
+Firebase is used as the backend platform. Firebase Authentication provides email/password 
+authentication and account-related functions, while Cloud Firestore stores user information, 
+delivery addresses and order information. Firebase Storage is used to store user profile 
+photos, with the resulting download URL stored in the corresponding user document. 
+The application supports both cart-based checkout and Buy Now checkout. Users can manage 
+delivery addresses, view order history and manage their profile. An admin order screen 
+allows the specified administrator to view customer orders and update order statuses such as 
+Pending, Confirmed, On the Way, Delivered and Cancelled. The application also includes an 
+AI Assistant screen. 
+The project demonstrates how Flutter and Firebase can be combined to develop a responsive 
+online medicine shopping application with persistent user, profile, address and order data. 
+  
+===PAGE 5===
+ 
+ 
+5 
+ 
+S.No TABLE OF CONTENTS 
+1  Introduction 
+2  Problem Statement 
+3  Objectives 
+4  Existing System 
+5  Proposed System 
+6  System Requirements 
+7  Technologies Used 
+8  System Architecture 
+9  Modules 
+10  System Design 
+11  Database / Firebase Design 
+12 Implementation 
+13  Screenshots 
+14  Testing 
+15  Results 
+16  Advantages 
+17  Limitations 
+18  Future Enhancement 
+19  Conclusion 
+20  References 
+  
+===PAGE 6===
+ 
+ 
+6 
+ 
+CHAPTER 1 – INTRODUCTION 
+The Online Medicine App is a digital medicine shopping application developed using Flutter 
+and Dart. The main purpose of the application is to provide users with a simple interface 
+through which they can browse medicines, search for required products, view detailed 
+medicine information, add medicines to a cart and place orders. 
+The application is designed for mobile and web use. Firebase services provide the backend 
+support required for user authentication, persistent data storage and profile image storage. 
+This allows important user and order information to remain available across sessions. 
+The application contains separate user and administrator functionality. Users can manage 
+their profile, addresses and orders, while the administrator can view customer orders and 
+update order status. The application also contains an AI Assistant screen to support the 
+overall user experience. 
+1.1 Project Overview 
+The system maintains a medicine database containing around 50 products. Each medicine 
+includes a name, price, category, image and an individual description. Categories include 
+Tablets, Antibiotics, Diabetes, Supplements, Syrups, Injections, Gels, Ointments, Sprays, 
+First Aid, Eye Care, Ear Care and Nutrition. 
+1.2 Need for the Project 
+Traditional medicine purchasing may require users to physically visit a store and search for 
+available products. A digital platform can organize medicine information and provide a 
+structured shopping process. The proposed application focuses on product discovery, cart 
+management, checkout, address management and persistent order history. 
+1.3 Project Scope 
+The project covers the development of the application interface, Firebase authentication, 
+Firestore-based data persistence, Firebase Storage for profile photos, medicine search and 
+browsing, cart management, checkout, order history, address management, profile 
+management and administrator order management. 
+CHAPTER 2 – PROBLEM STATEMENT 
+Users need a convenient way to browse medicine products, compare available information, 
+manage quantities and place orders without depending on temporary local application data. A 
+system is required to securely manage user accounts, retain delivery addresses and maintain 
+order records. 
+The project therefore addresses the problem of creating a centralized Flutter application that 
+connects medicine browsing and purchasing functions with a persistent Firebase backend. 
+CHAPTER 3 – OBJECTIVES 
+• To develop an online medicine shopping application using Flutter and Dart. 
+===PAGE 7===
+ 
+ 
+7 
+ 
+• To provide secure user registration and login using Firebase Authentication. 
+• To allow users to browse medicines by category and search for products. 
+• To display individual medicine information including name, price, category, image and 
+description. 
+• To provide cart management with quantity modification and removal of products. 
+• To support both Buy Now and cart-based checkout. 
+• To store delivery addresses permanently using Cloud Firestore. 
+• To store and retrieve user orders from Cloud Firestore. 
+• To provide persistent user profile information and profile photo storage. 
+• To provide an administrator interface for viewing and updating order status. 
+• To support Android and Flutter Web. 
+CHAPTER 4 – EXISTING SYSTEM 
+In a conventional medicine purchasing process, users generally depend on physical medicine 
+stores to identify available products and complete purchases. Product information, 
+availability and purchasing history may not be organized in a single digital interface. 
+4.1 Limitations of Existing System 
+• Requires physical interaction with a medicine store. 
+• Searching for a specific product may take additional time. 
+• Medicine information may not be presented in a standardized format. 
+• Order history may not be easily accessible digitally. 
+• Delivery addresses and profile information may not be centrally managed. 
+• Customer order status may require manual communication. 
+CHAPTER 5 – PROPOSED SYSTEM 
+The proposed Online Medicine App provides a digital interface for medicine browsing and 
+ordering. Users can create an account, log in, search medicines, view details, add products to 
+the cart, purchase medicines and manage their delivery information. 
+Firebase provides persistent backend functionality. User accounts are authenticated through 
+Firebase Authentication. Cloud Firestore stores user, address and order information. Firebase 
+Storage stores profile photos, while the corresponding download URL is saved in Firestore. 
+5.1 Proposed System Features 
+• Animated splash screen. 
+• Firebase email/password authentication. 
+• Forgot password and password-change functionality. 
+• Medicine search and category browsing. 
+• Individual medicine descriptions. 
+• Cart and Buy Now purchasing. 
+• Checkout and order confirmation. 
+===PAGE 8===
+ 
+ 
+8 
+ 
+• Persistent order history. 
+• Admin order management and status updates. 
+• Profile and address management. 
+• Persistent profile photo using Firebase Storage. 
+• AI Assistant screen. 
+• Android and Flutter Web support. 
+CHAPTER 6 – SYSTEM REQUIREMENTS 
+6.1 Functional Requirements 
+• User registration with name, email, phone number and password. 
+• User login and logout. 
+• Forgot password and change password. 
+• Medicine browsing and searching. 
+• Medicine detail display. 
+• Add, remove and update cart items. 
+• Buy Now checkout. 
+• Cart checkout. 
+• Address creation and management. 
+• Order placement and confirmation. 
+• Order history retrieval from Firestore. 
+• Profile editing and profile photo upload. 
+• Administrator order viewing and status updates. 
+6.2 Non-Functional Requirements 
+• Usability: The interface should be simple and understandable. 
+• Performance: Screens and database operations should respond efficiently. 
+• Reliability: Important user and order information should persist in Firebase. 
+• Security: Authentication and database access should protect user information. 
+• Scalability: Firebase provides a backend that can support future growth. 
+• Portability: The application is intended to support Android and Flutter Web. 
+6.3 Hardware Requirements 
+• Development computer with a modern processor. 
+• Minimum 8 GB RAM recommended for Flutter and Android development. 
+• Internet connection for Firebase services and package management. 
+• Android device or Android Emulator for testing. 
+• Web browser such as Chrome for Flutter Web testing. 
+6.4 Software Requirements 
+• Flutter SDK 
+• Dart SDK 
+===PAGE 9===
+ 
+ 
+9 
+ 
+• Visual Studio Code 
+• Android Studio 
+• Chrome browser 
+• Firebase Authentication 
+• Cloud Firestore 
+• Firebase Storage 
+• Flutter packages such as image_picker where required. 
+CHAPTER 7 – TECHNOLOGIES USED 
+7.1 Flutter 
+Flutter is used as the application development framework. It provides the widgets and 
+application structure required to create the user interface for Android and Web. 
+7.2 Dart 
+Dart is the programming language used to implement the Flutter application, screen logic, 
+models and Firebase operations. 
+7.3 Firebase Authentication 
+Firebase Authentication is used for email/password registration and login. It also supports 
+password-reset and password-change functionality. 
+7.4 Cloud Firestore 
+Cloud Firestore is used as the persistent database for user information, addresses and orders. 
+7.5 Firebase Storage 
+Firebase Storage is used for storing profile images. The profile image is uploaded and its 
+download URL is stored in the user's Firestore document. 
+7.6 VS Code and Android Studio 
+Visual Studio Code is used as the primary development environment. Android Studio 
+provides Android SDK and emulator support, while Chrome is used for Flutter Web testing. 
+CHAPTER 8 – SYSTEM ARCHITECTURE 
+The system follows a Flutter client and Firebase backend architecture. The Flutter application 
+provides the user interface and application logic. Firebase Authentication manages accounts, 
+Cloud Firestore stores structured application data, and Firebase Storage stores profile images. 
+ 
+===PAGE 10===
+ 
+ 
+10 
+ 
+ 
+Figure 1: Overall System Architecture 
+ 
+8.1 General Data Flow 
+The user interacts with the Flutter application. Authentication requests are handled by 
+Firebase Authentication. Medicine and user-related persistent data is accessed through Cloud 
+Firestore. Profile images are uploaded to Firebase Storage and the resulting URL is saved in 
+Firestore. Orders are created during checkout and later retrieved by the user through the 
+Order History screen. The administrator can retrieve orders and update their status. 
+CHAPTER 9 – MODULES 
+9.1 Splash Module 
+Displays the application loading interface with animation before navigation to the 
+application. 
+9.2 Authentication Module 
+Handles sign up, login, logout, password reset and password change using Firebase 
+Authentication. 
+9.3 Home Module 
+Displays popular medicines, categories, search access and navigation to major application 
+sections. 
+
+===PAGE 11===
+ 
+ 
+11 
+ 
+9.4 Search Module 
+Allows users to search the medicine data and locate products. 
+9.5 Medicine Details Module 
+Displays the selected medicine's image, name, price, category and individual description. 
+Users can select quantity, add the medicine to cart or use Buy Now. 
+9.6 Cart Module 
+Maintains multiple medicines, supports quantity increase/decrease, removal and total price 
+calculation. 
+9.7 Checkout Module 
+Supports cart checkout and Buy Now checkout, delivery address selection, payment-method 
+selection and order placement. 
+9.8 Order Module 
+Creates and stores order records in Firestore and displays successful order information. 
+9.9 Order History Module 
+Retrieves the user's stored orders and displays medicine details, quantity, price, address, 
+payment method, date and order status. 
+9.10 Admin Orders Module 
+Allows the specified administrator to view customer orders and update order status. 
+9.11 Profile Module 
+Displays and manages name, email, phone number, profile photo, saved addresses, order 
+history, password and logout options. 
+9.12 Address Module 
+Allows users to save and manage delivery addresses using Firestore. 
+9.13 AI Assistant Module 
+Provides the AI Assistant screen included in the application. 
+CHAPTER 10 – SYSTEM DESIGN 
+10.1 User Flow 
+The user starts at the splash screen and proceeds to login or registration. After successful 
+authentication, the user reaches the home screen. The user can search or browse medicines, 
+open medicine details, add products to the cart or purchase a product immediately. During 
+checkout, the user selects or provides a delivery address and payment method, then confirms 
+the order. 
+===PAGE 12===
+ 
+ 
+12 
+ 
+ 
+ 
+10.2 Order Flow 
+Medicine Selection → Cart/Buy Now → Checkout → Address → Payment Method → Place 
+Order → Order Success → Order History. 
+ 
+ 
+
+===PAGE 13===
+ 
+ 
+13 
+ 
+10.3 Admin Flow 
+Admin Login → Admin Orders → View Customer Orders → Select Order → Update Status 
+→ Status Stored in Firestore. 
+ 
+CHAPTER 11 – DATABASE / FIREBASE DESIGN 
+11.1 Authentication 
+Firebase Authentication manages user accounts using email and password. The authenticated 
+user's UID is used to associate persistent user and order information with the correct account. 
+11.2 Firestore Collections 
+The main Firestore collections used by the application are users, orders and addresses. 
+Collection Purpose Important Fields 
+users Stores user profile 
+information 
+name, phone, email, 
+photoUrl, updatedAt 
+orders Stores placed orders userId, customerName, 
+phone, medicines, 
+paymentMethod, 
+orderStatus, 
+deliveryAddress, totalPrice, 
+dateTime 
+addresses Stores delivery addresses Address information 
+associated with the user 
+
+===PAGE 14===
+ 
+ 
+14 
+ 
+11.3 Firebase Storage 
+Profile photos are stored under a profile_photos path using the authenticated user's UID. 
+After upload, the Firebase Storage download URL is stored in users/{userUID}/photoUrl. 
+This allows the profile image to remain available after logout and subsequent login. 
+11.4 Medicine Data 
+Medicine information is maintained in lib/data/medicine_data.dart. Each product contains 
+name, price, category, image and an individual description. The application currently 
+contains around 50 medicine products. 
+CHAPTER 12 – IMPLEMENTATION 
+12.1 Project Structure 
+ 
+ 
+
+===PAGE 15===
+ 
+ 
+15 
+ 
+ 
+ 
+ 
+main.dart 
+ 
+import 'package:flutter/material.dart'; 
+import 'package:firebase_core/firebase_core.dart'; 
+import 'firebase_options.dart'; 
+import 'screens/splash_screen.dart'; 
+ 
+void main() async { 
+  WidgetsFlutterBinding.ensureInitialized(); 
+ 
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform); 
+ 
+  runApp(const OnlineMedApp()); 
+} 
+ 
+class OnlineMedApp extends StatelessWidget { 
+  const OnlineMedApp({super.key}); 
+ 
+  @override 
+  Widget build(BuildContext context) { 
+    return MaterialApp( 
+      debugShowCheckedModeBanner: false, 
+      title: 'Online Medicine App', 
+
+===PAGE 16===
+ 
+ 
+16 
+ 
+      theme: ThemeData(primarySwatch: Colors.green),       
+home: const SplashScreen(), 
+    ); 
+  } 
+} 
+ 
+medicine_data.dart 
+final List<Map<String, dynamic>> medicineData = [ 
+  { 
+    "name": "Paracetamol 500mg", 
+    "price": "₹35", 
+    "category": "Tablets", 
+    "image": "assets/images/para.jpeg", 
+    "description": 
+        "Used to relieve mild to moderate pain and reduce fever.", 
+  }, 
+  { 
+    "name": "Dolo 650", 
+    "price": "₹45", 
+"category": "Tablets", 
+    "image": "assets/images/dolo.jpeg", 
+    "description": 
+        "Used for temporary relief from fever, headache, and body aches.", 
+  }, 
+ 
+===PAGE 17===
+ 
+ 
+17 
+ 
+     
+  { 
+    "name": "Azithromycin", 
+    "price": "₹180", 
+    "category": "Antibiotics", 
+    "image": "assets/images/azithromycin.jpeg", 
+    "description": 
+        "An antibiotic used to treat certain bacterial infections.", 
+  }, 
+  { 
+    "name": "Vitamin C", 
+    "price": "₹120", 
+    "category": "Supplements", 
+    "image": "assets/images/vitaminc.jpeg", 
+    "description": 
+        "A vitamin supplement that supports normal immune function.", 
+  }, 
+]; 
+ 
+cart_manager.dart 
+ 
+class CartItem { 
+  final String name; 
+  final double price; 
+  int quantity; 
+ 
+ 
+
+===PAGE 18===
+ 
+ 
+18 
+ 
+ 
+ 
+ 
+  CartItem({required this.name, required this.price, required this.quantity}); 
+} 
+ 
+class CartManager { 
+  static final List<CartItem> cartItems = []; 
+ 
+  static void addItem(String name, double price, int quantity) { 
+    // Check if medicine already exists 
+    for (var item in cartItems) { 
+      if (item.name == name) { 
+        item.quantity += quantity; 
+        return; 
+      } 
+    } 
+ 
+    // Add new medicine 
+    cartItems.add(CartItem(name: name, price: price, quantity: quantity)); 
+  } 
+ 
+  static void removeItem(CartItem item) { 
+    cartItems.remove(item); 
+  } 
+ 
+  static double getTotalPrice() { 
+    double total = 0; 
+ 
+    for (var item in cartItems) { 
+      total += item.price * item.quantity; 
+    } 
+ 
+    return total; 
+  } 
+ 
+  static void clearCart() { 
+    cartItems.clear(); 
+  } 
+} 
+ 
+ 
+
+===PAGE 19===
+ 
+ 
+19 
+ 
+ 
+ 
+gemini_service.dart 
+ 
+import 'package:google_generative_ai/google_generative_ai.dart'; 
+import '../constants.dart'; 
+ 
+class GeminiService { 
+  final GenerativeModel model = GenerativeModel( 
+    model: 'gemini-flash-latest', 
+    apiKey: AppConstants.geminiApiKey, 
+  ); 
+ 
+  Future<String> askAI(String prompt) async { 
+    try { 
+      final response = await model.generateContent([Content.text(prompt)]); 
+ 
+      return response.text ?? "No response from AI."; 
+    } catch (e) { 
+      return "Error: $e"; 
+    } 
+  } 
+} 
+ 
+login_screen.dart 
+ 
+import 'package:firebase_auth/firebase_auth.dart'; 
+ 
+final emailController = TextEditingController(); 
+final passwordController = TextEditingController(); 
+ 
+bool isLoading = false; 
+bool obscurePassword = true; 
+ 
+Future<void> loginUser() async { 
+  if (emailController.text.trim().isEmpty || 
+      passwordController.text.trim().isEmpty) { 
+    return; 
+  } 
+ 
+
+===PAGE 20===
+ 
+ 
+20 
+ 
+ 
+ 
+   
+setState(() { 
+    isLoading = true; 
+  }); 
+ 
+  try { 
+    await FirebaseAuth.instance.signInWithEmailAndPassword( 
+      email: emailController.text.trim(), 
+      password: passwordController.text.trim(), 
+    ); 
+ 
+    if (!mounted) return; 
+ 
+    Navigator.pushReplacement( 
+      context, 
+      MaterialPageRoute(builder: (_) => const HomeScreen()), 
+    ); 
+  } on FirebaseAuthException catch (e) { 
+    ScaffoldMessenger.of(context).showSnackBar( 
+      SnackBar(content: Text(e.message ?? "Login Failed")), 
+    ); 
+  } finally { 
+    if (mounted) { 
+      setState(() { 
+        isLoading = false; 
+      }); 
+    } 
+  } 
+} 
+ 
+ 
+signup_screen.dart 
+ 
+import 'package:firebase_auth/firebase_auth.dart'; 
+ 
+final nameController = TextEditingController(); 
+
+===PAGE 21===
+ 
+ 
+21 
+ 
+ 
+final emailController = TextEditingController(); 
+final phoneController = TextEditingController(); 
+final passwordController = TextEditingController(); 
+final confirmPasswordController = TextEditingController(); 
+ 
+bool loading = false; 
+bool obscurePassword = true; 
+bool obscureConfirmPassword = true; 
+ 
+Future<void> createAccount() async { 
+  if (passwordController.text != confirmPasswordController.text) { 
+    ScaffoldMessenger.of(context).showSnackBar( 
+      const SnackBar(content: Text("Passwords do not match")), 
+    ); 
+    return; 
+  } 
+ 
+  setState(() { 
+    loading = true; 
+  }); 
+ 
+  try { 
+    await FirebaseAuth.instance.createUserWithEmailAndPassword( 
+      email: emailController.text.trim(), 
+
+===PAGE 22===
+ 
+ 
+22 
+ 
+ 
+ 
+      password: passwordController.text.trim(), 
+    ); 
+ 
+    if (!mounted) return; 
+ Navigator.pushReplacement( 
+      context, 
+      MaterialPageRoute(builder: (_) => const HomeScreen()), 
+    ); 
+  } on FirebaseAuthException catch (e) { 
+    ScaffoldMessenger.of(context).showSnackBar( 
+      SnackBar(content: Text(e.message ?? "Signup Failed")), 
+    ); 
+  } finally { 
+    if (mounted) { 
+      setState(() { 
+        loading = false; 
+      }); 
+    } 
+  } 
+} 
+Password Visibility 
+TextField( 
+  controller: passwordController, 
+
+===PAGE 23===
+ 
+ 
+23 
+ 
+    
+  obscureText: obscurePassword, 
+  decoration: InputDecoration( 
+    labelText: "Password", 
+    prefixIcon: const Icon(Icons.lock), 
+    suffixIcon: IconButton( 
+   
+ icon: Icon( 
+        obscurePassword 
+            ? Icons.visibility_off 
+            : Icons.visibility, 
+      ), 
+      onPressed: () { 
+        setState(() { 
+          obscurePassword = !obscurePassword; 
+        }); 
+      }, 
+    ), 
+  ), 
+) 
+Confirm Password: 
+TextField( 
+  controller: confirmPasswordController, 
+  obscureText: obscureConfirmPassword, 
+  decoration: InputDecoration( 
+
+===PAGE 24===
+ 
+ 
+24 
+ 
+        
+ 
+    labelText: "Confirm Password", 
+    prefixIcon: const Icon(Icons.lock_outline), 
+    suffixIcon: IconButton( 
+      icon: Icon( 
+        obscureConfirmPassword 
+            ? Icons.visibility_off 
+ 
+    : Icons.visibility, 
+      ), 
+      onPressed: () { 
+        setState(() { 
+          obscureConfirmPassword = !obscureConfirmPassword; 
+        }); 
+      }, 
+    ), 
+  ), 
+) 
+ 
+ 
+home_screen.dart 
+ 
+import 'package:flutter/material.dart'; 
+import '../data/medicine_data.dart'; 
+
+===PAGE 25===
+ 
+ 
+25 
+ 
+ 
+ 
+class HomeScreen extends StatefulWidget { 
+  const HomeScreen({super.key}); 
+ 
+  @override 
+  State<HomeScreen> createState() => _HomeScreenState(); 
+} 
+ 
+class _HomeScreenState extends State<HomeScreen> { 
+  String selectedCategory = "All"; 
+ 
+  @override 
+  Widget build(BuildContext context) { 
+    final medicines = selectedCategory == "All" 
+        ? medicineData 
+        : medicineData 
+            .where((m) => m["category"] == selectedCategory) 
+            .toList(); 
+ 
+    return Scaffold( 
+      appBar: AppBar( 
+        title: const Text("Online Medicine App"), 
+      ), 
+      body: GridView.builder( 
+
+===PAGE 26===
+ 
+ 
+26 
+ 
+     
+   
+        itemCount: medicines.length, 
+        gridDelegate: 
+            const SliverGridDelegateWithFixedCrossAxisCount( 
+          crossAxisCount: 2, 
+        ), 
+        itemBuilder: (context, index) { 
+          final medicine = medicines[index]; 
+ 
+          return Card( 
+            child: Column( 
+              children: [ 
+     
+     Image.asset(medicine["image"] as String), 
+                Text(medicine["name"] as String), 
+                Text(medicine["price"] as String), 
+              ], 
+            ), 
+          ); 
+        }, 
+      ), 
+    ); 
+  } 
+} 
+
+===PAGE 27===
+ 
+ 
+27 
+ 
+  
+ 
+lib/screens/checkout_screen.dart 
+ 
+import 'package:cloud_firestore/cloud_firestore.dart'; 
+import 'package:firebase_auth/firebase_auth.dart'; 
+import '../models/cart_manager.dart'; 
+import '../models/checkout_item.dart'; 
+ 
+class CheckoutScreen extends StatefulWidget { 
+ 
+ 
+ final List<CheckoutItem>? buyNowItems; 
+ 
+  const CheckoutScreen({super.key, this.buyNowItems}); 
+ 
+  @override 
+  State<CheckoutScreen> createState() => _CheckoutScreenState(); 
+} 
+ 
+class _CheckoutScreenState extends State<CheckoutScreen> { 
+  String paymentMethod = "Cash on Delivery"; 
+ 
+  // Get checkout items 
+  List<CheckoutItem> get checkoutItems { 
+
+===PAGE 28===
+ 
+ 
+28 
+ 
+  
+ 
+    if (widget.buyNowItems != null) { 
+      return widget.buyNowItems!; 
+    } 
+ 
+    return CartManager.cartItems.map((item) { 
+      return CheckoutItem( 
+        name: item.name, 
+        price: item.price, 
+        quantity: item.quantity, 
+      ); 
+ 
+   }).toList(); 
+  } 
+ 
+  // Calculate total 
+  double get totalAmount { 
+    return checkoutItems.fold( 
+      0, 
+      (sum, item) => sum + item.total, 
+    ); 
+  } 
+ 
+  // Place order in Firestore 
+
+===PAGE 29===
+ 
+ 
+29 
+ 
+      
+  Future<void> placeOrder() async { 
+    final user = FirebaseAuth.instance.currentUser; 
+ 
+    if (user == null) return; 
+ 
+    final medicines = checkoutItems.map((item) => { 
+      "name": item.name, 
+      "price": item.price, 
+      "quantity": item.quantity, 
+    }).toList(); 
+ 
+    await FirebaseFirestore.instance.collection("orders").add({ 
+ 
+      "userId": user.uid, 
+      "paymentMethod": paymentMethod, 
+      "totalPrice": totalAmount, 
+      "orderStatus": "Pending", 
+      "dateTime": Timestamp.now(), 
+      "medicines": medicines, 
+    }); 
+ 
+    CartManager.clearCart(); 
+  } 
+} 
+
+===PAGE 30===
+ 
+ 
+30 
+ 
+ 
+ 
+order_history_screen.dart 
+ 
+final user = FirebaseAuth.instance.currentUser; 
+ 
+StreamBuilder<QuerySnapshot>( 
+  stream: FirebaseFirestore.instance 
+      .collection("orders") 
+      .where("userId", isEqualTo: user!.uid) 
+      .snapshots(), 
+  builder: (context, snapshot) { 
+    if (snapshot.connectionState == ConnectionState.waiting) { 
+      return const Center(child: CircularProgressIndicator()); 
+    } 
+ 
+    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) { 
+      return const Center(child: Text("No Orders Yet")); 
+    } 
+ 
+    final orders = snapshot.data!.docs; 
+ 
+ 
+    return ListView.builder( 
+      itemCount: orders.length, 
+      itemBuilder: (context, index) { 
+        final order = orders[index]; 
+ 
+        return Card( 
+          child: Column( 
+            children: [ 
+              Text("Customer: ${order["customerName"]}"), 
+              Text("Phone: ${order["phone"]}"), 
+              Text("Payment: ${order["paymentMethod"]}"), 
+              Text("Status: ${order["orderStatus"]}"), 
+              Text("Address: ${order["deliveryAddress"]}"), 
+              Text("₹${order["totalPrice"]}"), 
+            ], 
+          ), 
+
+===PAGE 31===
+ 
+ 
+31 
+ 
+ 
+        ); 
+      }, 
+    ); 
+  }, 
+) 
+ 
+ai_assistant_screen.dart 
+ 
+import 'package:flutter/material.dart'; 
+import '../services/gemini_service.dart'; 
+ 
+class AIAssistantScreen extends StatefulWidget { 
+  const AIAssistantScreen({super.key}); 
+ 
+  @override 
+  State<AIAssistantScreen> createState() => _AIAssistantScreenState(); 
+} 
+ 
+ 
+class _AIAssistantScreenState extends State<AIAssistantScreen> { 
+  final controller = TextEditingController(); 
+  final GeminiService gemini = GeminiService(); 
+ 
+  String response = ""; 
+  bool loading = false; 
+ 
+  Future<void> askAI() async { 
+
+===PAGE 32===
+ 
+ 
+32 
+ 
+      
+    if (controller.text.trim().isEmpty) return; 
+ 
+    setState(() => loading = true); 
+ 
+    final answer = await gemini.askAI(controller.text); 
+ 
+    setState(() { 
+      response = answer; 
+      loading = false; 
+    }); 
+  } 
+ 
+  @override 
+  Widget build(BuildContext context) { 
+    return Scaffold( 
+ 
+ appBar: AppBar( 
+        title: const Text("AI Medicine Assistant"), 
+      ), 
+      body: Column( 
+        children: [ 
+          TextField( 
+            controller: controller, 
+            decoration: const InputDecoration( 
+
+===PAGE 33===
+ 
+ 
+33 
+ 
+          
+ 
+   hintText: "Ask about medicines...", 
+            ), 
+          ), 
+ 
+          ElevatedButton( 
+            onPressed: loading ? null : askAI, 
+            child: const Text("Ask AI"), 
+          ), 
+ 
+          if (loading) 
+            const CircularProgressIndicator(), 
+ 
+          Text(response), 
+        ], 
+      ), 
+    );}} 
+12.2 Cart Management 
+The application uses a global CartManager to maintain selected medicines across screens. It 
+supports adding multiple medicines, updating quantities, removing products and calculating 
+the total price. 
+12.3 Checkout Implementation 
+The checkout implementation supports two purchase paths: checkout of all cart items and 
+Buy Now checkout for an individual medicine. The selected checkout items are converted 
+into an order record after the user confirms the checkout details. 
+
+===PAGE 34===
+ 
+ 
+34 
+ 
+12.4 Order Persistence 
+After an order is placed, the order information is stored in Cloud Firestore. The Order History 
+screen retrieves records associated with the current user and displays the stored order 
+information. 
+12.5 Administrator Implementation 
+The administrator order screen is restricted to the specified admin email. The administrator 
+can view customer orders and change the order status. The updated status is stored with the 
+order information so users can view the latest status in Order History. 
+ 
+CHAPTER 13 –SCREENSHOTS                  
+ 
+              Figure 7: Splash Screen                                                      Figure 8: Login Screen 
+
+===PAGE 35===
+ 
+ 
+35 
+ 
+ 
+    Figure 9: Sign Up Screen                                                         Figure 10: Home Screen 
+ 
+         Figure 11: Search Screen                                                         Figure 12: Medicine Details Screen 
+  
+
+===PAGE 36===
+ 
+ 
+36 
+ 
+ 
+               Figure 13: Cart Screen                                                Figure 14: Checkout Screen 
+  
+     Figure 15: Order Success Screen                                          Figure 16: Order History Screen 
+  
+ 
+ 
+
+===PAGE 37===
+ 
+ 
+37 
+ 
+ 
+ 
+         Figure 17: Profile Screen Figure                                                18: Add Address Screen  
+   
+      Figure 19: Saved Address Screen                                             Figure 20: AI Assistant Screen 
+
+===PAGE 38===
+ 
+ 
+38 
+ 
+ 
+Figure 21: Admin Order Screen 
+ 
+ 
+ 
+ 
+13.2 FIREBASE 
+ 
+Firebase is used as the backend service for the Online Medicine App. It provides secure user 
+authentication, cloud database management, and storage services. Firebase Authentication is 
+used for managing user registration and login activities. Cloud Firestore is used to store 
+application data such as user details, medicine information, cart details, and order records. 
+Firebase Storage is used for storing user profile images. 
+The Flutter application is connected with Firebase using Firebase Core configuration. The 
+integration enables real-time data communication between the mobile application and 
+Firebase services. 
+
+===PAGE 39===
+ 
+ 
+39 
+ 
+ 
+Figure 13.3.1: Firebase Authentication User Management 
+ 
+ 
+Figure 13.3.2: Firestore Order Data Storage 
+ 
+Figure 13.3.3: Firebase Project Configuration 
+
+===PAGE 40===
+ 
+ 
+40 
+ 
+CHAPTER 14 – TESTING 
+Testing is performed to verify that the Online Medicine App functions according to the 
+specified requirements. Testing focuses on authentication, medicine browsing, search, cart 
+operations, checkout, Firebase data persistence, profile management, address management 
+and administrator order handling. 
+14.1 Unit Testing 
+Individual application functions and components are tested independently, including 
+authentication actions, medicine selection, cart quantity changes and total-price calculations. 
+14.2 Integration Testing 
+Integration testing verifies interactions between Flutter screens and Firebase services. 
+Examples include login with Firebase Authentication, order storage in Firestore and profile 
+photo upload to Firebase Storage. 
+14.3 System Testing 
+System testing verifies the complete application flow from login through medicine selection, 
+checkout and order history. Administrator functions are also tested as part of the integrated 
+system. 
+14.4 User Acceptance Testing 
+User acceptance testing verifies whether the application is understandable and whether the 
+major user workflows operate as expected. 
+14.5 Test Cases 
+Test ID Test Condition Expected Result Status 
+TC01 Valid email and 
+password login 
+User successfully 
+enters the application 
+Pass 
+TC02 Invalid login 
+credentials 
+Appropriate 
+authentication error 
+is displayed 
+Pass 
+TC03 Search for an existing 
+medicine 
+Matching medicine is 
+displayed 
+Pass 
+TC04 Add medicine to cart Medicine appears in 
+cart with selected 
+quantity 
+Pass 
+TC05 Increase/decrease 
+quantity 
+Cart quantity and 
+total are updated 
+Pass 
+TC06 Remove medicine Medicine is removed 
+from cart 
+Pass 
+TC07 Place an order Order success screen 
+is displayed and 
+order is stored 
+Pass 
+TC08 Open Order History User's stored orders 
+are displayed 
+Pass 
+===PAGE 41===
+ 
+ 
+41 
+ 
+TC09 Save delivery address Address is stored and 
+available for 
+checkout 
+Pass 
+TC10 Upload profile photo Photo URL is saved 
+and image persists on 
+profile 
+Pass 
+TC11 Admin updates order 
+status 
+New status is stored 
+and visible to user 
+Pass 
+CHAPTER 15 – RESULTS 
+The implemented application provides the major workflows required for an online medicine 
+shopping system. Users can authenticate, browse and search medicine products, view 
+individual product information, manage a cart, complete checkout, save delivery addresses, 
+manage their profiles and access persistent order history. 
+The Firebase integration provides persistent storage for user, address and order information. 
+Profile photos are uploaded to Firebase Storage and their download URLs are stored in 
+Firestore. The administrator can view orders and update their status. 
+The application is designed for Android and Flutter Web, allowing the same Flutter project 
+structure to be used across the supported platforms. 
+CHAPTER 16 – ADVANTAGES 
+• Simple and organized medicine browsing experience. 
+• Search facility for locating medicines quickly. 
+• Individual medicine descriptions improve product information. 
+• Cart supports multiple products and quantity management. 
+• Buy Now provides a direct purchase flow. 
+• Firebase provides persistent authentication and data storage. 
+• Order history allows users to review previous orders. 
+• Saved addresses simplify delivery information management. 
+• Profile photos remain available after logout/login. 
+• Admin order status management provides order tracking information. 
+• Flutter supports Android and Web from a common codebase. 
+ 
+ 
+ 
+ 
+ 
+ 
+===PAGE 42===
+ 
+ 
+42 
+ 
+CHAPTER 17 – LIMITATIONS 
+• The application depends on internet connectivity for Firebase-based operations. 
+• The medicine database is currently a fixed project dataset of around 50 products. 
+• The application does not establish real-world medicine inventory verification. 
+• Payment processing functionality is represented through the checkout payment-method 
+flow rather than a confirmed real-world payment gateway implementation. 
+• Delivery logistics and real-time geographical tracking are outside the implemented scope. 
+CHAPTER 18 – FUTURE ENHANCEMENT 
+The application can be enhanced further by expanding the medicine catalogue and connecting 
+it to a dynamically managed medicine inventory. Additional backend administration features 
+could be introduced for medicine management, stock management and customer support. 
+• Integration with a real payment gateway. 
+• Real-time medicine stock and inventory management. 
+• Prescription upload and verification workflow where legally and operationally 
+appropriate. 
+• Push notifications for order-status changes. 
+• Improved AI Assistant capabilities. 
+• Advanced medicine search and filtering. 
+• Analytics for orders and product demand. 
+• More detailed administrator dashboard. 
+• Delivery tracking integration. 
+• Deployment and optimization for wider production use. 
+ 
+  
+===PAGE 43===
+ 
+ 
+43 
+ 
+CHAPTER 19 – CONCLUSION 
+The Online Medicine App demonstrates the development of a Flutter-based medicine 
+shopping application integrated with Firebase. The project combines a user-friendly interface 
+with authentication, persistent data storage, profile-image storage, cart management, 
+checkout, address management, order history and administrator order management. 
+The application provides a structured digital workflow from user authentication and medicine 
+discovery to order placement and status tracking. Flutter enables the application to target 
+Android and Web, while Firebase provides the backend services required for persistent 
+application data. 
+Overall, the project demonstrates the practical use of Flutter, Dart and Firebase in developing 
+a complete application with multiple interconnected modules and persistent cloud-based data. 
+ 
+ 
+  
+===PAGE 44===
+ 
+ 
+44 
+ 
+CHAPTER 20 – REFERENCES 
+1. Flutter Documentation – Official documentation for Flutter framework, widgets, UI 
+development, and application building using Dart language. Available at: 
+https://docs.flutter.dev/ 
+2. Firebase Documentation – Official documentation for Firebase Authentication, Cloud 
+Firestore Database, Firebase Storage, and Flutter integration. Available at: 
+https://firebase.google.com/docs/flutter  
+3. Cloud Firestore Documentation – Documentation for NoSQL cloud database design, 
+collections, documents, and data management. Available at: 
+https://firebase.google.com/docs/firestore 
+4. Firebase Authentication Documentation – Reference for implementing user 
+registration, login, and authentication management. Available at: 
+https://firebase.google.com/docs/auth 
+5. Dart Programming Language Documentation – Official reference for Dart syntax, 
+programming concepts, libraries, and APIs. Available at: https://dart.dev/docs 
+6. Android Studio Documentation – Official documentation for Android application 
+development, emulator configuration, and debugging tools. Available at: 
+https://developer.android.com/studio 
+7. Visual Studio Code Documentation – Documentation for Visual Studio Code editor, 
+extensions, and Flutter development environment. Available at: 
+https://code.visualstudio.com/docs 
+8. Flutter Image Picker Package Documentation – Package documentation used for 
+selecting images from device storage in Flutter applications. Available at: 
+https://pub.dev/packages/image\_picker 
+9. FlutterFire Documentation – Official Flutter plugins documentation for integrating 
+Firebase services with Flutter applications. Available at: 
+https://firebase.google.com/docs/flutter/setup 
+10. Google Generative AI SDK Documentation – Documentation used for integrating 
+Gemini AI features into Flutter applications. Available at: https://ai.google.dev/ 
+11. Lottie Flutter Package Documentation – Documentation for adding animation assets 
+in Flutter applications. Available at: https://pub.dev/packages/lottie 
+12. Material Design Guidelines – Design guidelines used for creating user interface 
+components and layouts. Available at: https://m3.material.io/ 

@@ -1,3 +1,5 @@
+import '../entities/finance_export_request.dart';
+import '../entities/finance_export_result.dart';
 import '../entities/finance_transaction.dart';
 import '../entities/revenue_breakdown.dart';
 import '../entities/revenue_trend.dart';
@@ -23,8 +25,11 @@ abstract class FinanceRepository {
     required DateTime endDate,
   });
 
-  Future<void>
-  createTransaction(
+  Future<void> createTransaction(
       FinanceTransaction transaction,
-  );
+      );
+
+  Future<FinanceExportResult> exportFinanceReport(
+      FinanceExportRequest request,
+      );
 }

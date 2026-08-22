@@ -4,11 +4,7 @@ import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
 import '../../../../../app/theme/app_text_styles.dart';
 
-enum FinanceExportFormat {
-  pdf,
-  excel,
-  csv,
-}
+import '../../../domain/entities/finance_export_request.dart';
 
 class FinanceExportFormatSelector extends StatelessWidget {
   const FinanceExportFormatSelector({

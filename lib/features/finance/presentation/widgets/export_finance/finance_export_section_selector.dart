@@ -4,12 +4,7 @@ import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
 import '../../../../../app/theme/app_text_styles.dart';
 
-enum FinanceExportSection {
-  revenueSummary,
-  transactionHistory,
-  expenseBreakdown,
-  membershipStats,
-}
+import '../../../domain/entities/finance_export_request.dart';
 
 class FinanceExportSectionSelector extends StatelessWidget {
   const FinanceExportSectionSelector({
@@ -94,7 +89,9 @@ class _SectionTile extends StatelessWidget {
         borderRadius: AppRadius.radiusSM,
         onTap: () {
           final updated =
-          Set<FinanceExportSection>.from(selectedSections);
+          Set<FinanceExportSection>.from(
+            selectedSections,
+          );
 
           if (selected) {
             updated.remove(section);
@@ -120,14 +117,16 @@ class _SectionTile extends StatelessWidget {
           child: Row(
             children: [
               AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
+                duration:
+                const Duration(milliseconds: 150),
                 width: 18,
                 height: 18,
                 decoration: BoxDecoration(
                   color: selected
                       ? AppColors.primary
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius:
+                  BorderRadius.circular(5),
                   border: Border.all(
                     color: selected
                         ? AppColors.primary
@@ -146,7 +145,8 @@ class _SectionTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: AppTextStyles.labelMedium.copyWith(
+                  style:
+                  AppTextStyles.labelMedium.copyWith(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
