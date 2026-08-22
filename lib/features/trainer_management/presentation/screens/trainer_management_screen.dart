@@ -305,7 +305,7 @@ class _TrainerManagementScreenState
           child: _StatCard(
             value:
             '${trainers.length}',
-            label: 'Trainers',
+            label: '$active Active',
           ),
         ),
         const SizedBox(width: 8),

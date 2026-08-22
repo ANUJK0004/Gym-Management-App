@@ -14,6 +14,7 @@ import 'package:sweatsync/features/profile/presentation/screens/edit_profile_scr
 import 'package:sweatsync/features/profile/presentation/screens/profile_setup_screen.dart';
 
 import '../../core/enums/app_role.dart';
+import '../../features/attendance/presentation/screens/owner_attendance_screen.dart';
 import '../../features/dashboard/owner/presentation/screens/owner_shell.dart';
 import '../../features/dashboard/trainer/presentation/screens/trainer_shell.dart';
 import '../../features/gym/presentation/screens/gym_management_screen.dart';
@@ -469,6 +470,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             state,
             ) {
           return const ReportScreen();
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.ownerAttendance,
+        builder: (
+            context,
+            state,
+            ) {
+          return const OwnerAttendanceScreen();
         },
       ),
     ],

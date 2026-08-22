@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sweatsync/app/routes/app_routes.dart';
 import 'package:sweatsync/features/dashboard/member/presentation/widgets/profile_summary_card.dart';
 
+import '../../../../attendance/presentation/widgets/member_attendance_card.dart';
 import '../../../../membership/presentation/providers/membership_provider.dart';
 import '../../../../workout/presentation/providers/workout_provider.dart';
 
@@ -200,6 +201,15 @@ class MemberHomeScreen extends ConsumerWidget {
                           ),
 
                           const SizedBox(
+                            height: 24,
+                          ),
+
+                          // --------------------------------
+                          // GYM ATTENDANCE
+                          // --------------------------------
+                          const MemberAttendanceCard(),
+
+                          const SizedBox(
                             height: 28,
                           ),
 
@@ -302,8 +312,9 @@ class MemberHomeScreen extends ConsumerWidget {
                               );
                             },
                             onProgressPressed: () {
-                              // TODO:
-                              // Navigate to progress.
+                              context.push(
+                                AppRoutes.progress,
+                              );
                             },
                             onMembershipPressed: () {
                               context.push(

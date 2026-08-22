@@ -693,6 +693,17 @@ class _ManagementGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       children: [
         _ManagementCard(
+          icon: Icons.qr_code_scanner_rounded,
+          title: 'Attendance',
+          subtitle: 'Daily QR & Check-ins',
+          onTap: () {
+            context.push(
+              AppRoutes.ownerAttendance,
+            );
+          },
+        ),
+
+        _ManagementCard(
           icon: Icons.groups_rounded,
           title: 'Members',
           subtitle: 'Manage gym members',
@@ -735,6 +746,17 @@ class _ManagementGrid extends StatelessWidget {
             );
           },
         ),
+
+        _ManagementCard(
+          icon: Icons.fitness_center_rounded,
+          title: 'Gym Profile',
+          subtitle: 'Operating info & bio',
+          onTap: () {
+            context.push(
+              AppRoutes.ownerGymManagement,
+            );
+          },
+        ),
       ],
     );
   }
@@ -766,7 +788,10 @@ class _ManagementCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: AppRadius.radiusLG,
         child: Ink(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 12,
+          ),
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: AppRadius.radiusLG,

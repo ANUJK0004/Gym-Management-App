@@ -7,6 +7,7 @@ import 'package:sweatsync/design_system/buttons/secondary_button.dart';
 import 'package:sweatsync/design_system/common/app_scaffold.dart';
 import 'package:sweatsync/design_system/indicators/app_progress_indicator.dart';
 
+import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sweatsync/features/profile/presentation/providers/current_user_profile_provider.dart';
 import 'package:sweatsync/features/profile/presentation/providers/profile_setup_provider.dart';
 
@@ -41,9 +42,48 @@ class ProfileSetupScreen extends ConsumerWidget {
           body: Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
-              child: Text(
-                'Unable to load profile.\n$error',
-                textAlign: TextAlign.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.cloud_off_rounded,
+                    size: 56,
+                    color: Colors.redAccent,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Unable to load profile',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    error.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: () {
+                      ref.invalidate(currentUserProfileProvider);
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton.icon(
+                    onPressed: () {
+                      ref.read(authControllerProvider.notifier).signOut();
+                    },
+                    icon: const Icon(Icons.logout, size: 18),
+                    label: const Text('Log Out / Switch Account'),
+                  ),
+                ],
               ),
             ),
           ),
