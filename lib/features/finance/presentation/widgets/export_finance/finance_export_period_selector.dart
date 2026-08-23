@@ -98,7 +98,7 @@ class _PeriodButton extends StatelessWidget {
 
     return Material(
       color: selected
-          ? AppColors.primary.withOpacity(0.14)
+          ? AppColors.primary.withValues(alpha: 0.14)
           : AppColors.inputField,
       borderRadius: AppRadius.radiusSM,
       child: InkWell(
@@ -111,7 +111,7 @@ class _PeriodButton extends StatelessWidget {
             borderRadius: AppRadius.radiusSM,
             border: Border.all(
               color: selected
-                  ? AppColors.primary.withOpacity(0.55)
+                  ? AppColors.primary.withValues(alpha: 0.55)
                   : Colors.transparent,
             ),
           ),

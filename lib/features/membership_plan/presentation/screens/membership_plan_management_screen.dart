@@ -52,6 +52,10 @@ class MembershipPlanManagementScreen
             gymAsync.value!.id,
           );
 
+          if (!context.mounted) {
+            return;
+          }
+
           _showFormResult(
             context,
             result,
@@ -118,6 +122,10 @@ class MembershipPlanManagementScreen
                       context,
                       gym.id,
                     );
+
+                    if (!context.mounted) {
+                      return;
+                    }
 
                     _showFormResult(
                       context,
@@ -190,6 +198,10 @@ class MembershipPlanManagementScreen
                               gym.id,
                               plan: plan,
                             );
+
+                            if (!context.mounted) {
+                              return;
+                            }
 
                             _showFormResult(
                               context,
@@ -490,7 +502,7 @@ class _EmptyPlansView
               decoration:
               BoxDecoration(
                 color: AppColors.primary
-                    .withOpacity(0.12),
+                    .withValues(alpha: 0.12),
                 borderRadius:
                 BorderRadius.circular(
                   22,

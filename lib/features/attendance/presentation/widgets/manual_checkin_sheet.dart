@@ -26,7 +26,6 @@ class _ManualCheckInSheetState extends ConsumerState<ManualCheckInSheet> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _selectedRole = 'member'; // 'member' | 'trainer'
-  String? _selectedUserId;
   bool _isSubmitting = false;
 
   @override
@@ -111,7 +110,6 @@ class _ManualCheckInSheetState extends ConsumerState<ManualCheckInSheet> {
                     onTap: () {
                       setState(() {
                         _selectedRole = 'member';
-                        _selectedUserId = null;
                       });
                     },
                     borderRadius: AppRadius.radiusMD,
@@ -137,7 +135,6 @@ class _ManualCheckInSheetState extends ConsumerState<ManualCheckInSheet> {
                     onTap: () {
                       setState(() {
                         _selectedRole = 'trainer';
-                        _selectedUserId = null;
                       });
                     },
                     borderRadius: AppRadius.radiusMD,

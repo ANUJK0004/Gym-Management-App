@@ -402,7 +402,7 @@ class _ReportExportSheetState
       decoration: BoxDecoration(
         color:
         AppColors.textSecondary
-            .withOpacity(0.55),
+            .withValues(alpha: 0.55),
         borderRadius:
         BorderRadius.circular(10),
       ),
@@ -675,8 +675,8 @@ class _ReportExportSheetState
                   Colors.black,
                   disabledBackgroundColor:
                   AppColors.primary
-                      .withOpacity(
-                    0.35,
+                      .withValues(
+                    alpha: 0.35,
                   ),
                   elevation: 0,
                   shape:

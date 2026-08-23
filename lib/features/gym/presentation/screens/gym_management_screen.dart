@@ -145,7 +145,7 @@ class _NoGymView
               decoration:
               BoxDecoration(
                 color: AppColors.primary
-                    .withOpacity(0.12),
+                    .withValues(alpha: 0.12),
                 borderRadius:
                 AppRadius.radiusLG,
               ),
@@ -277,8 +277,8 @@ class _GymDetailsView
                       BoxDecoration(
                         color: AppColors
                             .primary
-                            .withOpacity(
-                            0.12),
+                            .withValues(
+                            alpha: 0.12),
                         borderRadius:
                         BorderRadius
                             .circular(

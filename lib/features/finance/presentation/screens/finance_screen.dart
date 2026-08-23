@@ -56,7 +56,7 @@ class _FinanceScreenState
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor:
-      Colors.black.withOpacity(0.70),
+      Colors.black.withValues(alpha: 0.70),
       useSafeArea: true,
       builder: (sheetContext) {
         return FinanceExportSheet(
@@ -123,7 +123,7 @@ class _FinanceScreenState
                 }
               }
 
-              if (!mounted) {
+              if (!mounted || !sheetContext.mounted) {
                 return;
               }
 
@@ -182,7 +182,7 @@ class _FinanceScreenState
       backgroundColor:
       Colors.transparent,
       barrierColor:
-      Colors.black.withOpacity(0.70),
+      Colors.black.withValues(alpha: 0.70),
       isDismissible: false,
       enableDrag: false,
       useSafeArea: true,

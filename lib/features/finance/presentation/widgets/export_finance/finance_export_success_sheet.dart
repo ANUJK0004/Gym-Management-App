@@ -111,8 +111,8 @@ class _FinanceExportSuccessSheetState
               BoxDecoration(
                 color:
                 AppColors.primary
-                    .withOpacity(
-                  0.18,
+                    .withValues(
+                  alpha: 0.18,
                 ),
                 borderRadius:
                 BorderRadius.circular(
@@ -171,15 +171,15 @@ class _FinanceExportSuccessSheetState
               decoration:
               BoxDecoration(
                 color: AppColors.primary
-                    .withOpacity(
-                  0.10,
+                    .withValues(
+                  alpha: 0.10,
                 ),
                 borderRadius:
                 AppRadius.radiusSM,
                 border: Border.all(
                   color: AppColors.primary
-                      .withOpacity(
-                    0.35,
+                      .withValues(
+                    alpha: 0.35,
                   ),
                 ),
               ),

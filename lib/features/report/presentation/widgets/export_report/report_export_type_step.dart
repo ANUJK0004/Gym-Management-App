@@ -93,7 +93,7 @@ class _ReportTypeCard extends StatelessWidget {
                 height: 42,
                 decoration: BoxDecoration(
                   color: selected
-                      ? AppColors.primary.withOpacity(0.14)
+                      ? AppColors.primary.withValues(alpha: 0.14)
                       : AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),

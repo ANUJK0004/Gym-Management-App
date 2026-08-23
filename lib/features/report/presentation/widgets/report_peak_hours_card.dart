@@ -131,7 +131,7 @@ class _PeakHoursChart extends StatelessWidget {
     }
 
     if (ratio > .5) {
-      return AppColors.primary.withOpacity(.6);
+      return AppColors.primary.withValues(alpha: .6);
     }
 
     return AppColors.border;

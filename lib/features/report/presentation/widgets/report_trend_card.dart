@@ -250,8 +250,8 @@ class _TrendPainter extends CustomPainter {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          AppColors.primary.withOpacity(.24),
-          AppColors.primary.withOpacity(.02),
+          AppColors.primary.withValues(alpha: .24),
+          AppColors.primary.withValues(alpha: .02),
         ],
       ).createShader(chartRect);
 

@@ -12,6 +12,7 @@ import '../../../../activity/presentation/widgets/recent_activity_list.dart';
 import '../../../../gym/presentation/providers/gym_provider.dart';
 import '../../domain/entities/owner_dashboard_data.dart';
 import '../providers/owner_dashboard_provider.dart';
+import '../widgets/owner_header.dart';
 
 class OwnerHomeScreen extends ConsumerWidget {
   const OwnerHomeScreen({
@@ -138,7 +139,7 @@ class OwnerHomeScreen extends ConsumerWidget {
                       delegate:
                       SliverChildListDelegate(
                         [
-                          _OwnerHeader(
+                          OwnerHeader(
                             dashboard: dashboard,
                           ),
 
@@ -197,173 +198,6 @@ class OwnerHomeScreen extends ConsumerWidget {
             },
           ),
         ),
-      ),
-    );
-  }
-}
-
-String getInitials(String name) {
-  final parts = name
-      .trim()
-      .split(' ')
-      .where(
-        (e) => e.isNotEmpty,
-  )
-      .toList();
-
-  if (parts.isEmpty) {
-    return 'O';
-  }
-
-  if (parts.length == 1) {
-    return parts.first[0].toUpperCase();
-  }
-
-  return '${parts.first[0]}${parts.last[0]}'
-      .toUpperCase();
-}
-// ------------------------------------------------------------
-// HEADER
-// ------------------------------------------------------------
-
-class _OwnerHeader extends StatelessWidget {
-  const _OwnerHeader({
-    required this.dashboard,
-  });
-
-  final OwnerDashboardData dashboard;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment:
-            CrossAxisAlignment.start,
-            children: [
-              Text(
-                'ADMIN CONSOLE',
-                style: AppTextStyles
-                    .labelMedium
-                    .copyWith(
-                  color:
-                  AppColors.textSecondary,
-                  letterSpacing: 0.8,
-                  fontWeight:
-                  FontWeight.w600,
-                ),
-              ),
-
-              const SizedBox(
-                height: 3,
-              ),
-
-              Text(
-                dashboard.gymName,
-                maxLines: 1,
-                overflow:
-                TextOverflow.ellipsis,
-                style: AppTextStyles
-                    .headlineMedium
-                    .copyWith(
-                  fontWeight:
-                  FontWeight.w800,
-                ),
-              ),
-
-              const SizedBox(
-                height: 2,
-              ),
-
-              Text(
-                'Welcome, ${dashboard.ownerName}',
-                maxLines: 1,
-                overflow:
-                TextOverflow.ellipsis,
-                style: AppTextStyles
-                    .labelMedium
-                    .copyWith(
-                  color:
-                  AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const _HeaderIconButton(
-          icon:
-          Icons.notifications_none_rounded,
-        ),
-
-        const SizedBox(width: 10),
-
-        if (dashboard.ownerPhotoUrl != null &&
-            dashboard.ownerPhotoUrl!
-                .isNotEmpty)
-          CircleAvatar(
-            radius: 21,
-            backgroundImage:
-            NetworkImage(
-              dashboard.ownerPhotoUrl!,
-            ),
-          )
-        else
-          Container(
-            width: 42,
-            height: 42,
-            decoration:
-            const BoxDecoration(
-              color:
-              AppColors.primary,
-              shape: BoxShape.circle,
-            ),
-            alignment:
-            Alignment.center,
-            child: Text(
-              getInitials(
-                dashboard.ownerName,
-              ),
-              style: AppTextStyles
-                  .titleMedium
-                  .copyWith(
-                color: Colors.black,
-                fontWeight:
-                FontWeight.w800,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _HeaderIconButton
-    extends StatelessWidget {
-  const _HeaderIconButton({
-    required this.icon,
-  });
-
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 42,
-      height: 42,
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: AppColors.border,
-          width: .5,
-        ),
-      ),
-      child: Icon(
-        icon,
-        size: 20,
-        color: AppColors.textPrimary,
       ),
     );
   }

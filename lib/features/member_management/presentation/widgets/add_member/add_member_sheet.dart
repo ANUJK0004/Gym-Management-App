@@ -143,7 +143,7 @@ class _AddMemberSheetState
       height: 4,
       decoration: BoxDecoration(
         color: AppColors.textSecondary
-            .withOpacity(0.55),
+            .withValues(alpha: 0.55),
         borderRadius:
         BorderRadius.circular(10),
       ),
@@ -489,8 +489,8 @@ class _AddMemberSheetState
                   Colors.black,
                   disabledBackgroundColor:
                   AppColors.primary
-                      .withOpacity(
-                    0.45,
+                      .withValues(
+                    alpha: 0.45,
                   ),
                   elevation: 0,
                   shape:

@@ -55,12 +55,12 @@ class TransactionCard
               color: isIncome
                   ? AppColors
                   .primary
-                  .withOpacity(
-                0.10,
+                  .withValues(
+                alpha: 0.10,
               )
                   : Colors.red
-                  .withOpacity(
-                0.10,
+                  .withValues(
+                alpha: 0.10,
               ),
               shape:
               BoxShape.circle,

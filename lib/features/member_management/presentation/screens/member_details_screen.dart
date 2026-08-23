@@ -172,8 +172,8 @@ class MemberDetailsScreen
                         radius: 42,
                         backgroundColor:
                         AppColors.primary
-                            .withOpacity(
-                          0.12,
+                            .withValues(
+                          alpha: 0.12,
                         ),
                         backgroundImage:
                         member.photoUrl !=
@@ -473,6 +473,10 @@ class MemberDetailsScreen
         .getGymByOwnerId(
       user.uid,
     );
+
+    if (!context.mounted) {
+      return;
+    }
 
     if (gym == null) {
       _showMessage(
@@ -856,8 +860,8 @@ class _MembershipPlanPicker
                               BoxDecoration(
                                 color: AppColors
                                     .primary
-                                    .withOpacity(
-                                  0.12,
+                                    .withValues(
+                                  alpha: 0.12,
                                 ),
                                 borderRadius:
                                 BorderRadius

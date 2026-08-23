@@ -115,7 +115,7 @@ class _ReportExportSuccessSheetState
                 BorderRadius.circular(10),
                 border: Border.all(
                   color: AppColors.primary
-                      .withOpacity(0.45),
+                      .withValues(alpha: 0.45),
                 ),
               ),
               child: Row(

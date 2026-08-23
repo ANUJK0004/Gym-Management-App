@@ -72,9 +72,9 @@ class MembershipPlanCard
                 BoxDecoration(
                   color: plan.isActive
                       ? AppColors.primary
-                      .withOpacity(0.12)
+                      .withValues(alpha: 0.12)
                       : Colors.grey
-                      .withOpacity(0.12),
+                      .withValues(alpha: 0.12),
                   borderRadius:
                   BorderRadius
                       .circular(20),

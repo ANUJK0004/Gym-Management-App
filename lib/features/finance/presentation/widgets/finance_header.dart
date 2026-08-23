@@ -36,7 +36,7 @@ class FinanceHeader extends StatelessWidget {
           ),
         ),
         Material(
-          color: AppColors.primary.withOpacity(0.15),
+          color: AppColors.primary.withValues(alpha: 0.15),
           borderRadius: AppRadius.radiusSM,
           child: InkWell(
             onTap: onExport,

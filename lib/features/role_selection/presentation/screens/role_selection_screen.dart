@@ -179,7 +179,7 @@ class _RoleCard extends StatelessWidget {
             color: AppColors.surface,
             borderRadius: AppRadius.radiusLG,
             border: Border.all(
-              color: roleColor.withOpacity(0.5),
+              color: roleColor.withValues(alpha: 0.5),
               width: 0.8,
             ),
           ),
@@ -189,7 +189,7 @@ class _RoleCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: roleColor.withOpacity(0.12),
+                  color: roleColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(

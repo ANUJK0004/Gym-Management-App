@@ -138,7 +138,7 @@ class _BreakdownRow extends StatelessWidget {
       return Colors.orangeAccent;
     }
 
-    return AppColors.primary.withOpacity(.65);
+    return AppColors.primary.withValues(alpha: .65);
   }
 }
 

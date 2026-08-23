@@ -453,7 +453,7 @@ class _Badge
       decoration: BoxDecoration(
         color: isPrimary
             ? AppColors.primary
-            .withOpacity(0.15)
+            .withValues(alpha: 0.15)
             : AppColors.surface,
 
         borderRadius:
@@ -1067,7 +1067,7 @@ class _LogoutButton
           side: BorderSide(
             color:
             AppColors.error
-                .withOpacity(0.5),
+                .withValues(alpha: 0.5),
           ),
 
           padding:
