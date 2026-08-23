@@ -7,6 +7,9 @@ import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
 import '../../../../../app/theme/app_text_styles.dart';
 
+import '../../../../activity/presentation/providers/activity_provider.dart';
+import '../../../../activity/presentation/widgets/recent_activity_list.dart';
+import '../../../../gym/presentation/providers/gym_provider.dart';
 import '../../domain/entities/owner_dashboard_data.dart';
 import '../providers/owner_dashboard_provider.dart';
 
@@ -30,13 +33,14 @@ class OwnerHomeScreen extends ConsumerWidget {
 
         body: RefreshIndicator(
           onRefresh: () async {
-            ref.invalidate(
-              ownerDashboardProvider,
-            );
+            ref.invalidate(ownerDashboardProvider);
+            ref.invalidate(recentActivityProvider);
+            ref.invalidate(ownerGymProvider);
 
-            await ref.read(
-              ownerDashboardProvider.future,
-            );
+            await Future.wait([
+              ref.read(ownerDashboardProvider.future),
+              ref.read(ownerGymProvider.future),
+            ]);
           },
 
           child: dashboardAsync.when(
@@ -181,7 +185,9 @@ class OwnerHomeScreen extends ConsumerWidget {
                             height: 10,
                           ),
 
-                          const _RecentActivityList(),
+                          const RecentActivityList(
+                            maxItems: 6,
+                          ),
                         ],
                       ),
                     ),
@@ -520,20 +526,12 @@ class _RevenueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final values = [
-      .35,
-      .45,
-      .52,
-      .58,
-      .62,
-      .68,
-      .72,
-      .67,
-      .76,
-      .86,
-      .82,
-      .92,
-    ];
+    final trend = dashboard.monthlyRevenueTrend.length == 12
+        ? dashboard.monthlyRevenueTrend
+        : List.filled(12, 0.0);
+
+    final maxRevenue = trend.reduce((a, b) => a > b ? a : b);
+    final currentMonthIndex = DateTime.now().month - 1; // 0..11
 
     final months = [
       'J',
@@ -610,8 +608,22 @@ class _RevenueCard extends StatelessWidget {
               crossAxisAlignment:
               CrossAxisAlignment.end,
               children: List.generate(
-                values.length,
+                months.length,
                     (index) {
+                  final amount = trend[index];
+                  final isCurrentMonth = index == currentMonthIndex;
+                  final hasRevenue =
+                      amount > 0 || (isCurrentMonth && dashboard.monthlyRevenue > 0);
+
+                  double heightFactor;
+                  if (maxRevenue > 0 && amount > 0) {
+                    heightFactor = (amount / maxRevenue).clamp(0.12, 1.0);
+                  } else if (isCurrentMonth && dashboard.monthlyRevenue > 0) {
+                    heightFactor = 0.85;
+                  } else {
+                    heightFactor = 0.08;
+                  }
+
                   return Expanded(
                     child: Padding(
                       padding:
@@ -620,18 +632,15 @@ class _RevenueCard extends StatelessWidget {
                       ),
                       child:
                       FractionallySizedBox(
-                        heightFactor:
-                        values[index],
+                        heightFactor: heightFactor,
                         alignment:
                         Alignment.bottomCenter,
                         child: Container(
                           decoration:
                           BoxDecoration(
-                            color: index >= 9
-                                ? AppColors
-                                .primary
-                                : AppColors
-                                .border,
+                            color: hasRevenue
+                                ? AppColors.primary
+                                : AppColors.border,
                             borderRadius:
                             const BorderRadius
                                 .vertical(
@@ -654,15 +663,20 @@ class _RevenueCard extends StatelessWidget {
             children: List.generate(
               months.length,
                   (index) {
+                final isCurrentMonth = index == currentMonthIndex;
                 return Expanded(
                   child: Text(
                     months[index],
                     textAlign:
                     TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 7,
-                      color: AppColors
-                          .textSecondary,
+                      fontWeight: isCurrentMonth
+                          ? FontWeight.w700
+                          : FontWeight.normal,
+                      color: isCurrentMonth
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
                     ),
                   ),
                 );
@@ -857,116 +871,6 @@ class _ManagementCard extends StatelessWidget {
   }
 }
 
-// ------------------------------------------------------------
-// RECENT ACTIVITY
-// ------------------------------------------------------------
-
-class _RecentActivityList extends StatelessWidget {
-  const _RecentActivityList();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: const [
-        _ActivityItem(
-          icon: Icons.person_add_alt_1_rounded,
-          title: 'New member joined',
-          time: '2 min ago',
-        ),
-
-        SizedBox(height: 8),
-
-        _ActivityItem(
-          icon: Icons.directions_run_rounded,
-          title: 'Trainer assigned',
-          time: '15 min ago',
-        ),
-
-        SizedBox(height: 8),
-
-        _ActivityItem(
-          icon: Icons.payments_rounded,
-          title: 'Membership payment received',
-          time: '1 hr ago',
-        ),
-
-        SizedBox(height: 8),
-
-        _ActivityItem(
-          icon: Icons.warning_amber_rounded,
-          title: 'Membership expired',
-          time: '3 hr ago',
-        ),
-      ],
-    );
-  }
-}
-
-class _ActivityItem extends StatelessWidget {
-  const _ActivityItem({
-    required this.icon,
-    required this.title,
-    required this.time,
-  });
-
-  final IconData icon;
-  final String title;
-  final String time;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 11,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: AppRadius.radiusMD,
-        border: Border.all(
-          color: AppColors.border,
-          width: .5,
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 17,
-            color: AppColors.primary,
-          ),
-
-          const SizedBox(width: 10),
-
-          Expanded(
-            child: Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.bodySmall
-                  .copyWith(
-                fontWeight:
-                FontWeight.w500,
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          Text(
-            time,
-            style: AppTextStyles.labelMedium
-                .copyWith(
-              color:
-              AppColors.textSecondary,
-              fontSize: 9,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // ------------------------------------------------------------
 // SECTION TITLE

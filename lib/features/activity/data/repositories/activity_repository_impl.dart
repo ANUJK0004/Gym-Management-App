@@ -12,6 +12,17 @@ class ActivityRepositoryImpl
   final ActivityRemoteDataSource _datasource;
 
   @override
+  Stream<List<ActivityLog>> streamRecentActivities({
+    required String gymId,
+    int limit = 20,
+  }) {
+    return _datasource.streamRecentActivities(
+      gymId: gymId,
+      limit: limit,
+    );
+  }
+
+  @override
   Future<List<ActivityLog>>
   getRecentActivities({
     required String gymId,

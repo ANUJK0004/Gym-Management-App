@@ -130,6 +130,13 @@ class OwnerDashboardRemoteDataSource {
     )
         .get();
 
+    final financeTransactionsFuture =
+    _firestore
+        .collection('gyms')
+        .doc(gymId)
+        .collection('financeTransactions')
+        .get();
+
     //-------------------------------------------------------
     // STEP 4
     //-------------------------------------------------------
@@ -140,6 +147,7 @@ class OwnerDashboardRemoteDataSource {
       trainersFuture,
       newMembersFuture,
       membershipsFuture,
+      financeTransactionsFuture,
     ]);
 
     final totalMembers =
@@ -162,16 +170,26 @@ class OwnerDashboardRemoteDataSource {
         as QuerySnapshot)
             .docs;
 
+    final financeTransactions =
+        (results[4]
+        as QuerySnapshot)
+            .docs;
+
     //-------------------------------------------------------
     // STEP 5
-    // Membership statistics
+    // Membership & Revenue statistics
     //-------------------------------------------------------
+
+    final now = DateTime.now();
+    final currentYear = now.year;
+    final currentMonth = now.month; // 1-12
+    final List<double> monthlyRevenueTrend = List.filled(12, 0.0);
 
     int activeMembers = 0;
     int expiredMembers = 0;
     int pendingMembers = 0;
 
-    double revenue = 0;
+    double membershipRevenue = 0;
 
     for (final doc in memberships) {
       final data =
@@ -183,9 +201,13 @@ class OwnerDashboardRemoteDataSource {
           .toString()
           .toLowerCase();
 
+      final amount =
+          (data['amount'] as num?)?.toDouble() ?? 0.0;
+
       switch (status) {
         case 'active':
           activeMembers++;
+          membershipRevenue += amount;
           break;
 
         case 'expired':
@@ -196,11 +218,43 @@ class OwnerDashboardRemoteDataSource {
           pendingMembers++;
       }
 
-      revenue +=
-          (data['amount']
-          as num?)
-              ?.toDouble() ??
-              0;
+      final timestamp = data['startDate'] as Timestamp? ??
+          data['createdAt'] as Timestamp?;
+
+      if (timestamp != null) {
+        final date = timestamp.toDate();
+        if (date.year == currentYear && date.month >= 1 && date.month <= 12) {
+          monthlyRevenueTrend[date.month - 1] += amount;
+        }
+      } else if (status == 'active') {
+        monthlyRevenueTrend[currentMonth - 1] += amount;
+      }
+    }
+
+    double transactionRevenue = 0;
+    for (final doc in financeTransactions) {
+      final data = doc.data() as Map<String, dynamic>;
+      final type = (data['type'] ?? '').toString().toLowerCase();
+      final amount = (data['amount'] as num?)?.toDouble() ?? 0.0;
+      final timestamp = data['date'] as Timestamp?;
+
+      if (type == 'income' || type == 'revenue' || type.isEmpty) {
+        transactionRevenue += amount;
+        if (timestamp != null) {
+          final date = timestamp.toDate();
+          if (date.year == currentYear && date.month >= 1 && date.month <= 12) {
+            monthlyRevenueTrend[date.month - 1] += amount;
+          }
+        } else {
+          monthlyRevenueTrend[currentMonth - 1] += amount;
+        }
+      }
+    }
+
+    double currentMonthRevenue = monthlyRevenueTrend[currentMonth - 1];
+    if (currentMonthRevenue == 0 && (membershipRevenue > 0 || transactionRevenue > 0)) {
+      currentMonthRevenue = membershipRevenue > 0 ? membershipRevenue : transactionRevenue;
+      monthlyRevenueTrend[currentMonth - 1] = currentMonthRevenue;
     }
 
     //-------------------------------------------------------
@@ -261,7 +315,10 @@ class OwnerDashboardRemoteDataSource {
       newMembers??0,
 
       monthlyRevenue:
-      revenue,
+      currentMonthRevenue,
+
+      monthlyRevenueTrend:
+      monthlyRevenueTrend,
     );
   }
 }

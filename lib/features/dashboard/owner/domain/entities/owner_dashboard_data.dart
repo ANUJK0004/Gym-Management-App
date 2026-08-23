@@ -23,6 +23,7 @@ class OwnerDashboardData {
     required this.activeTrainers,
     required this.newMembersThisMonth,
     required this.monthlyRevenue,
+    this.monthlyRevenueTrend = const [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   });
 
   //================ OWNER ================//
@@ -57,4 +58,6 @@ class OwnerDashboardData {
   final int newMembersThisMonth;
 
   final double monthlyRevenue;
+
+  final List<double> monthlyRevenueTrend;
 }

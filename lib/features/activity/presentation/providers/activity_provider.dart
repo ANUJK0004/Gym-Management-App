@@ -29,18 +29,19 @@ Provider<ActivityRepository>(
 );
 
 final recentActivityProvider =
-FutureProvider<List<ActivityLog>>(
-      (ref) async {
+StreamProvider.autoDispose<List<ActivityLog>>(
+      (ref) async* {
     final gym =
     await ref.watch(ownerGymProvider.future);
 
     if (gym == null) {
-      return [];
+      yield [];
+      return;
     }
 
-    return ref
-        .watch(activityRepositoryProvider)
-        .getRecentActivities(
+    final repository = ref.watch(activityRepositoryProvider);
+
+    yield* repository.streamRecentActivities(
       gymId: gym.id,
       limit: 20,
     );

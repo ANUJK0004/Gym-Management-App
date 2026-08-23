@@ -22,5 +22,6 @@ class OwnerDashboardDataModel extends OwnerDashboardData {
     required super.activeTrainers,
     required super.newMembersThisMonth,
     required super.monthlyRevenue,
+    super.monthlyRevenueTrend,
   });
 }
