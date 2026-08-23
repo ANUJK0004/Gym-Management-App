@@ -13,11 +13,16 @@ class OwnerSettingsModel extends OwnerSettings {
     super.logoUrl,
     super.operatingHours,
     super.isVerified,
+    super.pushNotifications,
+    super.autoRenew,
+    super.darkMode,
+    super.maintenanceMode,
+    super.lastBackupAt,
   });
 
   factory OwnerSettingsModel.fromFirestore(
-      DocumentSnapshot<Map<String, dynamic>> document,
-      ) {
+    DocumentSnapshot<Map<String, dynamic>> document,
+  ) {
     final data = document.data();
 
     if (data == null) {
@@ -26,34 +31,36 @@ class OwnerSettingsModel extends OwnerSettings {
       );
     }
 
-    final rawHours =
-    data['operatingHours'] as Map<String, dynamic>?;
+    final rawHours = data['operatingHours'] as Map<String, dynamic>?;
+
+    DateTime? parsedBackupAt;
+    final rawBackup = data['lastBackupAt'];
+    if (rawBackup is Timestamp) {
+      parsedBackupAt = rawBackup.toDate();
+    } else if (rawBackup is String) {
+      parsedBackupAt = DateTime.tryParse(rawBackup);
+    }
 
     return OwnerSettingsModel(
-      gymId:
-      data['gymId'] as String? ?? '',
-      ownerId:
-      data['ownerId'] as String? ?? '',
-      gymName:
-      data['gymName'] as String?,
-      address:
-      data['address'] as String?,
-      phone:
-      data['phone'] as String?,
-      website:
-      data['website'] as String?,
-      logoUrl:
-      data['logoUrl'] as String?,
-      operatingHours:
-      rawHours?.map(
-            (key, value) =>
-            MapEntry(
-              key,
-              value.toString(),
-            ),
+      gymId: data['gymId'] as String? ?? '',
+      ownerId: data['ownerId'] as String? ?? '',
+      gymName: data['gymName'] as String?,
+      address: data['address'] as String?,
+      phone: data['phone'] as String?,
+      website: data['website'] as String?,
+      logoUrl: data['logoUrl'] as String?,
+      operatingHours: rawHours?.map(
+        (key, value) => MapEntry(
+          key,
+          value.toString(),
+        ),
       ),
-      isVerified:
-      data['isVerified'] as bool? ?? false,
+      isVerified: data['isVerified'] as bool? ?? false,
+      pushNotifications: data['pushNotifications'] as bool? ?? true,
+      autoRenew: data['autoRenew'] as bool? ?? true,
+      darkMode: data['darkMode'] as bool? ?? true,
+      maintenanceMode: data['maintenanceMode'] as bool? ?? false,
+      lastBackupAt: parsedBackupAt,
     );
   }
 
@@ -68,6 +75,13 @@ class OwnerSettingsModel extends OwnerSettings {
       'logoUrl': logoUrl,
       'operatingHours': operatingHours,
       'isVerified': isVerified,
+      'pushNotifications': pushNotifications,
+      'autoRenew': autoRenew,
+      'darkMode': darkMode,
+      'maintenanceMode': maintenanceMode,
+      'lastBackupAt': lastBackupAt != null
+          ? Timestamp.fromDate(lastBackupAt!)
+          : null,
     };
   }
 }

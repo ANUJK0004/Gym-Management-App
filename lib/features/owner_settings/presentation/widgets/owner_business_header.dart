@@ -32,7 +32,7 @@ class OwnerBusinessHeader
         AppRadius.radiusLG,
         border: Border.all(
           color: AppColors.primary
-              .withOpacity(0.2),
+              .withValues(alpha: 0.2),
           width: 0.7,
         ),
       ),
