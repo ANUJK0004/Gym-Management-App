@@ -6,6 +6,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/routes/app_routes.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../dashboard/member/presentation/providers/member_dashboard_provider.dart';
+import '../../../progress/presentation/providers/progress_provider.dart';
+import '../../../progress/presentation/providers/workout_completion_provider.dart'
+    hide workoutCompletionProvider;
 import '../../domain/entities/workout.dart';
 import '../../domain/entities/workout_completion.dart';
 import '../providers/workout_provider.dart';
@@ -357,12 +361,29 @@ class _WorkoutSessionScreenState
         ).future,
       );
 
+      try {
+        await ref.read(
+          workoutCompletionServiceProvider,
+        ).completeWorkout(
+          userId: authUser.id,
+          workout: widget.workout,
+        );
+      } catch (_) {}
+
       ref.invalidate(
         workoutProvider,
       );
 
       ref.invalidate(
         todaysWorkoutProvider,
+      );
+
+      ref.invalidate(
+        progressProvider,
+      );
+
+      ref.invalidate(
+        memberDashboardProvider,
       );
 
       if (!mounted) {

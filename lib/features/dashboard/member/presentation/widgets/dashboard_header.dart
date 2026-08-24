@@ -18,8 +18,21 @@ class DashboardHeader extends StatelessWidget {
   final VoidCallback? onNotificationPressed;
   final VoidCallback? onProfilePressed;
 
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Good morning 👋';
+    } else if (hour < 17) {
+      return 'Good afternoon 👋';
+    } else {
+      return 'Good evening 👋';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final displayName = name.trim().isEmpty ? 'Member' : name;
+
     return Row(
       children: [
         GestureDetector(
@@ -27,10 +40,10 @@ class DashboardHeader extends StatelessWidget {
           child: CircleAvatar(
             radius: 26,
             backgroundColor: AppColors.primary,
-            backgroundImage: photoUrl != null
+            backgroundImage: photoUrl != null && photoUrl!.trim().isNotEmpty
                 ? NetworkImage(photoUrl!)
                 : null,
-            child: photoUrl == null
+            child: photoUrl == null || photoUrl!.trim().isEmpty
                 ? const Icon(
               Icons.person,
               color: AppColors.textInverse,
@@ -47,7 +60,7 @@ class DashboardHeader extends StatelessWidget {
             CrossAxisAlignment.start,
             children: [
               Text(
-                'Good morning 👋',
+                _getGreeting(),
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -56,7 +69,7 @@ class DashboardHeader extends StatelessWidget {
               const SizedBox(height: 2),
 
               Text(
-                name,
+                displayName,
                 style: AppTextStyles.headlineMedium,
               ),
             ],
@@ -68,6 +81,7 @@ class DashboardHeader extends StatelessWidget {
           icon: const Icon(
             Icons.notifications_none_rounded,
           ),
+          tooltip: 'Notifications',
         ),
       ],
     );

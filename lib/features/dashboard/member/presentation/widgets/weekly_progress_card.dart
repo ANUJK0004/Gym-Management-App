@@ -9,16 +9,28 @@ class WeeklyProgressCard extends StatelessWidget {
     super.key,
     required this.completedWorkouts,
     required this.totalWorkouts,
+    this.weeklyActivity = const [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ],
   });
 
   final int completedWorkouts;
   final int totalWorkouts;
+  final List<bool> weeklyActivity;
 
   @override
   Widget build(BuildContext context) {
     final progress = totalWorkouts == 0
         ? 0.0
-        : completedWorkouts / totalWorkouts;
+        : (completedWorkouts / totalWorkouts).clamp(0.0, 1.0);
+
+    final currentWeekdayIndex = DateTime.now().weekday - 1; // 0 = Mon, 6 = Sun
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -30,11 +42,23 @@ class WeeklyProgressCard extends StatelessWidget {
         crossAxisAlignment:
         CrossAxisAlignment.start,
         children: [
-          Text(
-            'THIS WEEK',
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.textSecondary,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'THIS WEEK',
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              Text(
+                '$completedWorkouts Completed',
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
 
           const SizedBox(height: 16),
@@ -45,36 +69,62 @@ class WeeklyProgressCard extends StatelessWidget {
             children: List.generate(
               7,
                   (index) {
-                final completed =
-                    index < completedWorkouts;
+                final completed = index < weeklyActivity.length
+                    ? weeklyActivity[index]
+                    : false;
+
+                final isToday = index == currentWeekdayIndex;
 
                 return Column(
                   children: [
                     Text(
                       _dayName(index),
-                      style:
-                      AppTextStyles.bodySmall,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: isToday
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                        fontWeight:
+                        isToday ? FontWeight.w700 : FontWeight.w500,
+                      ),
                     ),
 
                     const SizedBox(height: 8),
 
                     Container(
-                      width: 32,
-                      height: 32,
+                      width: 34,
+                      height: 34,
                       decoration: BoxDecoration(
                         color: completed
                             ? AppColors.primary
-                            : AppColors.inputField,
+                            : (isToday
+                            ? AppColors.primary.withValues(alpha: 0.12)
+                            : AppColors.inputField),
                         shape: BoxShape.circle,
+                        border: isToday
+                            ? Border.all(
+                          color: AppColors.primary,
+                          width: 1.5,
+                        )
+                            : null,
                       ),
                       child: completed
                           ? const Icon(
-                        Icons.check,
+                        Icons.check_rounded,
                         size: 18,
-                        color:
-                        AppColors.textInverse,
+                        color: AppColors.textInverse,
                       )
-                          : null,
+                          : (isToday
+                          ? Center(
+                        child: Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      )
+                          : null),
                     ),
                   ],
                 );

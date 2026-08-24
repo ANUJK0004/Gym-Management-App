@@ -104,8 +104,7 @@ class MemberHomeScreen extends ConsumerWidget {
                             photoUrl:
                             dashboard.photoUrl,
                             onNotificationPressed: () {
-                              // TODO:
-                              // Open notifications.
+                              _showNotificationsSheet(context, dashboard.userName);
                             },
                             onProfilePressed: () {
                               context.push(
@@ -131,10 +130,6 @@ class MemberHomeScreen extends ConsumerWidget {
                             weight:
                             dashboard.weight,
                             onEditProfile: () {
-                              // context.push(
-                              //   AppRoutes.editProfile,
-                              //   extra: profile,
-                              // );
                               context.push(
                                 AppRoutes.profile,
                               );
@@ -277,6 +272,9 @@ class MemberHomeScreen extends ConsumerWidget {
                             totalWorkouts:
                             dashboard
                                 .totalWorkouts,
+                            weeklyActivity:
+                            dashboard
+                                .weeklyActivity,
                           ),
 
                           const SizedBox(
@@ -293,6 +291,12 @@ class MemberHomeScreen extends ConsumerWidget {
                             previousWeight:
                             dashboard
                                 .previousWeight,
+                            monthlyWorkouts:
+                            dashboard
+                                .monthlyWorkouts,
+                            workoutChange:
+                            dashboard
+                                .workoutChange,
                             onViewProgress: () {
                               context.push(AppRoutes.progress);
                             },
@@ -336,6 +340,95 @@ class MemberHomeScreen extends ConsumerWidget {
           },
         ),
       ),
+    );
+  }
+
+  void _showNotificationsSheet(BuildContext context, String userName) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: const BoxDecoration(
+            color: Color(0xFF1E1E2C),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Notifications',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF28293D),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6C5CE7).withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.celebration_rounded,
+                        color: Color(0xFF6C5CE7),
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Welcome to SweatSync, $userName! 👋',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Check in with your Gym QR to track your daily attendance and start today\'s workout.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white60,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
     );
   }
 }

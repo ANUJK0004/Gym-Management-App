@@ -9,20 +9,28 @@ class BodyMetricsCard extends StatelessWidget {
     super.key,
     required this.currentWeight,
     required this.previousWeight,
+    this.monthlyWorkouts = 0,
+    this.workoutChange = 0,
     this.onViewProgress,
   });
 
   final double currentWeight;
   final double previousWeight;
+  final int monthlyWorkouts;
+  final int workoutChange;
 
   final VoidCallback? onViewProgress;
 
   @override
   Widget build(BuildContext context) {
-    final difference =
-        currentWeight - previousWeight;
-
+    final difference = currentWeight - previousWeight;
     final isDown = difference < 0;
+
+    final workoutSubtitle = workoutChange > 0
+        ? '+$workoutChange this month'
+        : (workoutChange < 0
+        ? '$workoutChange this month'
+        : (monthlyWorkouts > 0 ? 'Logged this month' : 'No workouts yet'));
 
     return Column(
       crossAxisAlignment:
@@ -42,11 +50,12 @@ class BodyMetricsCard extends StatelessWidget {
             Expanded(
               child: _MetricCard(
                 title: 'Weight',
-                value:
-                '${currentWeight.toStringAsFixed(1)} kg',
-                subtitle:
-                '${isDown ? '↓' : '↑'} '
-                    '${difference.abs().toStringAsFixed(1)} kg',
+                value: currentWeight > 0
+                    ? '${currentWeight.toStringAsFixed(1)} kg'
+                    : '--',
+                subtitle: currentWeight > 0 && previousWeight > 0 && difference.abs() > 0.01
+                    ? '${isDown ? '↓' : '↑'} ${difference.abs().toStringAsFixed(1)} kg'
+                    : 'Current Weight',
               ),
             ),
 
@@ -55,8 +64,8 @@ class BodyMetricsCard extends StatelessWidget {
             Expanded(
               child: _MetricCard(
                 title: 'Workouts',
-                value: '12',
-                subtitle: '+20%',
+                value: '$monthlyWorkouts',
+                subtitle: workoutSubtitle,
               ),
             ),
           ],
@@ -116,7 +125,9 @@ class _MetricCard extends StatelessWidget {
 
           Text(
             subtitle,
-            style: AppTextStyles.bodySmall,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
           ),
         ],
       ),

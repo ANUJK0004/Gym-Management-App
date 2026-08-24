@@ -12,11 +12,34 @@ class MemberDashboardModel extends MemberDashboard {
     required super.totalWorkouts,
     required super.currentWeight,
     required super.previousWeight,
+    super.weeklyActivity,
+    super.monthlyWorkouts,
+    super.workoutChange,
   });
 
   factory MemberDashboardModel.fromMap(
       Map<String, dynamic> data,
       ) {
+    final rawWeekly = data['weeklyActivity'];
+    List<bool> parsedWeekly = const [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ];
+    if (rawWeekly is List) {
+      parsedWeekly = rawWeekly.map((e) => e == true).toList();
+      if (parsedWeekly.length < 7) {
+        parsedWeekly = [
+          ...parsedWeekly,
+          ...List.filled(7 - parsedWeekly.length, false),
+        ];
+      }
+    }
+
     return MemberDashboardModel(
       userName:
       data['userName'] as String? ?? '',
@@ -51,6 +74,14 @@ class MemberDashboardModel extends MemberDashboard {
       previousWeight:
       (data['previousWeight'] as num?)?.toDouble() ??
           0,
+
+      weeklyActivity: parsedWeekly,
+
+      monthlyWorkouts:
+      (data['monthlyWorkouts'] as num?)?.toInt() ?? 0,
+
+      workoutChange:
+      (data['workoutChange'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -70,6 +101,9 @@ class MemberDashboardModel extends MemberDashboard {
       currentWeight,
       'previousWeight':
       previousWeight,
+      'weeklyActivity': weeklyActivity,
+      'monthlyWorkouts': monthlyWorkouts,
+      'workoutChange': workoutChange,
     };
   }
 

@@ -50,23 +50,18 @@ class ProgressRemoteDataSource {
     as QuerySnapshot<
         Map<String, dynamic>>;
 
-    final activityMap = <String, WeeklyActivityModel>{};
+    final activityByOrder = <int, int>{};
 
-    for (final document
-    in activitySnapshot.docs) {
-      final activity =
-      WeeklyActivityModel.fromFirestore(
-        document,
-      );
-
-      activityMap[activity.day] =
-          activity;
+    for (final document in activitySnapshot.docs) {
+      final data = document.data();
+      final order = (data['order'] as num?)?.toInt();
+      final workouts = (data['workouts'] as num?)?.toInt() ?? 0;
+      if (order != null && order >= 0 && order < 7) {
+        activityByOrder[order] = workouts;
+      }
     }
 
-    final weeklyActivity =
-    _buildWeeklyActivity(
-      activityMap,
-    );
+    final weeklyActivity = _buildWeeklyActivity(activityByOrder);
 
     final personalRecords =
     recordsSnapshot.docs
@@ -95,10 +90,8 @@ class ProgressRemoteDataSource {
     );
   }
 
-  List<WeeklyActivityModel>
-  _buildWeeklyActivity(
-      Map<String, WeeklyActivityModel>
-      activityMap,
+  List<WeeklyActivityModel> _buildWeeklyActivity(
+      Map<int, int> activityByOrder,
       ) {
     const days = [
       'M',
@@ -113,13 +106,10 @@ class ProgressRemoteDataSource {
     return List.generate(
       7,
           (index) {
-        final day = days[index];
-
-        return activityMap[day] ??
-            WeeklyActivityModel(
-              day: day,
-              workouts: 0,
-            );
+        return WeeklyActivityModel(
+          day: days[index],
+          workouts: activityByOrder[index] ?? 0,
+        );
       },
     );
   }

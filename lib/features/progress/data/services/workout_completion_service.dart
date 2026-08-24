@@ -35,11 +35,6 @@ class WorkoutCompletionService {
         .collection('progress')
         .doc(userId);
 
-    final activityReference =
-    progressReference
-        .collection('weekly_activity')
-        .doc(_dayKey(today));
-
     return _firestore.runTransaction(
           (transaction) async {
         final completionSnapshot =
@@ -100,6 +95,11 @@ class WorkoutCompletionService {
           ),
         );
 
+        final activityReference =
+        progressReference
+            .collection('weekly_activity')
+            .doc('day_${_dayOrder(today)}');
+
         final activitySnapshot =
         await transaction.get(
           activityReference,
@@ -118,6 +118,8 @@ class WorkoutCompletionService {
           activityReference,
           {
             'day':
+            _shortDayName(today),
+            'dayFull':
             _dayName(today),
             'workouts':
             currentActivity + 1,
@@ -205,11 +207,22 @@ class WorkoutCompletionService {
     }
   }
 
-  String _dayKey(
+  String _shortDayName(
       DateTime date,
       ) {
-    return _dayName(date)
-        .toLowerCase();
+    const days = [
+      'M',
+      'T',
+      'W',
+      'T',
+      'F',
+      'S',
+      'S',
+    ];
+
+    return days[
+    date.weekday - 1
+    ];
   }
 
   String _dayName(
