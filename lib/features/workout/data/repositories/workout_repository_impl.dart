@@ -1,3 +1,4 @@
+import '../../domain/entities/exercise.dart';
 import '../../domain/entities/workout.dart';
 import '../../domain/entities/workout_completion.dart';
 import '../../domain/repositories/workout_repository.dart';
@@ -44,6 +45,35 @@ class WorkoutRepositoryImpl
       ) {
     return _dataSource.completeWorkout(
       completion,
+    );
+  }
+
+  @override
+  Future<Workout> createWorkout(
+      Workout workout,
+      ) {
+    return _dataSource.createWorkout(
+      workout,
+    );
+  }
+
+  @override
+  Future<void> addExerciseToWorkout({
+    required String workoutId,
+    required Exercise exercise,
+  }) {
+    return _dataSource.addExerciseToWorkout(
+      workoutId: workoutId,
+      exercise: exercise,
+    );
+  }
+
+  @override
+  Future<void> deleteWorkout(
+      String workoutId,
+      ) {
+    return _dataSource.deleteWorkout(
+      workoutId,
     );
   }
 }

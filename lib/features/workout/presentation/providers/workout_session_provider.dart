@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/legacy.dart';
 
+import '../../domain/entities/exercise.dart';
 import '../../domain/entities/workout.dart';
 
 class WorkoutSessionState {
@@ -47,52 +48,60 @@ class WorkoutSessionState {
           totalExercises - 1;
 
   WorkoutSessionState copyWith({
+    Workout? workout,
     int? currentExerciseIndex,
-    Set<int>?
-    completedExerciseIndexes,
+    Set<int>? completedExerciseIndexes,
     bool? isPaused,
     bool? isFinished,
     int? elapsedSeconds,
   }) {
     return WorkoutSessionState(
-      workout: workout,
+      workout: workout ?? this.workout,
       currentExerciseIndex:
-      currentExerciseIndex ??
-          this.currentExerciseIndex,
+          currentExerciseIndex ?? this.currentExerciseIndex,
       completedExerciseIndexes:
-      completedExerciseIndexes ??
-          this.completedExerciseIndexes,
-      isPaused:
-      isPaused ?? this.isPaused,
-      isFinished:
-      isFinished ?? this.isFinished,
-      elapsedSeconds:
-      elapsedSeconds ??
-          this.elapsedSeconds,
+          completedExerciseIndexes ?? this.completedExerciseIndexes,
+      isPaused: isPaused ?? this.isPaused,
+      isFinished: isFinished ?? this.isFinished,
+      elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
     );
   }
 }
 
 class WorkoutSessionNotifier
-    extends StateNotifier<
-        WorkoutSessionState> {
+    extends StateNotifier<WorkoutSessionState> {
   WorkoutSessionNotifier(
-      Workout workout,
-      ) : super(
-    WorkoutSessionState(
-      workout: workout,
-    ),
-  );
+    Workout workout,
+  ) : super(
+          WorkoutSessionState(
+            workout: workout,
+          ),
+        );
+
+  void addExercise(Exercise exercise) {
+    final currentExercises = List<Exercise>.from(state.workout.exercises);
+    final newExerciseWithOrder = exercise.copyWith(
+      order: currentExercises.length,
+    );
+    currentExercises.add(newExerciseWithOrder);
+
+    final updatedWorkout = state.workout.copyWith(
+      exercises: currentExercises,
+    );
+
+    state = state.copyWith(
+      workout: updatedWorkout,
+      isFinished: false,
+    );
+  }
 
   void updateElapsedTime() {
-    if (state.isPaused ||
-        state.isFinished) {
+    if (state.isPaused || state.isFinished) {
       return;
     }
 
     state = state.copyWith(
-      elapsedSeconds:
-      state.elapsedSeconds + 1,
+      elapsedSeconds: state.elapsedSeconds + 1,
     );
   }
 
@@ -107,13 +116,11 @@ class WorkoutSessionNotifier
   }
 
   void completeCurrentExercise() {
-    if (!state.hasExercises ||
-        state.isFinished) {
+    if (!state.hasExercises || state.isFinished) {
       return;
     }
 
-    final completed =
-    Set<int>.from(
+    final completed = Set<int>.from(
       state.completedExerciseIndexes,
     );
 
@@ -123,8 +130,7 @@ class WorkoutSessionNotifier
 
     if (state.isLastExercise) {
       state = state.copyWith(
-        completedExerciseIndexes:
-        completed,
+        completedExerciseIndexes: completed,
         isFinished: true,
       );
 
@@ -132,30 +138,23 @@ class WorkoutSessionNotifier
     }
 
     state = state.copyWith(
-      completedExerciseIndexes:
-      completed,
-      currentExerciseIndex:
-      state.currentExerciseIndex + 1,
+      completedExerciseIndexes: completed,
+      currentExerciseIndex: state.currentExerciseIndex + 1,
     );
   }
 
   void goToPreviousExercise() {
-    if (state.currentExerciseIndex ==
-        0) {
+    if (state.currentExerciseIndex == 0) {
       return;
     }
 
     state = state.copyWith(
-      currentExerciseIndex:
-      state.currentExerciseIndex - 1,
+      currentExerciseIndex: state.currentExerciseIndex - 1,
     );
   }
 
-  void goToExercise(
-      int index,
-      ) {
-    if (index < 0 ||
-        index >= state.totalExercises) {
+  void goToExercise(int index) {
+    if (index < 0 || index >= state.totalExercises) {
       return;
     }
 

@@ -29,4 +29,28 @@ class Workout {
   final List<Exercise> exercises;
 
   int get exerciseCount => exercises.length;
+
+  Workout copyWith({
+    String? id,
+    String? userId,
+    String? name,
+    String? description,
+    String? imageUrl,
+    String? difficulty,
+    int? duration,
+    DateTime? assignedDate,
+    List<Exercise>? exercises,
+  }) {
+    return Workout(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      imageUrl: imageUrl ?? this.imageUrl,
+      difficulty: difficulty ?? this.difficulty,
+      duration: duration ?? this.duration,
+      assignedDate: assignedDate ?? this.assignedDate,
+      exercises: exercises ?? this.exercises,
+    );
+  }
 }

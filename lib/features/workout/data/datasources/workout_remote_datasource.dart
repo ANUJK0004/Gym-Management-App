@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/exercise_model.dart';
 import '../models/workout_completion_model.dart';
 import '../models/workout_model.dart';
+import '../../domain/entities/exercise.dart';
+import '../../domain/entities/workout.dart';
 import '../../domain/entities/workout_completion.dart';
 
 class WorkoutRemoteDataSource {
@@ -168,6 +170,95 @@ class WorkoutRemoteDataSource {
     );
 
     return completionModel;
+  }
+
+  Future<WorkoutModel> createWorkout(
+      Workout workout,
+      ) async {
+    final workoutRef = workout.id.isNotEmpty
+        ? _workoutsCollection.doc(workout.id)
+        : _workoutsCollection.doc();
+
+    final workoutModel = WorkoutModel(
+      id: workoutRef.id,
+      userId: workout.userId,
+      name: workout.name,
+      description: workout.description,
+      imageUrl: workout.imageUrl,
+      difficulty: workout.difficulty,
+      duration: workout.duration,
+      assignedDate: workout.assignedDate,
+      exercises: workout.exercises,
+    );
+
+    final batch = _firestore.batch();
+    batch.set(workoutRef, workoutModel.toFirestore());
+
+    for (var i = 0; i < workout.exercises.length; i++) {
+      final exercise = workout.exercises[i];
+      final exerciseRef = exercise.id.isNotEmpty
+          ? workoutRef.collection('exercises').doc(exercise.id)
+          : workoutRef.collection('exercises').doc();
+
+      final exerciseModel = ExerciseModel(
+        id: exerciseRef.id,
+        name: exercise.name,
+        description: exercise.description,
+        imageUrl: exercise.imageUrl,
+        muscleGroup: exercise.muscleGroup,
+        sets: exercise.sets,
+        reps: exercise.reps,
+        weight: exercise.weight,
+        restSeconds: exercise.restSeconds,
+        order: exercise.order > 0 ? exercise.order : i,
+      );
+
+      batch.set(exerciseRef, exerciseModel.toFirestore());
+    }
+
+    await batch.commit();
+    return workoutModel;
+  }
+
+  Future<void> addExerciseToWorkout({
+    required String workoutId,
+    required Exercise exercise,
+  }) async {
+    final exercisesCollection =
+        _workoutsCollection.doc(workoutId).collection('exercises');
+
+    final exerciseRef = exercise.id.isNotEmpty
+        ? exercisesCollection.doc(exercise.id)
+        : exercisesCollection.doc();
+
+    final exerciseModel = ExerciseModel(
+      id: exerciseRef.id,
+      name: exercise.name,
+      description: exercise.description,
+      imageUrl: exercise.imageUrl,
+      muscleGroup: exercise.muscleGroup,
+      sets: exercise.sets,
+      reps: exercise.reps,
+      weight: exercise.weight,
+      restSeconds: exercise.restSeconds,
+      order: exercise.order,
+    );
+
+    await exerciseRef.set(exerciseModel.toFirestore());
+  }
+
+  Future<void> deleteWorkout(String workoutId) async {
+    final exercisesSnapshot = await _workoutsCollection
+        .doc(workoutId)
+        .collection('exercises')
+        .get();
+
+    final batch = _firestore.batch();
+    for (final doc in exercisesSnapshot.docs) {
+      batch.delete(doc.reference);
+    }
+    batch.delete(_workoutsCollection.doc(workoutId));
+    await batch.commit();
   }
 
   Future<WorkoutModel>
