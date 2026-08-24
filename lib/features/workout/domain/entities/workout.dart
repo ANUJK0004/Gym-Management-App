@@ -10,6 +10,7 @@ class Workout {
     this.difficulty,
     this.duration = 0,
     this.assignedDate,
+    this.day = 'Everyday',
     this.exercises = const [],
   });
 
@@ -25,6 +26,7 @@ class Workout {
   final int duration;
 
   final DateTime? assignedDate;
+  final String? day;
 
   final List<Exercise> exercises;
 
@@ -39,6 +41,7 @@ class Workout {
     String? difficulty,
     int? duration,
     DateTime? assignedDate,
+    String? day,
     List<Exercise>? exercises,
   }) {
     return Workout(
@@ -50,6 +53,7 @@ class Workout {
       difficulty: difficulty ?? this.difficulty,
       duration: duration ?? this.duration,
       assignedDate: assignedDate ?? this.assignedDate,
+      day: day ?? this.day,
       exercises: exercises ?? this.exercises,
     );
   }

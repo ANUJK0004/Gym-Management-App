@@ -72,21 +72,42 @@ class WorkoutRemoteDataSource {
     );
 
     final now = DateTime.now();
+    const dayNames = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    final todayDayName = dayNames[now.weekday - 1].toLowerCase();
 
+    // 1. Look for specific day match (e.g., 'Monday')
     for (final workout in workouts) {
-      final assignedDate =
-          workout.assignedDate;
-
-      if (assignedDate == null) {
-        continue;
+      final day = workout.day?.toLowerCase();
+      if (day != null && day == todayDayName) {
+        return workout;
       }
+    }
 
-      final isToday =
-          assignedDate.year == now.year &&
-              assignedDate.month == now.month &&
-              assignedDate.day == now.day;
+    // 2. Look for date match (assignedDate == today)
+    for (final workout in workouts) {
+      final assignedDate = workout.assignedDate;
+      if (assignedDate != null) {
+        final isToday = assignedDate.year == now.year &&
+            assignedDate.month == now.month &&
+            assignedDate.day == now.day;
+        if (isToday) {
+          return workout;
+        }
+      }
+    }
 
-      if (isToday) {
+    // 3. Look for 'Everyday' workout
+    for (final workout in workouts) {
+      final day = workout.day?.toLowerCase();
+      if (day == 'everyday') {
         return workout;
       }
     }
@@ -188,6 +209,7 @@ class WorkoutRemoteDataSource {
       difficulty: workout.difficulty,
       duration: workout.duration,
       assignedDate: workout.assignedDate,
+      day: workout.day ?? 'Everyday',
       exercises: workout.exercises,
     );
 

@@ -49,11 +49,22 @@ class _CreateCustomWorkoutSheetState
 
   int _duration = 45;
   String _difficulty = 'Intermediate';
+  String _selectedDay = 'Everyday';
   final List<Exercise> _exercises = [];
   bool _isLoading = false;
 
   final List<int> _durations = [30, 45, 60, 75, 90];
   final List<String> _difficulties = ['Beginner', 'Intermediate', 'Advanced'];
+  final List<String> _days = [
+    'Everyday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
 
   @override
   void initState() {
@@ -65,6 +76,7 @@ class _CreateCustomWorkoutSheetState
           ? widget.initialWorkout!.duration
           : 45;
       _difficulty = widget.initialWorkout!.difficulty ?? 'Intermediate';
+      _selectedDay = widget.initialWorkout!.day ?? 'Everyday';
       _exercises.addAll(widget.initialWorkout!.exercises);
     } else {
       _nameController.text = 'Custom Workout';
@@ -129,6 +141,7 @@ class _CreateCustomWorkoutSheetState
             exercises: _exercises,
             duration: _duration,
             difficulty: _difficulty,
+            day: _selectedDay,
           );
 
       if (!mounted) return;
@@ -259,6 +272,54 @@ class _CreateCustomWorkoutSheetState
                       fontSize: 14,
                     ),
                     decoration: _inputDecoration('e.g. Chest, Shoulders & Triceps'),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // Schedule Day Selection (Required, defaults to Everyday)
+                  _buildLabel('SCHEDULE DAY'),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _days.map((day) {
+                      final isSelected =
+                          _selectedDay.toLowerCase() == day.toLowerCase();
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedDay = day),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 160),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.primary
+                                : const Color(0xFF222222),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : const Color(0xFF333333),
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            day,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              color: isSelected
+                                  ? AppColors.textInverse
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
 
                   const SizedBox(height: 18),

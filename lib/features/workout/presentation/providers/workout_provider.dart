@@ -121,6 +121,7 @@ class WorkoutCreationNotifier
     int duration = 45,
     String? difficulty,
     DateTime? assignedDate,
+    String day = 'Everyday',
   }) async {
     final authState = _ref.read(authStateProvider);
     final authUser = authState.value;
@@ -138,6 +139,7 @@ class WorkoutCreationNotifier
         difficulty: difficulty ?? 'Normal',
         duration: duration,
         assignedDate: assignedDate ?? DateTime.now(),
+        day: day,
         exercises: exercises,
       );
 

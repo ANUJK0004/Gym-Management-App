@@ -13,6 +13,7 @@ class WorkoutModel extends Workout {
     super.difficulty,
     super.duration,
     super.assignedDate,
+    super.day,
     super.exercises,
   });
 
@@ -44,6 +45,8 @@ class WorkoutModel extends Workout {
       data['duration'] as int? ?? 0,
       assignedDate:
       _parseDate(data['assignedDate']),
+      day:
+      data['day'] as String? ?? 'Everyday',
       exercises: exercises,
     );
   }
@@ -56,6 +59,7 @@ class WorkoutModel extends Workout {
       'imageUrl': imageUrl,
       'difficulty': difficulty,
       'duration': duration,
+      'day': day ?? 'Everyday',
       'assignedDate':
       assignedDate != null
           ? Timestamp.fromDate(

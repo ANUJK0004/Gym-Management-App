@@ -184,24 +184,27 @@ class WorkoutDetailScreen extends ConsumerWidget {
                             ),
                           ],
                           const SizedBox(height: 16),
-                          Row(
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 8,
                             children: [
+                              _DetailBadge(
+                                icon: Icons.calendar_today_rounded,
+                                text: workout.day ?? 'Everyday',
+                              ),
                               _DetailBadge(
                                 icon: Icons.timer_outlined,
                                 text: '${workout.duration} min',
                               ),
-                              const SizedBox(width: 12),
                               _DetailBadge(
                                 icon: Icons.fitness_center_outlined,
                                 text: '${workout.exerciseCount} Exercises',
                               ),
-                              if (workout.difficulty != null) ...[
-                                const SizedBox(width: 12),
+                              if (workout.difficulty != null)
                                 _DetailBadge(
                                   icon: Icons.speed_outlined,
                                   text: workout.difficulty!,
                                 ),
-                              ],
                             ],
                           ),
                         ],
