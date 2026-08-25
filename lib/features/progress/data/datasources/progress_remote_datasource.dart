@@ -120,63 +120,53 @@ class ProgressRemoteDataSource {
     double? bodyFat,
     double? muscleMass,
   }) async {
-    final progressReference =
-    _firestore
-        .collection('progress')
-        .doc(userId);
+    final progressReference = _firestore.collection('progress').doc(userId);
 
-    final snapshot =
-    await progressReference.get();
+    final snapshot = await progressReference.get();
+    final oldData = snapshot.data() ?? {};
 
-    final oldData =
-        snapshot.data() ?? {};
+    final oldWeight = (oldData['currentWeight'] as num?)?.toDouble() ?? 0;
+    final oldBodyFat = (oldData['bodyFat'] as num?)?.toDouble() ?? 0;
+    final oldMuscleMass = (oldData['muscleMass'] as num?)?.toDouble() ?? 0;
 
-    final oldWeight =
-        (oldData['currentWeight']
-        as num?)
-            ?.toDouble() ??
-            0;
+    final updateData = <String, dynamic>{
+      'userId': userId,
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
 
-    final oldBodyFat =
-        (oldData['bodyFat'] as num?)
-            ?.toDouble() ??
-            0;
+    if (weight != null) {
+      updateData['currentWeight'] = weight;
+      updateData['weightChange'] = oldWeight > 0 ? (weight - oldWeight) : 0.0;
+    }
 
-    final oldMuscleMass =
-        (oldData['muscleMass']
-        as num?)
-            ?.toDouble() ??
-            0;
+    if (bodyFat != null) {
+      updateData['bodyFat'] = bodyFat;
+      updateData['bodyFatChange'] = oldBodyFat > 0 ? (bodyFat - oldBodyFat) : 0.0;
+    }
+
+    if (muscleMass != null) {
+      updateData['muscleMass'] = muscleMass;
+      updateData['muscleMassChange'] =
+          oldMuscleMass > 0 ? (muscleMass - oldMuscleMass) : 0.0;
+    }
 
     await progressReference.set(
-      {
-        'userId': userId,
-
-        'currentWeight': ?weight,
-
-        'bodyFat': ?bodyFat,
-
-        'muscleMass': ?muscleMass,
-
-        if (weight != null)
-          'weightChange':
-          weight - oldWeight,
-
-        if (bodyFat != null)
-          'bodyFatChange':
-          bodyFat - oldBodyFat,
-
-        if (muscleMass != null)
-          'muscleMassChange':
-          muscleMass -
-              oldMuscleMass,
-
-        'updatedAt':
-        FieldValue.serverTimestamp(),
-      },
+      updateData,
       SetOptions(
         merge: true,
       ),
     );
+
+    if (weight != null) {
+      try {
+        await _firestore.collection('users').doc(userId).set(
+          {
+            'weight': weight,
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      } catch (_) {}
+    }
   }
 }

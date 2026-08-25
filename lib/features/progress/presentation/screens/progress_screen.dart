@@ -7,6 +7,7 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../domain/entities/progress.dart';
 
 import '../providers/progress_provider.dart';
+import '../widgets/log_body_metrics_sheet.dart';
 import '../widgets/progress_metric_card.dart';
 import '../widgets/weekly_activity_card.dart';
 import '../widgets/personal_records_section.dart';
@@ -95,15 +96,27 @@ class ProgressScreen
                       delegate:
                       SliverChildListDelegate(
                         [
-                          const _ProgressHeader(),
+                          _ProgressHeader(
+                            onLogMetrics: () {
+                              LogBodyMetricsBottomSheet.show(
+                                context,
+                                currentProgress: progress,
+                              );
+                            },
+                          ),
 
                           const SizedBox(
                             height: 24,
                           ),
 
                           _MetricsGrid(
-                            progress:
-                            progress,
+                            progress: progress,
+                            onLogMetrics: () {
+                              LogBodyMetricsBottomSheet.show(
+                                context,
+                                currentProgress: progress,
+                              );
+                            },
                           ),
 
                           const SizedBox(
@@ -144,36 +157,79 @@ class ProgressScreen
 
 class _ProgressHeader
     extends StatelessWidget {
-  const _ProgressHeader();
+  const _ProgressHeader({
+    required this.onLogMetrics,
+  });
+
+  final VoidCallback onLogMetrics;
 
   @override
   Widget build(
       BuildContext context,
       ) {
-    return Column(
-      crossAxisAlignment:
-      CrossAxisAlignment.start,
-
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(
-          'Progress',
-          style: AppTextStyles
-              .headlineLarge
-              .copyWith(
-            fontWeight:
-            FontWeight.w700,
-          ),
+        Column(
+          crossAxisAlignment:
+          CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Progress',
+              style: AppTextStyles
+                  .headlineLarge
+                  .copyWith(
+                fontWeight:
+                FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Track your fitness journey',
+              style: AppTextStyles
+                  .bodySmall
+                  .copyWith(
+                color:
+                AppColors.textSecondary,
+              ),
+            ),
+          ],
         ),
-
-        const SizedBox(height: 4),
-
-        Text(
-          'Track your fitness journey',
-          style: AppTextStyles
-              .bodySmall
-              .copyWith(
-            color:
-            AppColors.textSecondary,
+        InkWell(
+          onTap: onLogMetrics,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 8,
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFF182414),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.5),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.edit_note_rounded,
+                  color: AppColors.primary,
+                  size: 18,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Log Metrics',
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -183,11 +239,13 @@ class _ProgressHeader
 
 class _MetricsGrid
     extends StatelessWidget {
-  const   _MetricsGrid({
+  const _MetricsGrid({
     required this.progress,
+    required this.onLogMetrics,
   });
 
   final Progress progress;
+  final VoidCallback onLogMetrics;
 
   @override
   Widget build(
@@ -220,6 +278,8 @@ class _MetricsGrid
 
           change:
           progress.weightChange,
+
+          onTap: onLogMetrics,
         ),
 
         ProgressMetricCard(
@@ -233,6 +293,8 @@ class _MetricsGrid
 
           change:
           progress.bodyFatChange,
+
+          onTap: onLogMetrics,
         ),
 
         ProgressMetricCard(
@@ -246,6 +308,8 @@ class _MetricsGrid
 
           change:
           progress.muscleMassChange,
+
+          onTap: onLogMetrics,
         ),
 
         ProgressMetricCard(

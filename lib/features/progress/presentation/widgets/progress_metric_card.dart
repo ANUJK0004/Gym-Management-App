@@ -12,12 +12,14 @@ class ProgressMetricCard
     required this.value,
     required this.unit,
     required this.change,
+    this.onTap,
   });
 
   final String title;
   final String value;
   final String unit;
   final double? change;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -42,19 +44,24 @@ class ProgressMetricCard
       '$prefix${change!.toStringAsFixed(1)} vs last month';
     }
 
-    return Container(
-      padding:
-      const EdgeInsets.all(14),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.radiusMD,
+        child: Container(
+          padding:
+          const EdgeInsets.all(14),
 
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius:
-        AppRadius.radiusMD,
-        border: Border.all(
-          color: AppColors.border,
-          width: 0.5,
-        ),
-      ),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius:
+            AppRadius.radiusMD,
+            border: Border.all(
+              color: AppColors.border,
+              width: 0.5,
+            ),
+          ),
 
       child: Column(
         crossAxisAlignment:
@@ -137,6 +144,8 @@ class ProgressMetricCard
           ],
         ],
       ),
-    );
+    ),
+  ),
+);
   }
 }

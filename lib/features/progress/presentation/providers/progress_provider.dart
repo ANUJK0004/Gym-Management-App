@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
+import 'package:sweatsync/features/dashboard/member/presentation/providers/member_dashboard_provider.dart';
 
 import '../../data/datasources/progress_remote_datasource.dart';
 import '../../data/repositories/progress_repository_impl.dart';
@@ -88,6 +89,10 @@ Provider<
 
     ref.invalidate(
       progressProvider,
+    );
+
+    ref.invalidate(
+      memberDashboardProvider,
     );
   };
 });
