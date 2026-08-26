@@ -1,27 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../profile/presentation/screens/profile_screen.dart';
 import '../../../../progress/presentation/screens/progress_screen.dart';
 import '../../../../workout/presentation/screens/workout_screen.dart';
+import '../providers/member_shell_provider.dart';
 import '../widgets/dashboard_bottom_nav.dart';
 import 'member_home_screen.dart';
 
-class MemberShell extends StatefulWidget {
+class MemberShell extends ConsumerWidget {
   const MemberShell({
     super.key,
   });
 
-  @override
-  State<MemberShell> createState() =>
-      _MemberShellState();
-}
-
-class _MemberShellState
-    extends State<MemberShell> {
-
-  int _currentIndex = 0;
-
-  final List<Widget> _pages = const [
+  static const List<Widget> _pages = [
     MemberHomeScreen(),
     WorkoutScreen(),
     ProgressScreen(),
@@ -29,21 +21,27 @@ class _MemberShellState
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(memberNavIndexProvider);
 
-      bottomNavigationBar: DashboardBottomNav(
-        selectedIndex: _currentIndex,
-
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+    return PopScope(
+      canPop: currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && currentIndex != 0) {
+          ref.read(memberNavIndexProvider.notifier).setIndex(0);
+        }
+      },
+      child: Scaffold(
+        body: IndexedStack(
+          index: currentIndex,
+          children: _pages,
+        ),
+        bottomNavigationBar: DashboardBottomNav(
+          selectedIndex: currentIndex,
+          onDestinationSelected: (index) {
+            ref.read(memberNavIndexProvider.notifier).setIndex(index);
+          },
+        ),
       ),
     );
   }

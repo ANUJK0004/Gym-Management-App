@@ -6,6 +6,7 @@ import 'package:sweatsync/app/routes/app_routes.dart';
 import 'package:sweatsync/app/theme/app_colors.dart';
 import 'package:sweatsync/app/theme/app_radius.dart';
 import 'package:sweatsync/app/theme/app_text_styles.dart';
+import 'package:sweatsync/design_system/appbar/app_back_button.dart';
 import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sweatsync/features/membership_plan/domain/entities/membership_plan.dart';
 import 'package:sweatsync/features/membership_plan/presentation/providers/membership_plan_provider.dart';
@@ -305,21 +306,29 @@ class OwnerSettingsScreen extends ConsumerWidget {
   }
 
   Widget _buildHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Text(
-          'Settings',
-          style: AppTextStyles.headlineMedium.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
+        const AppBackButton(
+          fallbackRoute: AppRoutes.ownerHome,
         ),
-        const SizedBox(height: 3),
-        Text(
-          'GymSync Admin Console',
-          style: AppTextStyles.labelMedium.copyWith(
-            color: AppColors.textSecondary,
-          ),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Settings',
+              style: AppTextStyles.headlineMedium.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              'GymSync Admin Console',
+              style: AppTextStyles.labelMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
         ),
       ],
     );

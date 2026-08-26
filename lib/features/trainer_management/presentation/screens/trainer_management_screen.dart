@@ -6,6 +6,7 @@ import 'package:sweatsync/app/routes/app_routes.dart';
 import 'package:sweatsync/app/theme/app_colors.dart';
 import 'package:sweatsync/app/theme/app_radius.dart';
 import 'package:sweatsync/app/theme/app_text_styles.dart';
+import 'package:sweatsync/design_system/appbar/app_back_button.dart';
 
 import '../../domain/entities/managed_trainer.dart';
 import '../../domain/entities/trainer_enrollment.dart';
@@ -164,27 +165,8 @@ class _TrainerManagementScreenState
       ) {
     return Row(
       children: [
-        Material(
-          color: AppColors.surface,
-          shape:
-          const CircleBorder(),
-          child: InkWell(
-            customBorder:
-            const CircleBorder(),
-            onTap: () =>
-                context.pop(),
-            child:
-            const SizedBox(
-              width: 38,
-              height: 38,
-              child: Icon(
-                Icons.chevron_left_rounded,
-                size: 22,
-                color:
-                AppColors.textPrimary,
-              ),
-            ),
-          ),
+        const AppBackButton(
+          fallbackRoute: AppRoutes.ownerHome,
         ),
 
         const SizedBox(width: 12),

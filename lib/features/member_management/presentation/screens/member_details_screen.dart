@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:sweatsync/app/routes/app_routes.dart';
 import 'package:sweatsync/app/theme/app_colors.dart';
 import 'package:sweatsync/app/theme/app_radius.dart';
 import 'package:sweatsync/app/theme/app_text_styles.dart';
+import 'package:sweatsync/design_system/appbar/app_back_button.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../gym/presentation/providers/gym_provider.dart';
@@ -59,6 +61,12 @@ class MemberDetailsScreen
       AppColors.background,
 
       appBar: AppBar(
+        leadingWidth: 56,
+        leading: const Center(
+          child: AppBackButton(
+            fallbackRoute: AppRoutes.memberManagement,
+          ),
+        ),
         title: const Text(
           'Member Details',
         ),

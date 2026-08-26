@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../app/routes/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../design_system/appbar/app_back_button.dart';
 import '../../../gym/presentation/providers/gym_provider.dart';
 import '../../domain/entities/attendance_record.dart';
 import '../../domain/entities/daily_qr_payload.dart';
@@ -118,22 +119,8 @@ class _OwnerAttendanceScreenState extends ConsumerState<OwnerAttendanceScreen> {
   Widget _buildHeader(BuildContext context, dynamic gym) {
     return Row(
       children: [
-        Material(
-          color: AppColors.surface,
-          shape: const CircleBorder(),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: () => context.pop(),
-            child: const SizedBox(
-              width: 38,
-              height: 38,
-              child: Icon(
-                Icons.chevron_left_rounded,
-                size: 22,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
+        const AppBackButton(
+          fallbackRoute: AppRoutes.ownerHome,
         ),
         const SizedBox(width: 12),
         Expanded(

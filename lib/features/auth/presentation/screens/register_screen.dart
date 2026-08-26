@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:sweatsync/app/routes/app_routes.dart';
 import 'package:sweatsync/core/enums/app_role.dart';
 import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
 
+import '../../../../design_system/appbar/app_back_button.dart';
 import '../../../../design_system/buttons/primary_button.dart';
 import '../../../../design_system/inputs/app_text_field.dart';
 
@@ -76,6 +78,12 @@ class _RegisterScreenState
 
     return Scaffold(
       appBar: AppBar(
+        leadingWidth: 56,
+        leading: const Center(
+          child: AppBackButton(
+            fallbackRoute: AppRoutes.roleSelection,
+          ),
+        ),
         title: Text(
           'Create ${_formatRole(widget.role)} Account',
         ),

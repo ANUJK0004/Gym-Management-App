@@ -8,6 +8,7 @@ import '../../../../app/routes/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../design_system/appbar/app_back_button.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../dashboard/member/presentation/providers/member_dashboard_provider.dart';
 import '../../../progress/presentation/providers/progress_provider.dart';
@@ -105,28 +106,12 @@ class _WorkoutSessionScreenState
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                // Back Button (Dark circular button with <)
-                InkWell(
-                  onTap: () => _showExitConfirmation(context),
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E1E),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFF2C2C2C),
-                        width: 1,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ),
+                // Back Button
+                AppBackButton(
+                  onPressed: () => _showExitConfirmation(context),
                 ),
+
+                const SizedBox(width: 8),
 
                 // Centered Title & Subtitle
                 Expanded(

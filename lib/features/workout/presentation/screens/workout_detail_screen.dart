@@ -6,6 +6,7 @@ import '../../../../app/routes/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../design_system/appbar/app_back_button.dart';
 import '../providers/workout_provider.dart';
 import '../widgets/add_exercise_sheet.dart';
 
@@ -31,24 +32,10 @@ class WorkoutDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12),
-          child: InkWell(
-            onTap: () => Navigator.of(context).pop(),
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              margin: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF2C2C2C)),
-              ),
-              child: const Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Colors.white,
-                size: 16,
-              ),
-            ),
+        leadingWidth: 56,
+        leading: const Center(
+          child: AppBackButton(
+            fallbackRoute: AppRoutes.home,
           ),
         ),
         title: const Text(

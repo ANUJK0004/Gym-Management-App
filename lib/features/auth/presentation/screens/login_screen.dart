@@ -6,6 +6,7 @@ import 'package:sweatsync/app/routes/app_routes.dart';
 import 'package:sweatsync/core/enums/app_role.dart';
 import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
 
+import '../../../../design_system/appbar/app_back_button.dart';
 import '../../../../design_system/buttons/primary_button.dart';
 import '../../../../design_system/inputs/app_text_field.dart';
 
@@ -78,96 +79,99 @@ class _LoginScreenState
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding:
-          const EdgeInsets.all(24),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 16,
+          ),
           child: Column(
-            mainAxisAlignment:
-            MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              Text(
-                'Welcome Back',
-                style:
-                const TextStyle(
-                  fontSize: 28,
-                  fontWeight:
-                  FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(
-                height: 8,
-              ),
-
-              Text(
-                'Login as ${_formatRole(widget.role)}',
+              AppBackButton(
+                fallbackRoute: AppRoutes.roleSelection,
               ),
 
               const SizedBox(
                 height: 32,
               ),
 
-              AppTextField(
-                controller:
-                _emailController,
-                label: 'Email',
-                hint:
-                'Enter your email',
-                prefixIcon:
-                Icons.email_outlined,
-              ),
+              Center(
+                child: Column(
+                  children: [
+                    const Text(
+                      'Welcome Back',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
 
-              const SizedBox(
-                height: 16,
-              ),
+                    const SizedBox(
+                      height: 8,
+                    ),
 
-              AppTextField(
-                controller:
-                _passwordController,
-                label: 'Password',
-                hint:
-                'Enter your password',
-                prefixIcon:
-                Icons.lock_outline,
-                obscureText: true,
-              ),
+                    Text(
+                      'Login as ${_formatRole(widget.role)}',
+                    ),
 
-              const SizedBox(
-                height: 24,
-              ),
+                    const SizedBox(
+                      height: 32,
+                    ),
 
-              PrimaryButton(
-                text: 'Login',
-                isLoading:
-                authState.isLoading,
-                onPressed: _login,
-              ),
+                    AppTextField(
+                      controller: _emailController,
+                      label: 'Email',
+                      hint: 'Enter your email',
+                      prefixIcon: Icons.email_outlined,
+                    ),
 
-              const SizedBox(
-                height: 16,
-              ),
+                    const SizedBox(
+                      height: 16,
+                    ),
 
-              TextButton(
-                onPressed: () {
-                  // Forgot password
-                },
-                child:
-                const Text(
-                  'Forgot Password?',
-                ),
-              ),
+                    AppTextField(
+                      controller: _passwordController,
+                      label: 'Password',
+                      hint: 'Enter your password',
+                      prefixIcon: Icons.lock_outline,
+                      obscureText: true,
+                    ),
 
-              TextButton(
-                onPressed: () {
-                  context.push(
-                    AppRoutes.register,
-                    extra: widget.role,
-                  );
-                },
-                child:
-                const Text(
-                  'Create an Account',
+                    const SizedBox(
+                      height: 24,
+                    ),
+
+                    PrimaryButton(
+                      text: 'Login',
+                      isLoading: authState.isLoading,
+                      onPressed: _login,
+                    ),
+
+                    const SizedBox(
+                      height: 16,
+                    ),
+
+                    TextButton(
+                      onPressed: () {
+                        // Forgot password
+                      },
+                      child: const Text(
+                        'Forgot Password?',
+                      ),
+                    ),
+
+                    TextButton(
+                      onPressed: () {
+                        context.push(
+                          AppRoutes.register,
+                          extra: widget.role,
+                        );
+                      },
+                      child: const Text(
+                        'Create an Account',
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

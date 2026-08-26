@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:sweatsync/app/routes/app_routes.dart';
 import 'package:sweatsync/app/theme/app_colors.dart';
 import 'package:sweatsync/app/theme/app_radius.dart';
 import 'package:sweatsync/app/theme/app_text_styles.dart';
+import 'package:sweatsync/design_system/appbar/app_back_button.dart';
 
 import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
 
@@ -29,6 +31,12 @@ class GymManagementScreen
       AppColors.background,
 
       appBar: AppBar(
+        leadingWidth: 56,
+        leading: const Center(
+          child: AppBackButton(
+            fallbackRoute: AppRoutes.ownerHome,
+          ),
+        ),
         title: const Text(
           'Gym Management',
         ),

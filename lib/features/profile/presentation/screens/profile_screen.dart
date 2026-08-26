@@ -7,6 +7,7 @@ import '../../../../app/routes/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../design_system/appbar/app_back_button.dart';
 
 import '../../../membership/presentation/providers/membership_provider.dart';
 import '../../../progress/domain/entities/progress.dart';
@@ -215,11 +216,8 @@ class _ProfileTopBar
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _RoundIconButton(
-          icon: Icons.arrow_back_ios_new_rounded,
-          onPressed: () {
-            Navigator.of(context).maybePop();
-          },
+        const AppBackButton(
+          fallbackRoute: AppRoutes.home,
         ),
 
         const Spacer(),

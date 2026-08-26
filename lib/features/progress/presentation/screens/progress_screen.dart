@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/routes/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../design_system/appbar/app_back_button.dart';
 
 import '../../domain/entities/progress.dart';
 
@@ -171,28 +173,37 @@ class _ProgressHeader
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Column(
-          crossAxisAlignment:
-          CrossAxisAlignment.start,
+        Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Progress',
-              style: AppTextStyles
-                  .headlineLarge
-                  .copyWith(
-                fontWeight:
-                FontWeight.w700,
-              ),
+            const AppBackButton(
+              fallbackRoute: AppRoutes.home,
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Track your fitness journey',
-              style: AppTextStyles
-                  .bodySmall
-                  .copyWith(
-                color:
-                AppColors.textSecondary,
-              ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Progress',
+                  style: AppTextStyles
+                      .headlineMedium
+                      .copyWith(
+                    fontWeight:
+                    FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Track your fitness journey',
+                  style: AppTextStyles
+                      .bodySmall
+                      .copyWith(
+                    color:
+                    AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

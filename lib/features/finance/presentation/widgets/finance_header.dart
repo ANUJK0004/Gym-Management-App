@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/routes/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../design_system/appbar/app_back_button.dart';
 
 class FinanceHeader extends StatelessWidget {
   const FinanceHeader({
@@ -16,6 +18,10 @@ class FinanceHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        const AppBackButton(
+          fallbackRoute: AppRoutes.ownerHome,
+        ),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

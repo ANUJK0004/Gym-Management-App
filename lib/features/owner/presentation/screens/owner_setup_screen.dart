@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../design_system/appbar/app_back_button.dart';
 import '../../../../design_system/buttons/primary_button.dart';
 import '../../../../design_system/inputs/app_text_field.dart';
 
@@ -146,6 +147,10 @@ class _OwnerSetupScreenState
 
     return Scaffold(
       appBar: AppBar(
+        leadingWidth: 56,
+        leading: const Center(
+          child: AppBackButton(),
+        ),
         title: const Text(
           'Set Up Your Gym',
         ),
