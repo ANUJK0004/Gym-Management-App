@@ -9,6 +9,8 @@ import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
 
 import '../../../membership/presentation/providers/membership_provider.dart';
+import '../../../progress/domain/entities/progress.dart';
+import '../../../progress/presentation/providers/progress_provider.dart';
 import '../../domain/entities/user_profile.dart';
 import '../providers/current_user_profile_provider.dart';
 import 'edit_profile_screen.dart';
@@ -27,6 +29,8 @@ class ProfileScreen extends ConsumerWidget {
     ref.watch(currentUserProfileProvider);
     final membershipAsync =
     ref.watch(activeMembershipProvider);
+    final progressAsync =
+    ref.watch(progressProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -71,12 +75,19 @@ class ProfileScreen extends ConsumerWidget {
                   activeMembershipProvider,
                 );
 
+                ref.invalidate(
+                  progressProvider,
+                );
+
                 await Future.wait([
                   ref.read(
                     currentUserProfileProvider.future,
                   ),
                   ref.read(
                     activeMembershipProvider.future,
+                  ),
+                  ref.read(
+                    progressProvider.future,
                   ),
                 ]);
               },
@@ -122,7 +133,9 @@ class ProfileScreen extends ConsumerWidget {
                             height: 22,
                           ),
 
-                          _ProfileStats(),
+                          _ProfileStats(
+                            progressAsync: progressAsync,
+                          ),
 
                           const SizedBox(
                             height: 28,
@@ -411,7 +424,7 @@ class _ProfileBadges
 
       children: [
         _Badge(
-          text: 'Member',
+          text: _formatRole(profile.role),
           isPrimary: true,
         ),
 
@@ -489,41 +502,117 @@ class _Badge
 
 class _ProfileStats
     extends StatelessWidget {
-  const _ProfileStats();
+  const _ProfileStats({
+    required this.progressAsync,
+  });
+
+  final AsyncValue<Progress> progressAsync;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _StatItem(
-            value: '--',
-            label: 'Workouts',
+    return progressAsync.when(
+      loading: () => Row(
+        children: const [
+          Expanded(
+            child: _StatItem(
+              value: '--',
+              label: 'Workouts',
+            ),
           ),
-        ),
-
-        const SizedBox(
-          width: 10,
-        ),
-
-        Expanded(
-          child: _StatItem(
-            value: '--',
-            label: 'This Month',
+          SizedBox(
+            width: 10,
           ),
-        ),
-
-        const SizedBox(
-          width: 10,
-        ),
-
-        Expanded(
-          child: _StatItem(
-            value: '--',
-            label: 'Lost Total',
+          Expanded(
+            child: _StatItem(
+              value: '--',
+              label: 'This Month',
+            ),
           ),
-        ),
-      ],
+          SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            child: _StatItem(
+              value: '--',
+              label: 'Lost Total',
+            ),
+          ),
+        ],
+      ),
+      error: (error, stackTrace) => Row(
+        children: const [
+          Expanded(
+            child: _StatItem(
+              value: '0',
+              label: 'Workouts',
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            child: _StatItem(
+              value: '0',
+              label: 'This Month',
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            child: _StatItem(
+              value: '0.0 kg',
+              label: 'Lost Total',
+            ),
+          ),
+        ],
+      ),
+      data: (progress) {
+        final totalWorkouts = progress.totalWorkouts.toString();
+        final thisMonth = progress.workoutChange.toString();
+
+        String lostTotal;
+        if (progress.weightChange < 0) {
+          lostTotal = '-${progress.weightChange.abs().toStringAsFixed(1)} kg';
+        } else if (progress.weightChange > 0) {
+          lostTotal = '+${progress.weightChange.toStringAsFixed(1)} kg';
+        } else {
+          lostTotal = '0.0 kg';
+        }
+
+        return Row(
+          children: [
+            Expanded(
+              child: _StatItem(
+                value: totalWorkouts,
+                label: 'Workouts',
+              ),
+            ),
+
+            const SizedBox(
+              width: 10,
+            ),
+
+            Expanded(
+              child: _StatItem(
+                value: thisMonth,
+                label: 'This Month',
+              ),
+            ),
+
+            const SizedBox(
+              width: 10,
+            ),
+
+            Expanded(
+              child: _StatItem(
+                value: lostTotal,
+                label: 'Lost Total',
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -1245,4 +1334,14 @@ String _formatDate(
   return '${date.day.toString().padLeft(2, '0')}/'
       '${date.month.toString().padLeft(2, '0')}/'
       '${date.year}';
+}
+
+String _formatRole(
+    String? role,
+    ) {
+  if (role == null || role.trim().isEmpty) {
+    return 'Member';
+  }
+
+  return role[0].toUpperCase() + role.substring(1).toLowerCase();
 }

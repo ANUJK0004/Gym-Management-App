@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 
+import '../../../dashboard/member/presentation/providers/member_dashboard_provider.dart';
+import '../../../progress/presentation/providers/progress_provider.dart';
 import '../../domain/entities/user_profile.dart';
 import '../providers/current_user_profile_provider.dart';
 import '../providers/profile_edit_provider.dart';
@@ -106,6 +108,12 @@ class _EditProfileScreenState
 
       ref.invalidate(
         currentUserProfileProvider,
+      );
+      ref.invalidate(
+        progressProvider,
+      );
+      ref.invalidate(
+        memberDashboardProvider,
       );
 
       if (!mounted) {
