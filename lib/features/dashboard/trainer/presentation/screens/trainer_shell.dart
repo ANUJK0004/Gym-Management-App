@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../profile/presentation/screens/profile_screen.dart';
+import 'package:sweatsync/features/trainer_schedule/presentation/screens/trainer_schedule_screen.dart';
 import '../providers/trainer_shell_provider.dart';
 import '../widgets/trainer_bottom_nav.dart';
 import 'trainer_clients_screen.dart';
 import 'trainer_home_screen.dart';
-import 'trainer_schedule_screen.dart';
 
 class TrainerShell extends ConsumerWidget {
   const TrainerShell({super.key});
