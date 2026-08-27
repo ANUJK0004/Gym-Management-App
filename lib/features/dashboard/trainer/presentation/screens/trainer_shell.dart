@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../profile/presentation/screens/profile_screen.dart';
+import 'package:sweatsync/features/trainer_profile/presentation/screens/trainer_profile_screen.dart';
 import 'package:sweatsync/features/client_management/presentation/screens/trainer_clients_screen.dart';
 import 'package:sweatsync/features/trainer_schedule/presentation/screens/trainer_schedule_screen.dart';
 import '../providers/trainer_shell_provider.dart';
@@ -15,7 +15,7 @@ class TrainerShell extends ConsumerWidget {
     TrainerHomeScreen(),
     TrainerScheduleScreen(),
     TrainerClientsScreen(),
-    ProfileScreen(),
+    TrainerProfileScreen(),
   ];
 
   @override

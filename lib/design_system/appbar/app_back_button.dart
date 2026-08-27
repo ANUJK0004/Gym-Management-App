@@ -6,6 +6,7 @@ import '../../app/routes/app_routes.dart';
 import '../../app/theme/app_colors.dart';
 import '../../features/dashboard/member/presentation/providers/member_shell_provider.dart';
 import '../../features/dashboard/owner/presentation/providers/owner_shell_provider.dart';
+import '../../features/dashboard/trainer/presentation/providers/trainer_shell_provider.dart';
 import '../../features/profile/presentation/providers/current_user_profile_provider.dart';
 
 class AppBackButton extends ConsumerWidget {
@@ -59,6 +60,8 @@ class AppBackButton extends ConsumerWidget {
         ref.read(memberNavIndexProvider.notifier).setIndex(0);
       } else if (fallbackRoute == AppRoutes.ownerHome) {
         ref.read(ownerNavIndexProvider.notifier).setIndex(0);
+      } else if (fallbackRoute == AppRoutes.trainerHome) {
+        ref.read(trainerNavIndexProvider.notifier).setIndex(0);
       }
       context.go(fallbackRoute!);
       return;
@@ -69,6 +72,7 @@ class AppBackButton extends ConsumerWidget {
       ref.read(ownerNavIndexProvider.notifier).setIndex(0);
       context.go(AppRoutes.ownerHome);
     } else if (role == 'trainer') {
+      ref.read(trainerNavIndexProvider.notifier).setIndex(0);
       context.go(AppRoutes.trainerHome);
     } else {
       ref.read(memberNavIndexProvider.notifier).setIndex(0);

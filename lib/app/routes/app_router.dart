@@ -17,6 +17,7 @@ import '../../core/enums/app_role.dart';
 import '../../features/attendance/presentation/screens/owner_attendance_screen.dart';
 import '../../features/dashboard/owner/presentation/screens/owner_shell.dart';
 import '../../features/dashboard/trainer/presentation/screens/trainer_shell.dart';
+import '../../features/trainer_profile/presentation/screens/trainer_profile_screen.dart';
 import '../../features/client_management/domain/entities/trainer_client.dart';
 import '../../features/client_management/presentation/screens/client_details_screen.dart';
 import '../../features/client_management/presentation/screens/trainer_clients_screen.dart';
@@ -506,6 +507,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final client = state.extra as TrainerClient;
           return ClientDetailsScreen(client: client);
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.trainerProfile,
+        builder: (context, state) {
+          return const TrainerProfileScreen();
         },
       ),
     ],

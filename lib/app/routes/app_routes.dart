@@ -29,5 +29,6 @@ class AppRoutes {
   static const String ownerAttendance = '/owner/attendance';
   static const String trainerClients = '/trainer/clients';
   static const String clientDetails = '/trainer/clients/details';
+  static const String trainerProfile = '/trainer/profile';
 
 }
