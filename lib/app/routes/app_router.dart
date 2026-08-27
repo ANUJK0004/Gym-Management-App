@@ -181,6 +181,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             return AppRoutes.home;
           }
         }
+
+        if (profile.role == 'trainer') {
+          if (isSplash ||
+              isAuthPage ||
+              isProfileSetup) {
+            return AppRoutes.trainerHome;
+          }
+        }
       }
       return null;
     },
