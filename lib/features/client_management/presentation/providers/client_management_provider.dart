@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/datasources/client_management_mock_datasource.dart';
+import '../../data/datasources/client_management_datasource.dart';
+import '../../data/datasources/client_management_remote_datasource.dart';
 import '../../data/repositories/client_management_repository_impl.dart';
 import '../../domain/entities/trainer_client.dart';
 import '../../domain/repositories/client_management_repository.dart';
@@ -80,8 +83,11 @@ class ClientManagementState {
 }
 
 final clientManagementDatasourceProvider =
-    Provider<ClientManagementMockDatasource>((ref) {
-  return ClientManagementMockDatasource();
+    Provider<ClientManagementDatasource>((ref) {
+  return ClientManagementRemoteDatasource(
+    FirebaseFirestore.instance,
+    FirebaseAuth.instance,
+  );
 });
 
 final clientManagementRepositoryProvider =

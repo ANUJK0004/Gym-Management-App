@@ -124,10 +124,14 @@ class TrainerHomeScreen extends ConsumerWidget {
                           TrainerNextSessionCard(
                             session: dashboard.nextSession,
                             onStart: () {
-                              _showStartSessionDialog(
-                                context,
-                                dashboard.nextSession?.clientName ?? 'Client',
-                              );
+                              if (dashboard.nextSession != null) {
+                                _showStartSessionDialog(
+                                  context,
+                                  ref,
+                                  dashboard.nextSession!.id,
+                                  dashboard.nextSession!.clientName,
+                                );
+                              }
                             },
                           ),
 
@@ -198,7 +202,12 @@ class TrainerHomeScreen extends ConsumerWidget {
     );
   }
 
-  void _showStartSessionDialog(BuildContext context, String clientName) {
+  void _showStartSessionDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String sessionId,
+    String clientName,
+  ) {
     showDialog(
       context: context,
       builder: (context) {
@@ -241,24 +250,30 @@ class TrainerHomeScreen extends ConsumerWidget {
               ),
             ),
             FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    backgroundColor: const Color(0xFF38BDF8),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    content: Text(
-                      'Session with $clientName started! ⏱️',
-                      style: const TextStyle(
-                        color: Color(0xFF0B132B),
-                        fontWeight: FontWeight.w700,
+                await ref
+                    .read(trainerDashboardControllerProvider.notifier)
+                    .startSession(sessionId);
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: const Color(0xFF38BDF8),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      content: Text(
+                        'Session with $clientName started in Firestore! ⏱️',
+                        style: const TextStyle(
+                          color: Color(0xFF0B132B),
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                  ),
-                );
+                  );
+                }
               },
               style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFF38BDF8),
