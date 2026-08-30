@@ -78,7 +78,9 @@ class MemberDetailsScreen
         loading: () =>
         const Center(
           child:
-          CircularProgressIndicator(),
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+          ),
         ),
 
         error: (
@@ -179,7 +181,7 @@ class MemberDetailsScreen
                       CircleAvatar(
                         radius: 42,
                         backgroundColor:
-                        AppColors.primary
+                        AppColors.owner
                             .withValues(
                           alpha: 0.12,
                         ),
@@ -203,7 +205,7 @@ class MemberDetailsScreen
                           size: 40,
                           color:
                           AppColors
-                              .primary,
+                              .owner,
                         )
                             : null,
                       ),
@@ -341,7 +343,9 @@ class MemberDetailsScreen
                     const Padding(
                       padding:
                       EdgeInsets.all(24),
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+                      ),
                     )
                   else if (plansAsync.hasError)
                       _MembershipEmptyCard(
@@ -413,6 +417,11 @@ class MemberDetailsScreen
                     double.infinity,
                     child:
                     ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: member.isAssignedToGym ? Colors.red.shade800 : AppColors.owner,
+                        foregroundColor: member.isAssignedToGym ? Colors.white : Colors.black,
+                        textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
                       onPressed:
                       isBusy
                           ? null
@@ -867,7 +876,7 @@ class _MembershipPlanPicker
                               decoration:
                               BoxDecoration(
                                 color: AppColors
-                                    .primary
+                                    .owner
                                     .withValues(
                                   alpha: 0.12,
                                 ),
@@ -882,7 +891,7 @@ class _MembershipPlanPicker
                                 Icons
                                     .card_membership_rounded,
                                 color:
-                                AppColors.primary,
+                                AppColors.owner,
                               ),
                             ),
 
@@ -1008,7 +1017,7 @@ class _CurrentMembershipCard
                 Icons
                     .card_membership_rounded,
                 color:
-                AppColors.primary,
+                AppColors.owner,
               ),
 
               const SizedBox(
@@ -1178,7 +1187,7 @@ class _NoMembershipCard
             Icons
                 .card_membership_outlined,
             color:
-            AppColors.primary,
+            AppColors.owner,
             size: 30,
           ),
 
@@ -1223,6 +1232,11 @@ class _NoMembershipCard
             width: double.infinity,
             child:
             ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.owner,
+                foregroundColor: Colors.black,
+                textStyle: const TextStyle(fontWeight: FontWeight.w700),
+              ),
               onPressed:
               isBusy
                   ? null
@@ -1467,7 +1481,7 @@ class _InfoTile
           Icon(
             icon,
             color:
-            AppColors.primary,
+            AppColors.owner,
           ),
 
           const SizedBox(

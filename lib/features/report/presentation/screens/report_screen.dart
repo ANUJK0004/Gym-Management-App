@@ -38,6 +38,7 @@ class ReportScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: RefreshIndicator(
+          color: AppColors.owner,
           onRefresh: () async {
             ref.invalidate(
               reportDashboardDataProvider,
@@ -50,7 +51,9 @@ class ReportScreen extends ConsumerWidget {
           child: dashboardAsync.when(
             loading: () {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+                ),
               );
             },
             error: (
@@ -550,7 +553,7 @@ class _ErrorView extends StatelessWidget {
             const Icon(
               Icons.analytics_outlined,
               size: 48,
-              color: AppColors.primary,
+              color: AppColors.owner,
             ),
 
             const SizedBox(
@@ -587,6 +590,11 @@ class _ErrorView extends StatelessWidget {
             ),
 
             ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.owner,
+                foregroundColor: Colors.black,
+                textStyle: const TextStyle(fontWeight: FontWeight.w700),
+              ),
               onPressed: onRetry,
               icon: const Icon(
                 Icons.refresh,

@@ -1,15 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../data/datasources/trainer_profile_remote_datasource.dart';
 import '../../data/repositories/trainer_profile_repository_impl.dart';
 import '../../domain/entities/trainer_profile.dart';
 import '../../domain/repositories/trainer_profile_repository.dart';
 
+final trainerProfileFirestoreProvider = Provider<FirebaseFirestore>((ref) {
+  return FirebaseFirestore.instance;
+});
+
 final trainerProfileRemoteDataSourceProvider =
     Provider<TrainerProfileRemoteDataSource>((ref) {
-  return TrainerProfileRemoteDataSource(FirebaseFirestore.instance);
+  try {
+    final firestore = ref.watch(trainerProfileFirestoreProvider);
+    final auth = ref.watch(firebaseAuthProvider);
+    return TrainerProfileRemoteDataSource(firestore, auth);
+  } catch (_) {
+    return TrainerProfileRemoteDataSource();
+  }
 });
 
 final trainerProfileRepositoryProvider =
@@ -19,10 +29,24 @@ final trainerProfileRepositoryProvider =
   );
 });
 
+final trainerProfileStreamProvider =
+    StreamProvider.autoDispose<TrainerProfile>((ref) {
+  String trainerId = 'trainer_001';
+  try {
+    final user = ref.watch(firebaseAuthProvider).currentUser;
+    if (user != null && user.uid.isNotEmpty) {
+      trainerId = user.uid;
+    }
+  } catch (_) {}
+
+  final repository = ref.watch(trainerProfileRepositoryProvider);
+  return repository.watchProfile(trainerId: trainerId);
+});
+
 class TrainerProfileController extends AsyncNotifier<TrainerProfile> {
   late final TrainerProfileRepository _repository;
 
-  String _getTrainerId() {
+  String _resolveTrainerId() {
     try {
       final user = ref.read(firebaseAuthProvider).currentUser;
       if (user != null && user.uid.isNotEmpty) {
@@ -35,13 +59,15 @@ class TrainerProfileController extends AsyncNotifier<TrainerProfile> {
   @override
   Future<TrainerProfile> build() async {
     _repository = ref.watch(trainerProfileRepositoryProvider);
-    return _repository.getProfile(trainerId: _getTrainerId());
+    final trainerId = _resolveTrainerId();
+    return _repository.getProfile(trainerId: trainerId);
   }
 
   Future<void> loadProfile() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      return _repository.getProfile(trainerId: _getTrainerId());
+      final trainerId = _resolveTrainerId();
+      return _repository.getProfile(trainerId: trainerId);
     });
   }
 

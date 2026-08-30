@@ -123,7 +123,7 @@ class AddMemberMembershipStep
                     BoxDecoration(
                       color: selected
                           ? AppColors
-                          .primary
+                          .owner
                           : AppColors
                           .background,
                       borderRadius:
@@ -135,7 +135,7 @@ class AddMemberMembershipStep
                       Border.all(
                         color: selected
                             ? AppColors
-                            .primary
+                            .owner
                             : AppColors
                             .border,
                       ),
@@ -194,14 +194,14 @@ class AddMemberMembershipStep
         BoxDecoration(
           color: selected
               ? const Color(
-            0xFF1D2A1B,
+            0xFF332314,
           )
               : AppColors.background,
           borderRadius:
           AppRadius.radiusLG,
           border: Border.all(
             color: selected
-                ? AppColors.primary
+                ? AppColors.owner
                 : AppColors.border,
           ),
         ),
@@ -219,7 +219,7 @@ class AddMemberMembershipStep
                       .radio_button_off,
                   size: 17,
                   color: selected
-                      ? AppColors.primary
+                      ? AppColors.owner
                       : AppColors
                       .textSecondary,
                 ),
@@ -240,7 +240,7 @@ class AddMemberMembershipStep
                   style:
                   const TextStyle(
                     color:
-                    AppColors.primary,
+                    AppColors.owner,
                     fontSize: 14,
                     fontWeight:
                     FontWeight.w800,
@@ -336,7 +336,7 @@ class AddMemberMembershipStep
                 const ColorScheme
                     .dark(
                   primary:
-                  AppColors.primary,
+                  AppColors.owner,
                 ),
               ),
               child: child!,

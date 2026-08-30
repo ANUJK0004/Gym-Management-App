@@ -670,11 +670,11 @@ class _ReportExportSheetState
                 style:
                 ElevatedButton.styleFrom(
                   backgroundColor:
-                  AppColors.primary,
+                  AppColors.owner,
                   foregroundColor:
                   Colors.black,
                   disabledBackgroundColor:
-                  AppColors.primary
+                  AppColors.owner
                       .withValues(
                     alpha: 0.35,
                   ),

@@ -21,6 +21,7 @@ class AppTextField extends StatelessWidget {
     this.enabled = true,
     this.readOnly = false,
     this.maxLines = 1,
+    this.focusedColor,
   });
 
   final TextEditingController controller;
@@ -37,9 +38,12 @@ class AppTextField extends StatelessWidget {
   final bool enabled;
   final bool readOnly;
   final int maxLines;
+  final Color? focusedColor;
 
   @override
   Widget build(BuildContext context) {
+    final activeColor = focusedColor ?? AppColors.primary;
+
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
@@ -52,7 +56,7 @@ class AppTextField extends StatelessWidget {
       readOnly: readOnly,
       maxLines: maxLines,
       style: AppTextStyles.bodyLarge,
-      cursorColor: AppColors.primary,
+      cursorColor: activeColor,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -68,7 +72,7 @@ class AppTextField extends StatelessWidget {
         ),
         labelStyle: AppTextStyles.bodyMedium,
         floatingLabelStyle: AppTextStyles.bodyMedium.copyWith(
-          color: AppColors.primary,
+          color: activeColor,
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
@@ -90,8 +94,8 @@ class AppTextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.radiusMD,
-          borderSide: const BorderSide(
-            color: AppColors.primary,
+          borderSide: BorderSide(
+            color: activeColor,
             width: 1.5,
           ),
         ),

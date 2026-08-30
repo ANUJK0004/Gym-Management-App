@@ -364,6 +364,8 @@ class _MembershipPlanFormState
                 SwitchListTile(
                   contentPadding:
                   EdgeInsets.zero,
+                  activeThumbColor: AppColors.owner,
+                  activeTrackColor: AppColors.owner.withValues(alpha: 0.5),
                   title:
                   const Text(
                     'Active Plan',
@@ -398,6 +400,11 @@ class _MembershipPlanFormState
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.owner,
+                    foregroundColor: Colors.black,
+                    textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
                   onPressed:
                   state.isLoading
                       ? null
@@ -410,6 +417,7 @@ class _MembershipPlanFormState
                     child:
                     CircularProgressIndicator(
                       strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                     ),
                   )
                       : Text(

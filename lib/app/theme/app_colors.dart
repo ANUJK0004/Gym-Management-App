@@ -10,6 +10,15 @@ class AppColors {
   static const Color primaryDark = Color(0xFF5FD62D);
   static const Color primaryLight = Color(0xFFA2F779);
 
+  // Role Theme Colors
+  static const Color roleMember = Color(0xFF7CF04A);
+  static const Color roleTrainer = Color(0xFF38BDF8);
+  static const Color roleOwner = Color(0xFFFF9800);
+
+  static const Color member = Color(0xFF7CF04A);
+  static const Color trainer = Color(0xFF38BDF8);
+  static const Color owner = Color(0xFFFF9800);
+
   // Background Colors
 
   static const Color background = Color(0xFF111111);

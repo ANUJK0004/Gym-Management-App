@@ -1,17 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../domain/entities/trainer_profile.dart';
 import '../models/trainer_profile_model.dart';
 
 class TrainerProfileRemoteDataSource {
-  TrainerProfileRemoteDataSource([this._firestore]);
+  TrainerProfileRemoteDataSource([
+    this._firestore,
+    this._auth,
+  ]);
 
   final FirebaseFirestore? _firestore;
-
-  CollectionReference<Map<String, dynamic>>? get _trainerProfilesCollection =>
-      _firestore?.collection('trainer_profiles');
-
-  CollectionReference<Map<String, dynamic>>? get _usersCollection =>
-      _firestore?.collection('users');
+  final FirebaseAuth? _auth;
 
   static const TrainerProfileModel _defaultProfile = TrainerProfileModel(
     id: 'trainer_001',
@@ -85,94 +85,232 @@ class TrainerProfileRemoteDataSource {
     _currentProfile = _defaultProfile;
   }
 
-  Future<TrainerProfileModel> getProfile({required String trainerId}) async {
-    if (_firestore == null) {
-      await Future.delayed(const Duration(milliseconds: 50));
+  CollectionReference<Map<String, dynamic>>? get _usersCollection =>
+      _firestore?.collection('users');
+
+  String resolveEffectiveTrainerId(String? trainerId) {
+    if (trainerId != null && trainerId.isNotEmpty) {
+      return trainerId;
+    }
+    return _auth?.currentUser?.uid ?? 'trainer_001';
+  }
+
+  // ===========================================================================
+  // REAL-TIME STREAM WATCH PROFILE
+  // ===========================================================================
+
+  Stream<TrainerProfileModel> watchProfile({String? trainerId}) {
+    final effectiveId = resolveEffectiveTrainerId(trainerId);
+    final collection = _usersCollection;
+
+    if (collection == null) {
+      return Stream.value(_currentProfile);
+    }
+
+    return collection.doc(effectiveId).snapshots().map((snapshot) {
+      if (!snapshot.exists || snapshot.data() == null) {
+        // Asynchronously trigger auto-seed if doc doesn't exist
+        _seedStarterProfile(effectiveId);
+        return _buildDefaultModelForId(effectiveId);
+      }
+      return TrainerProfileModel.fromFirestore(snapshot);
+    });
+  }
+
+  // ===========================================================================
+  // GET PROFILE (WITH AUTO-SEEDING)
+  // ===========================================================================
+
+  Future<TrainerProfileModel> getProfile({String? trainerId}) async {
+    final effectiveId = resolveEffectiveTrainerId(trainerId);
+    final collection = _usersCollection;
+
+    if (collection == null) {
+      await Future.delayed(const Duration(milliseconds: 100));
       return _currentProfile;
     }
 
     try {
-      final doc = await _trainerProfilesCollection?.doc(trainerId).get();
-      if (doc != null && doc.exists && doc.data() != null) {
-        _currentProfile = TrainerProfileModel.fromJson(doc.data()!);
-        return _currentProfile;
+      final doc = await collection.doc(effectiveId).get();
+      if (!doc.exists || doc.data() == null) {
+        await _seedStarterProfile(effectiveId);
+        final freshDoc = await collection.doc(effectiveId).get();
+        if (freshDoc.exists && freshDoc.data() != null) {
+          return TrainerProfileModel.fromFirestore(freshDoc);
+        }
+        return _buildDefaultModelForId(effectiveId);
       }
 
-      // Check users collection for trainer details
-      final userDoc = await _usersCollection?.doc(trainerId).get();
-      if (userDoc != null && userDoc.exists && userDoc.data() != null) {
-        final userData = userDoc.data()!;
-        final name = (userData['displayName'] as String?) ?? 'Coach Mike';
-        final email =
-            (userData['email'] as String?) ?? 'coach.mike@sweatsync.com';
-        final photoUrl = userData['photoUrl'] as String?;
-
-        final profile = TrainerProfileModel(
-          id: trainerId,
-          name: name,
-          title:
-              (userData['specialization'] as String?) ?? 'Senior Personal Trainer',
-          email: email,
-          initials: _getInitials(name),
-          photoUrl: photoUrl,
-          isVerified: true,
-          rating: 4.9,
-          reviewCount: 128,
-          clientCount: 5,
-          experienceYears: 3.2,
-          sessionCount: 142,
-          specializations: _defaultProfile.specializations,
-          certifications: _defaultProfile.certifications,
-          monthlyMetrics: _defaultProfile.monthlyMetrics,
-          availability: _defaultProfile.availability,
-          accountSettings: _defaultProfile.accountSettings,
-        );
-
-        // Seed to trainer_profiles collection
-        await _trainerProfilesCollection?.doc(trainerId).set(profile.toJson());
-        _currentProfile = profile;
-        return profile;
+      final data = doc.data()!;
+      // If document exists but is missing extended trainer profile fields, seed them
+      if (!data.containsKey('certifications') || !data.containsKey('monthlyMetrics')) {
+        await _seedStarterProfile(effectiveId, preserveExistingUserFields: true);
+        final freshDoc = await collection.doc(effectiveId).get();
+        return TrainerProfileModel.fromFirestore(freshDoc);
       }
 
-      // If no doc in users, seed default
-      final seededProfile = _defaultProfile;
-      await _trainerProfilesCollection
-          ?.doc(trainerId)
-          .set(seededProfile.toJson());
-      _currentProfile = seededProfile;
-      return seededProfile;
+      return TrainerProfileModel.fromFirestore(doc);
     } catch (_) {
       return _currentProfile;
     }
   }
 
+  // ===========================================================================
+  // UPDATE PROFILE
+  // ===========================================================================
+
   Future<TrainerProfileModel> updateProfile(TrainerProfileModel updated) async {
     _currentProfile = updated;
+    final collection = _usersCollection;
 
-    if (_firestore != null) {
+    if (collection != null) {
+      final docRef = collection.doc(updated.id);
+      await docRef.set(
+        updated.toFirestore(),
+        SetOptions(merge: true),
+      );
+
+      // Also update auth user displayName if changed and currentUser is active
       try {
-        await _trainerProfilesCollection
-            ?.doc(updated.id)
-            .set(updated.toJson(), SetOptions(merge: true));
-
-        await _usersCollection?.doc(updated.id).set({
-          'displayName': updated.name,
-          'specialization': updated.title,
-          'photoUrl': updated.photoUrl,
-          'updatedAt': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
+        final currentUser = _auth?.currentUser;
+        if (currentUser != null && currentUser.uid == updated.id) {
+          if (updated.name.isNotEmpty && currentUser.displayName != updated.name) {
+            await currentUser.updateDisplayName(updated.name);
+          }
+        }
       } catch (_) {}
+    } else {
+      await Future.delayed(const Duration(milliseconds: 100));
     }
 
-    return _currentProfile;
+    return updated;
   }
 
-  static String _getInitials(String fullName) {
-    final parts = fullName.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty || parts[0].isEmpty) return 'MT';
-    if (parts.length == 1) {
-      return parts[0].substring(0, parts[0].length >= 2 ? 2 : 1).toUpperCase();
+  // ===========================================================================
+  // TARGETED UPDATES
+  // ===========================================================================
+
+  Future<void> updateAvailability({
+    required String trainerId,
+    required TrainerAvailability availability,
+  }) async {
+    final effectiveId = resolveEffectiveTrainerId(trainerId);
+    final collection = _usersCollection;
+
+    final availabilityModel = TrainerAvailabilityModel(
+      workingHours: availability.workingHours,
+      daysAvailable: availability.daysAvailable,
+      sessionDuration: availability.sessionDuration,
+    );
+
+    _currentProfile = _currentProfile.copyWith(availability: availability);
+
+    if (collection != null) {
+      await collection.doc(effectiveId).set({
+        'availability': availabilityModel.toMap(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     }
-    return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
+  }
+
+  Future<void> updateAccountSettings({
+    required String trainerId,
+    required TrainerAccountSettings settings,
+  }) async {
+    final effectiveId = resolveEffectiveTrainerId(trainerId);
+    final collection = _usersCollection;
+
+    final settingsModel = TrainerAccountSettingsModel(
+      notificationsEnabled: settings.notificationsEnabled,
+      clientMessagingEnabled: settings.clientMessagingEnabled,
+    );
+
+    _currentProfile = _currentProfile.copyWith(accountSettings: settings);
+
+    if (collection != null) {
+      await collection.doc(effectiveId).set({
+        'accountSettings': settingsModel.toMap(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    }
+  }
+
+  // ===========================================================================
+  // SEEDING HELPERS
+  // ===========================================================================
+
+  TrainerProfileModel _buildDefaultModelForId(String trainerId) {
+    final authUser = _auth?.currentUser;
+    final name = authUser?.displayName?.trim();
+    final email = authUser?.email?.trim();
+
+    return _defaultProfile.copyWith(
+      id: trainerId,
+      name: (name != null && name.isNotEmpty) ? name : _defaultProfile.name,
+      email: (email != null && email.isNotEmpty) ? email : _defaultProfile.email,
+    );
+  }
+
+  Future<void> _seedStarterProfile(
+    String trainerId, {
+    bool preserveExistingUserFields = false,
+  }) async {
+    final collection = _usersCollection;
+    if (collection == null) return;
+
+    try {
+      final docRef = collection.doc(trainerId);
+      final existingDoc = await docRef.get();
+      final existingData = existingDoc.data() ?? {};
+
+      final authUser = _auth?.currentUser;
+      final effectiveName = (existingData['displayName'] as String?) ??
+          (existingData['name'] as String?) ??
+          authUser?.displayName ??
+          'Coach Mike Torres';
+
+      final effectiveEmail = (existingData['email'] as String?) ??
+          authUser?.email ??
+          'mike.torres@gymsync.com';
+
+      final seedModel = TrainerProfileModel(
+        id: trainerId,
+        name: effectiveName,
+        title: (existingData['title'] as String?) ?? 'Senior Personal Trainer',
+        email: effectiveEmail,
+        initials: TrainerProfileModel.extractInitials(effectiveName),
+        photoUrl: existingData['photoUrl'] as String? ?? authUser?.photoURL,
+        isVerified: (existingData['isVerified'] as bool?) ?? true,
+        rating: (existingData['rating'] as num?)?.toDouble() ?? 4.9,
+        reviewCount: (existingData['reviewCount'] as num?)?.toInt() ?? 128,
+        clientCount: (existingData['clientCount'] as num?)?.toInt() ?? 5,
+        experienceYears: (existingData['experienceYears'] as num?)?.toDouble() ?? 3.2,
+        sessionCount: (existingData['sessionCount'] as num?)?.toInt() ?? 142,
+        specializations: TrainerProfileModel.defaultSpecializations,
+        certifications: TrainerProfileModel.defaultCertifications,
+        monthlyMetrics: const TrainerMonthlyMetricsModel(
+          sessionsCompleted: 38,
+          clientRetentionPercentage: 96,
+          avgSessionRating: 4.9,
+          newClientsCount: 2,
+        ),
+        availability: const TrainerAvailabilityModel(
+          workingHours: '8AM–6PM',
+          daysAvailable: 'Mon–Sat',
+          sessionDuration: '45–60 min',
+        ),
+        accountSettings: const TrainerAccountSettingsModel(
+          notificationsEnabled: true,
+          clientMessagingEnabled: true,
+        ),
+      );
+
+      final payload = seedModel.toFirestore();
+      if (!existingDoc.exists) {
+        payload['createdAt'] = FieldValue.serverTimestamp();
+      }
+
+      await docRef.set(payload, SetOptions(merge: true));
+    } catch (_) {}
   }
 }

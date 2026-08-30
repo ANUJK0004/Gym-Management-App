@@ -73,14 +73,14 @@ class _MemberEnrollmentSuccessState
               width: 68,
               height: 68,
               decoration: BoxDecoration(
-                color: const Color(0xFF294725),
+                color: AppColors.owner.withValues(alpha: 0.18),
                 borderRadius:
                 BorderRadius.circular(20),
               ),
               child: const Icon(
                 Icons.check_rounded,
                 size: 40,
-                color: AppColors.primary,
+                color: AppColors.owner,
               ),
             ),
 

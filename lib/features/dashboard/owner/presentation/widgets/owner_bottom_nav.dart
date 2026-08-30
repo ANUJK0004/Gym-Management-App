@@ -20,7 +20,7 @@ class OwnerBottomNav extends StatelessWidget {
 
       backgroundColor: AppColors.surface,
 
-      indicatorColor: AppColors.primary,
+      indicatorColor: AppColors.owner,
 
       height: 72,
 

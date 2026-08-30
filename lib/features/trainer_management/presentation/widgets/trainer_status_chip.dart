@@ -21,7 +21,7 @@ class TrainerStatusChip
       ) {
     return Material(
       color: selected
-          ? AppColors.primary
+          ? AppColors.owner
           : AppColors.surface,
       borderRadius:
       BorderRadius.circular(9),
@@ -41,7 +41,7 @@ class TrainerStatusChip
             BorderRadius.circular(9),
             border: Border.all(
               color: selected
-                  ? AppColors.primary
+                  ? AppColors.owner
                   : AppColors.border,
               width: 0.5,
             ),

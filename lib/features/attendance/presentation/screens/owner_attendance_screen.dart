@@ -95,14 +95,14 @@ class _OwnerAttendanceScreenState extends ConsumerState<OwnerAttendanceScreen> {
                     _openManualCheckIn(context, todayRecords);
                   },
                   backgroundColor: AppColors.surface,
-                  icon: const Icon(Icons.person_add_alt_1_rounded, color: AppColors.primary),
+                  icon: const Icon(Icons.person_add_alt_1_rounded, color: AppColors.owner),
                   label: const Text('Check In', style: TextStyle(color: AppColors.textPrimary)),
                 ),
                 const SizedBox(height: 10),
                 FloatingActionButton.extended(
                   heroTag: 'daily_qr',
                   onPressed: () => _openDailyQR(context, gymAsync.value!),
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.owner,
                   icon: const Icon(Icons.qr_code_rounded, color: Colors.black),
                   label: const Text('Daily QR Pass', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
                 ),
@@ -169,7 +169,7 @@ class _OwnerAttendanceScreenState extends ConsumerState<OwnerAttendanceScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.calendar_month_rounded, size: 20, color: AppColors.primary),
+          const Icon(Icons.calendar_month_rounded, size: 20, color: AppColors.owner),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -234,7 +234,7 @@ class _OwnerAttendanceScreenState extends ConsumerState<OwnerAttendanceScreen> {
           child: _StatBox(
             title: 'Members',
             value: '$membersPresent',
-            accent: AppColors.primary,
+            accent: AppColors.owner,
             icon: Icons.groups_rounded,
           ),
         ),
@@ -342,10 +342,10 @@ class _OwnerAttendanceScreenState extends ConsumerState<OwnerAttendanceScreen> {
           padding: const EdgeInsets.symmetric(vertical: 8),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary : AppColors.surface,
+            color: isSelected ? AppColors.owner : AppColors.surface,
             borderRadius: AppRadius.radiusMD,
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.border,
+              color: isSelected ? AppColors.owner : AppColors.border,
               width: 0.5,
             ),
           ),
@@ -379,14 +379,14 @@ class _OwnerAttendanceScreenState extends ConsumerState<OwnerAttendanceScreen> {
           color: isSelected ? AppColors.textPrimary.withValues(alpha: 0.15) : AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected ? AppColors.owner : AppColors.border,
             width: 0.5,
           ),
         ),
         child: Text(
           status,
           style: TextStyle(
-            color: isSelected ? AppColors.primary : AppColors.textSecondary,
+            color: isSelected ? AppColors.owner : AppColors.textSecondary,
             fontSize: 11,
             fontWeight: FontWeight.w600,
           ),
@@ -406,7 +406,11 @@ class _OwnerAttendanceScreenState extends ConsumerState<OwnerAttendanceScreen> {
     return attendanceAsync.when(
       loading: () => const Padding(
         padding: EdgeInsets.all(40),
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+          ),
+        ),
       ),
       error: (err, _) => Padding(
         padding: const EdgeInsets.all(20),

@@ -39,7 +39,9 @@ class OwnerSettingsScreen extends ConsumerWidget {
         child: settingsAsync.when(
           loading: () {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+              ),
             );
           },
           error: (error, stackTrace) {
@@ -346,7 +348,10 @@ class OwnerSettingsScreen extends ConsumerWidget {
             child: SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+              ),
             ),
           ),
         ),
@@ -538,7 +543,7 @@ class OwnerSettingsScreen extends ConsumerWidget {
         shape: RoundedRectangleBorder(borderRadius: AppRadius.radiusLG),
         title: Row(
           children: [
-            const Icon(Icons.lock_reset_rounded, color: AppColors.primary),
+            const Icon(Icons.lock_reset_rounded, color: AppColors.owner),
             const SizedBox(width: 10),
             Text(
               'Reset Password',
@@ -560,6 +565,11 @@ class OwnerSettingsScreen extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.owner,
+              foregroundColor: Colors.black,
+              textStyle: const TextStyle(fontWeight: FontWeight.w700),
+            ),
             onPressed: () async {
               Navigator.of(ctx).pop();
               try {

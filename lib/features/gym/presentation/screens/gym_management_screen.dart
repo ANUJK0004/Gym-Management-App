@@ -48,7 +48,9 @@ class GymManagementScreen
         loading: () {
           return const Center(
             child:
-            CircularProgressIndicator(),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+            ),
           );
         },
 
@@ -152,7 +154,7 @@ class _NoGymView
 
               decoration:
               BoxDecoration(
-                color: AppColors.primary
+                color: AppColors.owner
                     .withValues(alpha: 0.12),
                 borderRadius:
                 AppRadius.radiusLG,
@@ -163,7 +165,7 @@ class _NoGymView
                     .fitness_center_rounded,
                 size: 40,
                 color:
-                AppColors.primary,
+                AppColors.owner,
               ),
             ),
 
@@ -207,6 +209,11 @@ class _NoGymView
 
               child:
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.owner,
+                  foregroundColor: Colors.black,
+                  textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                ),
                 onPressed:
                 onCreateGym,
 
@@ -284,7 +291,7 @@ class _GymDetailsView
                       decoration:
                       BoxDecoration(
                         color: AppColors
-                            .primary
+                            .owner
                             .withValues(
                             alpha: 0.12),
                         borderRadius:
@@ -300,7 +307,7 @@ class _GymDetailsView
                             .fitness_center_rounded,
                         color:
                         AppColors
-                            .primary,
+                            .owner,
                         size: 28,
                       ),
                     ),
@@ -479,7 +486,7 @@ class _InfoCard
           Icon(
             icon,
             color:
-            AppColors.primary,
+            AppColors.owner,
           ),
 
           const SizedBox(
@@ -810,6 +817,11 @@ class _GymFormState
 
                 child:
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.owner,
+                    foregroundColor: Colors.black,
+                    textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
                   onPressed:
                   _isSaving
                       ? null
@@ -823,6 +835,7 @@ class _GymFormState
                     CircularProgressIndicator(
                       strokeWidth:
                       2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                     ),
                   )
                       : Text(

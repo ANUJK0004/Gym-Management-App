@@ -241,13 +241,13 @@ class _RoleCard extends StatelessWidget {
   Color _roleColor(AppRole role) {
     switch (role) {
       case AppRole.member:
-        return AppColors.primary;
+        return AppColors.roleMember;
 
       case AppRole.trainer:
-        return Colors.lightBlue;
+        return AppColors.roleTrainer;
 
       case AppRole.owner:
-        return Colors.orange;
+        return AppColors.roleOwner;
     }
   }
 }

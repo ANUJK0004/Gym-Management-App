@@ -124,7 +124,7 @@ class _ReportTrendCardState extends State<ReportTrendCard> {
                 Text(
                   _formatChange(trend),
                   style: AppTextStyles.labelMedium.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.owner,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -178,7 +178,7 @@ class _Tab extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.primary
+              ? AppColors.owner
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
@@ -239,7 +239,7 @@ class _TrendPainter extends CustomPainter {
     );
 
     final linePaint = Paint()
-      ..color = AppColors.primary
+      ..color = AppColors.owner
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.4
       ..strokeCap = StrokeCap.round
@@ -250,8 +250,8 @@ class _TrendPainter extends CustomPainter {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          AppColors.primary.withValues(alpha: .24),
-          AppColors.primary.withValues(alpha: .02),
+          AppColors.owner.withValues(alpha: .24),
+          AppColors.owner.withValues(alpha: .02),
         ],
       ).createShader(chartRect);
 
@@ -300,7 +300,7 @@ class _TrendPainter extends CustomPainter {
     canvas.drawCircle(
       Offset(lastX, lastY),
       pointRadius,
-      Paint()..color = AppColors.primary,
+      Paint()..color = AppColors.owner,
     );
 
     final textStyle = const TextStyle(

@@ -42,7 +42,7 @@ class FinanceHeader extends StatelessWidget {
           ),
         ),
         Material(
-          color: AppColors.primary.withValues(alpha: 0.15),
+          color: AppColors.owner.withValues(alpha: 0.15),
           borderRadius: AppRadius.radiusSM,
           child: InkWell(
             onTap: onExport,
@@ -58,13 +58,13 @@ class FinanceHeader extends StatelessWidget {
                   const Icon(
                     Icons.download_rounded,
                     size: 15,
-                    color: AppColors.primary,
+                    color: AppColors.owner,
                   ),
                   const SizedBox(width: 5),
                   Text(
                     'Export',
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.owner,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

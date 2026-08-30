@@ -40,7 +40,7 @@ class OwnerSettingsTile
                   icon,
                   size: 20,
                   color:
-                  AppColors.primary,
+                  AppColors.owner,
                 ),
 
                 const SizedBox(

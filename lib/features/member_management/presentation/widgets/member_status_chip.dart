@@ -23,7 +23,7 @@ class MemberStatusChip
       ) {
     return Material(
       color: selected
-          ? AppColors.primary
+          ? AppColors.owner
           : AppColors.surface,
 
       borderRadius:
@@ -48,7 +48,7 @@ class MemberStatusChip
 
             border: Border.all(
               color: selected
-                  ? AppColors.primary
+                  ? AppColors.owner
                   : AppColors.border,
               width: 0.5,
             ),

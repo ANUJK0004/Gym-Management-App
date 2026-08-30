@@ -37,7 +37,7 @@ class DownloadableReportCard extends StatelessWidget {
             height: 38,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: .12),
+              color: AppColors.owner.withValues(alpha: .12),
               borderRadius: BorderRadius.circular(11),
             ),
             child: Text(
@@ -71,7 +71,7 @@ class DownloadableReportCard extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Material(
-            color: AppColors.primary.withValues(alpha: .18),
+            color: AppColors.owner.withValues(alpha: .18),
             borderRadius: BorderRadius.circular(9),
             child: InkWell(
               onTap: () => onDownload(report),
@@ -82,7 +82,7 @@ class DownloadableReportCard extends StatelessWidget {
                 child: Icon(
                   Icons.download_rounded,
                   size: 18,
-                  color: AppColors.primary,
+                  color: AppColors.owner,
                 ),
               ),
             ),

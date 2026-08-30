@@ -82,7 +82,7 @@ class _SectionTile extends StatelessWidget {
 
     return Material(
       color: selected
-          ? AppColors.primary.withValues(alpha: 0.10)
+          ? AppColors.owner.withValues(alpha: 0.10)
           : AppColors.inputField,
       borderRadius: AppRadius.radiusSM,
       child: InkWell(
@@ -110,7 +110,7 @@ class _SectionTile extends StatelessWidget {
             borderRadius: AppRadius.radiusSM,
             border: Border.all(
               color: selected
-                  ? AppColors.primary.withValues(alpha: 0.55)
+                  ? AppColors.owner.withValues(alpha: 0.55)
                   : AppColors.border,
             ),
           ),
@@ -123,13 +123,13 @@ class _SectionTile extends StatelessWidget {
                 height: 18,
                 decoration: BoxDecoration(
                   color: selected
-                      ? AppColors.primary
+                      ? AppColors.owner
                       : Colors.transparent,
                   borderRadius:
                   BorderRadius.circular(5),
                   border: Border.all(
                     color: selected
-                        ? AppColors.primary
+                        ? AppColors.owner
                         : AppColors.textHint,
                   ),
                 ),

@@ -67,6 +67,7 @@ class _MemberManagementScreenState
       body: SafeArea(
         bottom: false,
         child: RefreshIndicator(
+          color: AppColors.owner,
           onRefresh: () async {
             ref.invalidate(
               gymMembersProvider,
@@ -186,7 +187,7 @@ class _MemberManagementScreenState
         ),
 
         Material(
-          color: AppColors.primary,
+          color: AppColors.owner,
           borderRadius:
           BorderRadius.circular(10),
           child: InkWell(
@@ -285,7 +286,9 @@ class _MemberManagementScreenState
           ),
           child: Center(
             child:
-            CircularProgressIndicator(),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+            ),
           ),
         );
       },
@@ -364,7 +367,9 @@ class _MemberManagementScreenState
           ),
           child: Center(
             child:
-            CircularProgressIndicator(),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+            ),
           ),
         );
       },

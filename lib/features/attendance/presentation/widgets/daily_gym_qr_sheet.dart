@@ -65,7 +65,7 @@ class DailyGymQRSheet extends StatelessWidget {
                     Text(
                       'DAILY GYM QR PASS',
                       style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.owner,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1,
                       ),
@@ -123,7 +123,7 @@ class DailyGymQRSheet extends StatelessWidget {
               borderRadius: AppRadius.radiusLG,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.15),
+                  color: AppColors.owner.withValues(alpha: 0.15),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -182,7 +182,7 @@ class DailyGymQRSheet extends StatelessWidget {
               children: [
                 const Icon(
                   Icons.shield_outlined,
-                  color: AppColors.primary,
+                  color: AppColors.owner,
                   size: 20,
                 ),
                 const SizedBox(width: 10),
@@ -204,8 +204,12 @@ class DailyGymQRSheet extends StatelessWidget {
             width: double.infinity,
             child: FilledButton.icon(
               onPressed: () => Navigator.of(context).pop(),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.owner,
+                foregroundColor: Colors.black,
+              ),
               icon: const Icon(Icons.check_circle_outline),
-              label: const Text('Close QR Pass'),
+              label: const Text('Close QR Pass', style: TextStyle(fontWeight: FontWeight.w700)),
             ),
           ),
         ],

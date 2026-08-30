@@ -45,12 +45,12 @@ class AuditLogSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.12),
+                      color: AppColors.owner.withValues(alpha: 0.12),
                       borderRadius: AppRadius.radiusMD,
                     ),
                     child: const Icon(
                       Icons.receipt_long_rounded,
-                      color: AppColors.primary,
+                      color: AppColors.owner,
                       size: 20,
                     ),
                   ),
@@ -95,8 +95,8 @@ class AuditLogSheet extends StatelessWidget {
               icon: const Icon(Icons.analytics_outlined, size: 18),
               label: const Text('View Full Analytics & Reports'),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppColors.primary, width: 0.8),
-                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.owner, width: 0.8),
+                foregroundColor: AppColors.owner,
                 shape: RoundedRectangleBorder(
                   borderRadius: AppRadius.radiusMD,
                 ),

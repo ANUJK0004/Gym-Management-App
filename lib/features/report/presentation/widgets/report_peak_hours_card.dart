@@ -127,11 +127,11 @@ class _PeakHoursChart extends StatelessWidget {
         : hour.sessions / maxSessions;
 
     if (ratio > .75) {
-      return AppColors.primary;
+      return AppColors.owner;
     }
 
     if (ratio > .5) {
-      return AppColors.primary.withValues(alpha: .6);
+      return AppColors.owner.withValues(alpha: .6);
     }
 
     return AppColors.border;

@@ -112,12 +112,12 @@ class _BackupDataDialogState extends ConsumerState<BackupDataDialog> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.15),
+                    color: AppColors.owner.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.backup_rounded,
-                    color: AppColors.primary,
+                    color: AppColors.owner,
                     size: 24,
                   ),
                 ),
@@ -215,6 +215,9 @@ class _BackupDataDialogState extends ConsumerState<BackupDataDialog> {
                   child: ElevatedButton(
                     onPressed: _isBackingUp ? null : _performBackup,
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.owner,
+                      foregroundColor: Colors.black,
+                      textStyle: const TextStyle(fontWeight: FontWeight.w700),
                       shape: RoundedRectangleBorder(
                         borderRadius: AppRadius.radiusMD,
                       ),
@@ -223,7 +226,10 @@ class _BackupDataDialogState extends ConsumerState<BackupDataDialog> {
                         ? const SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                            ),
                           )
                         : const Text('Backup Now'),
                   ),
@@ -258,7 +264,7 @@ class _BackupDataDialogState extends ConsumerState<BackupDataDialog> {
           value,
           style: AppTextStyles.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
-            color: highlight ? AppColors.primary : AppColors.textPrimary,
+            color: highlight ? AppColors.owner : AppColors.textPrimary,
           ),
         ),
       ],

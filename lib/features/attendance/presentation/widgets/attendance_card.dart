@@ -25,7 +25,7 @@ class AttendanceCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: AppRadius.radiusLG,
         border: Border.all(
-          color: isInGym ? AppColors.primary.withValues(alpha: 0.4) : AppColors.border,
+          color: isInGym ? AppColors.owner.withValues(alpha: 0.4) : AppColors.border,
           width: isInGym ? 1.0 : 0.5,
         ),
       ),
@@ -123,7 +123,7 @@ class AttendanceCard extends StatelessWidget {
                 time: record.checkOutTime != null
                     ? _formatTime(record.checkOutTime!)
                     : 'Active',
-                color: record.checkOutTime != null ? Colors.orangeAccent : AppColors.primary,
+                color: record.checkOutTime != null ? Colors.orangeAccent : AppColors.owner,
               ),
 
               const Spacer(),

@@ -77,12 +77,12 @@ class _ReportTypeCard extends StatelessWidget {
           padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
             color: selected
-                ? const Color(0xFF1D2A1B)
+                ? const Color(0xFF332314)
                 : AppColors.background,
             borderRadius: AppRadius.radiusLG,
             border: Border.all(
               color: selected
-                  ? AppColors.primary
+                  ? AppColors.owner
                   : AppColors.border,
             ),
           ),
@@ -93,7 +93,7 @@ class _ReportTypeCard extends StatelessWidget {
                 height: 42,
                 decoration: BoxDecoration(
                   color: selected
-                      ? AppColors.primary.withValues(alpha: 0.14)
+                      ? AppColors.owner.withValues(alpha: 0.14)
                       : AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -136,7 +136,7 @@ class _ReportTypeCard extends StatelessWidget {
                     ? Icons.radio_button_checked
                     : Icons.radio_button_off,
                 color: selected
-                    ? AppColors.primary
+                    ? AppColors.owner
                     : AppColors.textSecondary,
                 size: 19,
               ),

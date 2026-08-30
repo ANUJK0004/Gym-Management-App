@@ -433,7 +433,7 @@ class _EmailField
               borderSide:
               const BorderSide(
                 color:
-                AppColors.primary,
+                AppColors.owner,
               ),
             ),
           ),
@@ -484,7 +484,7 @@ class _ExportButton
     return Material(
       color:
       active
-          ? AppColors.primary
+          ? AppColors.owner
           : AppColors.card,
       borderRadius:
       AppRadius.radiusSM,

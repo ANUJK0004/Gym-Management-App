@@ -36,7 +36,7 @@ class SystemSettingSwitchTile extends StatelessWidget {
 
               Icon(
                 icon,
-                color: AppColors.primary,
+                color: AppColors.owner,
               ),
 
               const SizedBox(width: 14),
@@ -67,7 +67,7 @@ class SystemSettingSwitchTile extends StatelessWidget {
 
               Switch(
                 value: value,
-                activeThumbColor: AppColors.primary,
+                activeThumbColor: AppColors.owner,
                 onChanged: onChanged,
               ),
             ],

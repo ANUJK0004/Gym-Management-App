@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:sweatsync/app/routes/app_routes.dart';
+import 'package:sweatsync/app/theme/app_colors.dart';
 import 'package:sweatsync/core/enums/app_role.dart';
 import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
 
@@ -30,6 +31,17 @@ class _RegisterScreenState
 
   final _passwordController =
   TextEditingController();
+
+  Color _getRoleColor(AppRole role) {
+    switch (role) {
+      case AppRole.member:
+        return AppColors.roleMember;
+      case AppRole.trainer:
+        return AppColors.roleTrainer;
+      case AppRole.owner:
+        return AppColors.roleOwner;
+    }
+  }
 
   Future<void> _register() async {
     await ref
@@ -75,8 +87,10 @@ class _RegisterScreenState
   Widget build(BuildContext context) {
     final authState =
     ref.watch(authControllerProvider);
+    final roleColor = _getRoleColor(widget.role);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         leadingWidth: 56,
         leading: const Center(
@@ -86,26 +100,43 @@ class _RegisterScreenState
         ),
         title: Text(
           'Create ${_formatRole(widget.role)} Account',
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
 
       body: SafeArea(
-        child: Padding(
-          padding:
-          const EdgeInsets.all(24),
-
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
           child: Column(
-            mainAxisAlignment:
-            MainAxisAlignment.center,
-
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const SizedBox(height: 16),
 
-              Text(
-                'Registering as ${_formatRole(widget.role)}',
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: roleColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: roleColor.withValues(alpha: 0.35),
+                    width: 0.8,
+                  ),
+                ),
+                child: Text(
+                  'Registering as ${_formatRole(widget.role)}',
+                  style: TextStyle(
+                    color: roleColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
               ),
 
               const SizedBox(
-                height: 24,
+                height: 28,
               ),
 
               AppTextField(
@@ -116,6 +147,7 @@ class _RegisterScreenState
                 'Enter your email',
                 prefixIcon:
                 Icons.email_outlined,
+                focusedColor: roleColor,
               ),
 
               const SizedBox(
@@ -131,6 +163,7 @@ class _RegisterScreenState
                 prefixIcon:
                 Icons.lock_outline,
                 obscureText: true,
+                focusedColor: roleColor,
               ),
 
               const SizedBox(
@@ -140,6 +173,8 @@ class _RegisterScreenState
               PrimaryButton(
                 text:
                 'Create Account',
+                backgroundColor: roleColor,
+                foregroundColor: Colors.black,
                 isLoading:
                 authState.isLoading,
                 onPressed:

@@ -69,14 +69,14 @@ class _ReportExportSuccessSheetState
               width: 68,
               height: 68,
               decoration: BoxDecoration(
-                color: const Color(0xFF294725),
+                color: AppColors.owner.withValues(alpha: 0.18),
                 borderRadius:
                 BorderRadius.circular(20),
               ),
               child: const Icon(
                 Icons.check_rounded,
                 size: 40,
-                color: AppColors.primary,
+                color: AppColors.owner,
               ),
             ),
             const SizedBox(height: 20),
@@ -110,11 +110,11 @@ class _ReportExportSuccessSheetState
               ),
               decoration: BoxDecoration(
                 color:
-                const Color(0xFF294725),
+                AppColors.owner.withValues(alpha: 0.14),
                 borderRadius:
                 BorderRadius.circular(10),
                 border: Border.all(
-                  color: AppColors.primary
+                  color: AppColors.owner
                       .withValues(alpha: 0.45),
                 ),
               ),
@@ -124,7 +124,7 @@ class _ReportExportSuccessSheetState
                   const Icon(
                     Icons.download_rounded,
                     size: 14,
-                    color: AppColors.primary,
+                    color: AppColors.owner,
                   ),
                   const SizedBox(width: 6),
                   Text(
@@ -132,7 +132,7 @@ class _ReportExportSuccessSheetState
                     style:
                     AppTextStyles.labelMedium.copyWith(
                       color:
-                      AppColors.primary,
+                      AppColors.owner,
                       fontWeight:
                       FontWeight.w700,
                     ),

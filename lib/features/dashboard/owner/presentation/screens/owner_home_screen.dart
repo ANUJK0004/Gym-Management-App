@@ -33,6 +33,7 @@ class OwnerHomeScreen extends ConsumerWidget {
         backgroundColor: AppColors.background,
 
         body: RefreshIndicator(
+          color: AppColors.owner,
           onRefresh: () async {
             ref.invalidate(ownerDashboardProvider);
             ref.invalidate(recentActivityProvider);
@@ -47,7 +48,9 @@ class OwnerHomeScreen extends ConsumerWidget {
           child: dashboardAsync.when(
             loading: () {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+                ),
               );
             },
 
@@ -104,11 +107,16 @@ class OwnerHomeScreen extends ConsumerWidget {
                                   ownerDashboardProvider,
                                 );
                               },
+                              style: FilledButton.styleFrom(
+                                backgroundColor: AppColors.owner,
+                                foregroundColor: Colors.black,
+                              ),
                               icon: const Icon(
                                 Icons.refresh,
                               ),
                               label: const Text(
                                 'Retry',
+                                style: TextStyle(fontWeight: FontWeight.w700),
                               ),
                             ),
                           ],
@@ -306,7 +314,7 @@ class _StatCard extends StatelessWidget {
               Icon(
                 icon,
                 size: 18,
-                color: AppColors.primary,
+                color: AppColors.owner,
               ),
 
               const Spacer(),
@@ -315,7 +323,7 @@ class _StatCard extends StatelessWidget {
                 change,
                 style: AppTextStyles.labelMedium
                     .copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.owner,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -427,7 +435,7 @@ class _RevenueCard extends StatelessWidget {
                 '₹${dashboard.monthlyRevenue.toStringAsFixed(0)}',
                 style: AppTextStyles.titleMedium
                     .copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.owner,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -473,7 +481,7 @@ class _RevenueCard extends StatelessWidget {
                           decoration:
                           BoxDecoration(
                             color: hasRevenue
-                                ? AppColors.primary
+                                ? AppColors.owner
                                 : AppColors.border,
                             borderRadius:
                             const BorderRadius
@@ -509,7 +517,7 @@ class _RevenueCard extends StatelessWidget {
                           ? FontWeight.w700
                           : FontWeight.normal,
                       color: isCurrentMonth
-                          ? AppColors.primary
+                          ? AppColors.owner
                           : AppColors.textSecondary,
                     ),
                   ),
@@ -653,7 +661,7 @@ class _ManagementCard extends StatelessWidget {
               Icon(
                 icon,
                 size: 22,
-                color: AppColors.primary,
+                color: AppColors.owner,
               ),
 
               const SizedBox(width: 10),

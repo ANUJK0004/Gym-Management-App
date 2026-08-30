@@ -127,7 +127,7 @@ class _BreakdownRow extends StatelessWidget {
     final normalized = name.toLowerCase();
 
     if (normalized.contains('premium')) {
-      return AppColors.primary;
+      return AppColors.owner;
     }
 
     if (normalized.contains('standard')) {
@@ -135,10 +135,10 @@ class _BreakdownRow extends StatelessWidget {
     }
 
     if (normalized.contains('basic')) {
-      return Colors.orangeAccent;
+      return Colors.amberAccent;
     }
 
-    return AppColors.primary.withValues(alpha: .65);
+    return AppColors.owner.withValues(alpha: .65);
   }
 }
 

@@ -35,7 +35,7 @@ class AdminAccountTile extends StatelessWidget {
 
                 Icon(
                   icon,
-                  color: AppColors.primary,
+                  color: AppColors.owner,
                 ),
 
                 const SizedBox(width: 14),

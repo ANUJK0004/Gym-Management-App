@@ -97,13 +97,13 @@ class ReportExportFormatStep extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: selected
-                            ? const Color(0xFF1D2A1B)
+                            ? const Color(0xFF332314)
                             : AppColors.background,
                         borderRadius:
                         AppRadius.radiusMD,
                         border: Border.all(
                           color: selected
-                              ? AppColors.primary
+                              ? AppColors.owner
                               : AppColors.border,
                         ),
                       ),
@@ -113,7 +113,7 @@ class ReportExportFormatStep extends StatelessWidget {
                         AppTextStyles.labelMedium
                             .copyWith(
                           color: selected
-                              ? AppColors.primary
+                              ? AppColors.owner
                               : AppColors.textSecondary,
                           fontWeight:
                           selected
@@ -164,7 +164,7 @@ class ReportExportFormatStep extends StatelessWidget {
                 borderRadius:
                 AppRadius.radiusMD,
                 borderSide: const BorderSide(
-                  color: AppColors.primary,
+                  color: AppColors.owner,
                 ),
               ),
             ),
@@ -204,7 +204,7 @@ class ReportExportFormatStep extends StatelessWidget {
             value:
             '$selectedSectionCount selected',
             valueColor:
-            AppColors.primary,
+            AppColors.owner,
           ),
         ],
       ),
@@ -292,12 +292,12 @@ class _FormatCard extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: selected
-                ? const Color(0xFF1D2A1B)
+                ? const Color(0xFF332314)
                 : AppColors.background,
             borderRadius: AppRadius.radiusMD,
             border: Border.all(
               color: selected
-                  ? AppColors.primary
+                  ? AppColors.owner
                   : AppColors.border,
             ),
           ),

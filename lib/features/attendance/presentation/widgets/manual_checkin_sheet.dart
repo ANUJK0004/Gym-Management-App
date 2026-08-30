@@ -116,7 +116,7 @@ class _ManualCheckInSheetState extends ConsumerState<ManualCheckInSheet> {
                     child: Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: _selectedRole == 'member' ? AppColors.primary : Colors.transparent,
+                        color: _selectedRole == 'member' ? AppColors.owner : Colors.transparent,
                         borderRadius: AppRadius.radiusMD,
                       ),
                       child: Text(
@@ -141,7 +141,7 @@ class _ManualCheckInSheetState extends ConsumerState<ManualCheckInSheet> {
                     child: Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: _selectedRole == 'trainer' ? AppColors.primary : Colors.transparent,
+                        color: _selectedRole == 'trainer' ? AppColors.owner : Colors.transparent,
                         borderRadius: AppRadius.radiusMD,
                       ),
                       child: Text(
@@ -205,7 +205,11 @@ class _ManualCheckInSheetState extends ConsumerState<ManualCheckInSheet> {
     String gymId,
   ) {
     return membersAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+        ),
+      ),
       error: (e, _) => Center(child: Text('Error loading members: $e')),
       data: (members) {
         final filtered = members.where((m) {
@@ -236,13 +240,13 @@ class _ManualCheckInSheetState extends ConsumerState<ManualCheckInSheet> {
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+                    backgroundColor: AppColors.owner.withValues(alpha: 0.15),
                     child: Text(
                       member.displayName != null && member.displayName!.isNotEmpty
                           ? member.displayName![0].toUpperCase()
                           : 'M',
                       style: const TextStyle(
-                        color: AppColors.primary,
+                        color: AppColors.owner,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -288,6 +292,8 @@ class _ManualCheckInSheetState extends ConsumerState<ManualCheckInSheet> {
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        backgroundColor: AppColors.owner,
+                        foregroundColor: Colors.black,
                       ),
                       onPressed: _isSubmitting
                           ? null
@@ -299,7 +305,7 @@ class _ManualCheckInSheetState extends ConsumerState<ManualCheckInSheet> {
                                 userPhotoUrl: member.photoUrl,
                                 planOrSpecialization: member.membershipPlanName,
                               ),
-                      child: const Text('Check In', style: TextStyle(fontSize: 12)),
+                      child: const Text('Check In', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                     ),
                 ],
               ),
@@ -316,7 +322,11 @@ class _ManualCheckInSheetState extends ConsumerState<ManualCheckInSheet> {
     String gymId,
   ) {
     return trainersAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+        ),
+      ),
       error: (e, _) => Center(child: Text('Error loading trainers: $e')),
       data: (trainers) {
         final filtered = trainers.where((t) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sweatsync/features/trainer_profile/data/datasources/trainer_profile_remote_datasource.dart';
+import 'package:sweatsync/features/trainer_profile/data/models/trainer_profile_model.dart';
 import 'package:sweatsync/features/trainer_profile/data/repositories/trainer_profile_repository_impl.dart';
 import 'package:sweatsync/features/trainer_profile/presentation/providers/trainer_profile_provider.dart';
 import 'package:sweatsync/features/trainer_profile/presentation/screens/trainer_profile_screen.dart';
@@ -103,6 +104,72 @@ void main() {
           container.read(trainerProfileProvider).value?.availability;
       expect(availability?.workingHours, equals('7AM–7PM'));
       expect(availability?.daysAvailable, equals('Mon–Fri'));
+    });
+
+    test('TrainerProfileModel fromMap and toFirestore serialization', () {
+      final sampleMap = {
+        'uid': 'trainer_test_123',
+        'displayName': 'Alex Rivera',
+        'title': 'CrossFit Coach',
+        'email': 'alex@gym.com',
+        'specializations': ['CrossFit', 'Olympic Lifting'],
+        'certifications': [
+          {
+            'id': 'c1',
+            'title': 'CrossFit L2',
+            'obtainedYear': 2022,
+            'emoji': '🏋️',
+            'isVerified': true,
+          }
+        ],
+        'monthlyMetrics': {
+          'sessionsCompleted': 42,
+          'clientRetentionPercentage': 98,
+          'avgSessionRating': 5.0,
+          'newClientsCount': 4,
+        },
+        'availability': {
+          'workingHours': '6AM–2PM',
+          'daysAvailable': 'Mon–Fri',
+          'sessionDuration': '60 min',
+        },
+        'accountSettings': {
+          'notificationsEnabled': false,
+          'clientMessagingEnabled': true,
+        },
+      };
+
+      final model = TrainerProfileModel.fromMap(sampleMap);
+      expect(model.id, equals('trainer_test_123'));
+      expect(model.name, equals('Alex Rivera'));
+      expect(model.title, equals('CrossFit Coach'));
+      expect(model.specializations, equals(['CrossFit', 'Olympic Lifting']));
+      expect(model.certifications.length, equals(1));
+      expect(model.certifications.first.title, equals('CrossFit L2'));
+      expect(model.monthlyMetrics.sessionsCompleted, equals(42));
+      expect(model.monthlyMetrics.clientRetentionPercentage, equals(98));
+      expect(model.availability.workingHours, equals('6AM–2PM'));
+      expect(model.accountSettings.notificationsEnabled, isFalse);
+      expect(model.accountSettings.clientMessagingEnabled, isTrue);
+
+      final firestoreMap = model.toFirestore();
+      expect(firestoreMap['uid'], equals('trainer_test_123'));
+      expect(firestoreMap['displayName'], equals('Alex Rivera'));
+      expect(firestoreMap['role'], equals('trainer'));
+    });
+
+    test('TrainerProfileModel handles minimal/empty map with fallback defaults', () {
+      final emptyMap = <String, dynamic>{
+        'uid': 'trainer_minimal',
+      };
+
+      final model = TrainerProfileModel.fromMap(emptyMap);
+      expect(model.id, equals('trainer_minimal'));
+      expect(model.name, equals('Coach Mike Torres'));
+      expect(model.specializations, isNotEmpty);
+      expect(model.certifications, isNotEmpty);
+      expect(model.monthlyMetrics.sessionsCompleted, equals(38));
+      expect(model.availability.workingHours, equals('8AM–6PM'));
     });
   });
 

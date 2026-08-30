@@ -147,12 +147,12 @@ class _EditOperatingHoursSheetState
               margin: const EdgeInsets.only(bottom: 8),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.12)
+                    ? AppColors.owner.withValues(alpha: 0.12)
                     : AppColors.surface,
                 borderRadius: AppRadius.radiusMD,
                 border: Border.all(
                   color: isSelected
-                      ? AppColors.primary
+                      ? AppColors.owner
                       : AppColors.border.withValues(alpha: 0.5),
                   width: isSelected ? 1.2 : 0.6,
                 ),
@@ -172,7 +172,7 @@ class _EditOperatingHoursSheetState
                   isSelected
                       ? Icons.radio_button_checked_rounded
                       : Icons.radio_button_off_rounded,
-                  color: isSelected ? AppColors.primary : AppColors.textHint,
+                  color: isSelected ? AppColors.owner : AppColors.textHint,
                   size: 20,
                 ),
                 onTap: () {
@@ -199,12 +199,20 @@ class _EditOperatingHoursSheetState
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.owner,
+                foregroundColor: Colors.black,
+                textStyle: const TextStyle(fontWeight: FontWeight.w700),
+              ),
               onPressed: _isSaving ? null : _saveHours,
               child: _isSaving
                   ? const SizedBox(
                       width: 22,
                       height: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                      ),
                     )
                   : const Text('Save Operating Hours'),
             ),

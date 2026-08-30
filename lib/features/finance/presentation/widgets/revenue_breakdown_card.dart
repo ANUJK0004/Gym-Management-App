@@ -116,7 +116,7 @@ class RevenueBreakdownCard
               valueColor:
               const AlwaysStoppedAnimation<
                   Color>(
-                AppColors.primary,
+                AppColors.owner,
               ),
             ),
           ),

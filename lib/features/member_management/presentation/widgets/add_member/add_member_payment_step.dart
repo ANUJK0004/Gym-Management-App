@@ -159,7 +159,7 @@ class AddMemberPaymentStep extends StatelessWidget {
               Text(
                 '₱${_money(amount)}',
                 style: const TextStyle(
-                  color: AppColors.primary,
+                  color: AppColors.owner,
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
                 ),
@@ -224,12 +224,12 @@ class AddMemberPaymentStep extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: selected
-              ? const Color(0xFF1D2A1B)
+              ? const Color(0xFF332314)
               : AppColors.background,
           borderRadius: AppRadius.radiusMD,
           border: Border.all(
             color: selected
-                ? AppColors.primary
+                ? AppColors.owner
                 : AppColors.border,
           ),
         ),
@@ -239,7 +239,7 @@ class AddMemberPaymentStep extends StatelessWidget {
               option.icon,
               size: 18,
               color: selected
-                  ? AppColors.primary
+                  ? AppColors.owner
                   : AppColors.textSecondary,
             ),
 
@@ -262,7 +262,7 @@ class AddMemberPaymentStep extends StatelessWidget {
                   : Icons.radio_button_off,
               size: 17,
               color: selected
-                  ? AppColors.primary
+                  ? AppColors.owner
                   : AppColors.textSecondary,
             ),
           ],
@@ -279,10 +279,10 @@ class AddMemberPaymentStep extends StatelessWidget {
         vertical: 10,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFF1D2A1B),
+        color: const Color(0xFF332314),
         borderRadius: AppRadius.radiusMD,
         border: Border.all(
-          color: AppColors.primary,
+          color: AppColors.owner,
         ),
       ),
       child: Row(
@@ -290,14 +290,14 @@ class AddMemberPaymentStep extends StatelessWidget {
           const Icon(
             Icons.schedule_outlined,
             size: 16,
-            color: AppColors.primary,
+            color: AppColors.owner,
           ),
           const SizedBox(width: 9),
           const Expanded(
             child: Text(
               'Payment Pending',
               style: TextStyle(
-                color: AppColors.primary,
+                color: AppColors.owner,
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
               ),

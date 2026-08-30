@@ -31,7 +31,7 @@ class OwnerBusinessHeader
         borderRadius:
         AppRadius.radiusLG,
         border: Border.all(
-          color: AppColors.primary
+          color: AppColors.owner
               .withValues(alpha: 0.2),
           width: 0.7,
         ),
@@ -44,7 +44,7 @@ class OwnerBusinessHeader
             decoration:
             BoxDecoration(
               color:
-              AppColors.primary,
+              AppColors.owner,
               borderRadius:
               BorderRadius.circular(
                 14,
@@ -129,7 +129,7 @@ class OwnerBusinessHeader
                         .labelMedium
                         .copyWith(
                       color:
-                      AppColors.primary,
+                      AppColors.owner,
                       fontWeight:
                       FontWeight.w600,
                     ),

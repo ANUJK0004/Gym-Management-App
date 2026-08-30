@@ -16,7 +16,7 @@ class ReportExportButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.primary,
+      color: AppColors.owner,
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
         onTap: loading ? null : onPressed,

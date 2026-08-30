@@ -250,6 +250,7 @@ class _FinanceScreenState
       AppColors.background,
       body: SafeArea(
         child: RefreshIndicator(
+          color: AppColors.owner,
           onRefresh: () async {
             ref.invalidate(
               financeTransactionsProvider,
@@ -410,7 +411,7 @@ class _FinanceScreenState
                                 .copyWith(
                               color:
                               AppColors
-                                  .primary,
+                                  .owner,
                               fontWeight:
                               FontWeight.w600,
                             ),
@@ -514,7 +515,9 @@ class _LoadingCard
       height: 120,
       child: Center(
         child:
-        CircularProgressIndicator(),
+        CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+        ),
       ),
     );
   }

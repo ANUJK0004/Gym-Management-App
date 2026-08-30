@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../../design_system/appbar/app_back_button.dart';
 import '../../../../design_system/buttons/primary_button.dart';
 import '../../../../design_system/inputs/app_text_field.dart';
@@ -195,6 +196,7 @@ class _OwnerSetupScreenState
                 'Enter your gym name',
                 prefixIcon:
                 Icons.fitness_center,
+                focusedColor: AppColors.owner,
               ),
 
               const SizedBox(
@@ -209,6 +211,7 @@ class _OwnerSetupScreenState
                 'Tell members about your gym',
                 prefixIcon:
                 Icons.description_outlined,
+                focusedColor: AppColors.owner,
               ),
 
               const SizedBox(
@@ -223,6 +226,7 @@ class _OwnerSetupScreenState
                 'Enter gym address',
                 prefixIcon:
                 Icons.location_on_outlined,
+                focusedColor: AppColors.owner,
               ),
 
               const SizedBox(
@@ -237,6 +241,7 @@ class _OwnerSetupScreenState
                 'Enter gym phone number',
                 prefixIcon:
                 Icons.phone_outlined,
+                focusedColor: AppColors.owner,
               ),
 
               const SizedBox(
@@ -251,6 +256,7 @@ class _OwnerSetupScreenState
                 'Enter gym email',
                 prefixIcon:
                 Icons.email_outlined,
+                focusedColor: AppColors.owner,
               ),
 
               const SizedBox(
@@ -262,6 +268,8 @@ class _OwnerSetupScreenState
                 'Create Gym',
                 isLoading:
                 state.isLoading,
+                backgroundColor: AppColors.owner,
+                foregroundColor: Colors.black,
                 onPressed:
                 _createGym,
               ),

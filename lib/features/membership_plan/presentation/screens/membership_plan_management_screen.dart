@@ -70,12 +70,12 @@ class MembershipPlanManagementScreen
           );
         },
         backgroundColor:
-        AppColors.primary,
+        AppColors.owner,
         child:
         const Icon(
           Icons.add,
           color:
-          AppColors.textInverse,
+          Colors.black,
         ),
       )
           : null,
@@ -84,7 +84,9 @@ class MembershipPlanManagementScreen
         loading: () {
           return const Center(
             child:
-            CircularProgressIndicator(),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+            ),
           );
         },
 
@@ -107,7 +109,9 @@ class MembershipPlanManagementScreen
             loading: () {
               return const Center(
                 child:
-                CircularProgressIndicator(),
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+                ),
               );
             },
 
@@ -144,6 +148,7 @@ class MembershipPlanManagementScreen
               }
 
               return RefreshIndicator(
+                color: AppColors.owner,
                 onRefresh: () async {
                   ref.invalidate(
                     ownerMembershipPlansProvider,
@@ -509,7 +514,7 @@ class _EmptyPlansView
               height: 80,
               decoration:
               BoxDecoration(
-                color: AppColors.primary
+                color: AppColors.owner
                     .withValues(alpha: 0.12),
                 borderRadius:
                 BorderRadius.circular(
@@ -522,7 +527,7 @@ class _EmptyPlansView
                     .card_membership_rounded,
                 size: 40,
                 color:
-                AppColors.primary,
+                AppColors.owner,
               ),
             ),
 
@@ -561,6 +566,11 @@ class _EmptyPlansView
             ),
 
             ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.owner,
+                foregroundColor: Colors.black,
+                textStyle: const TextStyle(fontWeight: FontWeight.w700),
+              ),
               onPressed:
               onCreatePlan,
               icon:

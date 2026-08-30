@@ -54,7 +54,9 @@ class TrainerDetailsScreen
         loading: () =>
         const Center(
           child:
-          CircularProgressIndicator(),
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+          ),
         ),
 
         error:
@@ -247,9 +249,7 @@ class _ProfileHeader
           CircleAvatar(
             radius: 42,
             backgroundColor:
-            const Color(
-              0xFF294725,
-            ),
+            AppColors.owner.withValues(alpha: 0.15),
             backgroundImage:
             photoUrl != null &&
                 photoUrl!
@@ -269,7 +269,7 @@ class _ProfileHeader
               const TextStyle(
                 color:
                 AppColors
-                    .primary,
+                    .owner,
                 fontWeight:
                 FontWeight
                     .w800,
@@ -329,7 +329,7 @@ class _ProfileHeader
               status.toLowerCase() ==
                   'active'
                   ? AppColors
-                  .primary
+                  .owner
                   : AppColors
                   .textSecondary,
               fontWeight:
@@ -426,7 +426,7 @@ class _InfoCard
           Icon(
             icon,
             color:
-            AppColors.primary,
+            AppColors.owner,
           ),
 
           const SizedBox(

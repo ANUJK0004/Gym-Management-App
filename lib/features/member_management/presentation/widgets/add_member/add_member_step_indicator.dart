@@ -29,7 +29,7 @@ class AddMemberStepIndicator extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: completed || active
-                    ? AppColors.primary
+                    ? AppColors.owner
                     : AppColors.border,
                 borderRadius: BorderRadius.circular(10),
               ),

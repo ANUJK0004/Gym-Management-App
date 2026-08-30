@@ -77,6 +77,7 @@ class _TrainerManagementScreenState
       body: SafeArea(
         bottom: false,
         child: RefreshIndicator(
+          color: AppColors.owner,
           onRefresh: () async {
             ref.invalidate(
               gymTrainersProvider,
@@ -199,7 +200,7 @@ class _TrainerManagementScreenState
         ),
 
         Material(
-          color: AppColors.primary,
+          color: AppColors.owner,
           borderRadius:
           BorderRadius.circular(10),
           child: InkWell(
@@ -364,7 +365,9 @@ class _TrainerManagementScreenState
         ),
         child: Center(
           child:
-          CircularProgressIndicator(),
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+          ),
         ),
       ),
 
@@ -437,7 +440,9 @@ class _TrainerManagementScreenState
         EdgeInsets.only(top: 40),
         child: Center(
           child:
-          CircularProgressIndicator(),
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.owner),
+          ),
         ),
       ),
 
@@ -564,7 +569,7 @@ class _StatCard
     required this.value,
     required this.label,
     this.accent =
-        AppColors.primary,
+        AppColors.owner,
   });
 
   final String value;

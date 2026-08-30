@@ -165,7 +165,7 @@ class RevenueTrendCard
                           BoxDecoration(
                             color:
                             AppColors
-                                .primary,
+                                .owner,
                             borderRadius:
                             const BorderRadius
                                 .vertical(
@@ -213,7 +213,7 @@ class RevenueTrendCard
         decoration:
         BoxDecoration(
           color: selected
-              ? AppColors.primary
+              ? AppColors.owner
               : Colors.transparent,
           borderRadius:
           BorderRadius.circular(

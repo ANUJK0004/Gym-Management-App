@@ -102,7 +102,7 @@ class OwnerHeader extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.all(3),
                   decoration: const BoxDecoration(
-                    color: AppColors.primary,
+                    color: AppColors.owner,
                     shape: BoxShape.circle,
                   ),
                   constraints: const BoxConstraints(
@@ -143,7 +143,7 @@ class OwnerHeader extends ConsumerWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.4),
+                        color: AppColors.owner.withValues(alpha: 0.4),
                         width: 1.5,
                       ),
                     ),
@@ -158,10 +158,10 @@ class OwnerHeader extends ConsumerWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.owner,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.6),
+                        color: AppColors.owner.withValues(alpha: 0.6),
                         width: 1.5,
                       ),
                     ),

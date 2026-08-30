@@ -83,7 +83,7 @@ class _TrainerEnrollmentSuccessSheetState
               decoration:
               BoxDecoration(
                 color:
-                const Color(0xFF294725),
+                AppColors.owner.withValues(alpha: 0.18),
                 borderRadius:
                 BorderRadius.circular(
                   20,
@@ -93,7 +93,7 @@ class _TrainerEnrollmentSuccessSheetState
                 Icons.check_rounded,
                 size: 40,
                 color:
-                AppColors.primary,
+                AppColors.owner,
               ),
             ),
 

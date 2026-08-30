@@ -162,7 +162,7 @@ class AddMemberPersonalStep extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.radiusMD,
           borderSide: const BorderSide(
-            color: AppColors.primary,
+            color: AppColors.owner,
           ),
         ),
       ),
@@ -181,7 +181,7 @@ class AddMemberPersonalStep extends StatelessWidget {
             return Theme(
               data: Theme.of(context).copyWith(
                 colorScheme: const ColorScheme.dark(
-                  primary: AppColors.primary,
+                  primary: AppColors.owner,
                 ),
               ),
               child: child!,
@@ -252,12 +252,12 @@ class AddMemberPersonalStep extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: selected
-                    ? AppColors.primary
+                    ? AppColors.owner
                     : AppColors.background,
                 borderRadius: BorderRadius.circular(9),
                 border: Border.all(
                   color: selected
-                      ? AppColors.primary
+                      ? AppColors.owner
                       : AppColors.border,
                 ),
               ),

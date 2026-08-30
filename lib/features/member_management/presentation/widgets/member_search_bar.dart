@@ -91,7 +91,7 @@ class MemberSearchBar
           borderSide:
           const BorderSide(
             color:
-            AppColors.primary,
+            AppColors.owner,
             width: 1,
           ),
         ),

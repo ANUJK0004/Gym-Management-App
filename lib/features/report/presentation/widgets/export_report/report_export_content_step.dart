@@ -126,12 +126,12 @@ class _SelectionTile extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: highlighted
-                ? const Color(0xFF1D2A1B)
+                ? const Color(0xFF332314)
                 : AppColors.background,
             borderRadius: AppRadius.radiusMD,
             border: Border.all(
               color: highlighted
-                  ? AppColors.primary
+                  ? AppColors.owner
                   : AppColors.border,
             ),
           ),
@@ -145,11 +145,11 @@ class _SelectionTile extends StatelessWidget {
                   BorderRadius.circular(5),
                   border: Border.all(
                     color: selected
-                        ? AppColors.primary
+                        ? AppColors.owner
                         : AppColors.textSecondary,
                   ),
                   color: selected
-                      ? AppColors.primary
+                      ? AppColors.owner
                       : Colors.transparent,
                 ),
                 child: selected

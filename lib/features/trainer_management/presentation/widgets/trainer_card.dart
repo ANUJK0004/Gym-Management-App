@@ -44,7 +44,7 @@ class TrainerCard extends StatelessWidget {
                             width: 9,
                             height: 9,
                             decoration: const BoxDecoration(
-                              color: AppColors.primary,
+                              color: AppColors.owner,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -147,7 +147,7 @@ class TrainerCard extends StatelessWidget {
                     Text(
                       '₹${_money(trainer.monthlySalary!)} /mo',
                       style: const TextStyle(
-                        color: AppColors.primary,
+                        color: AppColors.owner,
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
                       ),
@@ -266,14 +266,14 @@ class _InitialAvatar extends StatelessWidget {
       width: 42,
       height: 42,
       alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        color: Color(0xFF294725),
+      decoration: BoxDecoration(
+        color: AppColors.owner.withValues(alpha: 0.15),
         shape: BoxShape.circle,
       ),
       child: Text(
         initials,
         style: AppTextStyles.labelMedium.copyWith(
-          color: AppColors.primary,
+          color: AppColors.owner,
           fontWeight: FontWeight.w800,
         ),
       ),

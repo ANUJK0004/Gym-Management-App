@@ -48,14 +48,14 @@ class ReportMetricCard extends StatelessWidget {
               Icon(
                 icon,
                 size: 19,
-                color: AppColors.primary,
+                color: AppColors.owner,
               ),
               const Spacer(),
               Text(
                 change,
                 style: AppTextStyles.labelMedium.copyWith(
                   color: isGood
-                      ? AppColors.primary
+                      ? AppColors.owner
                       : Colors.redAccent,
                   fontWeight: FontWeight.w700,
                 ),

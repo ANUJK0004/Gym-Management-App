@@ -61,7 +61,7 @@ class FinancePeriodSelector
         decoration:
         BoxDecoration(
           color:
-          AppColors.primary
+          AppColors.owner
               .withValues(
             alpha: 0.12,
           ),
@@ -72,7 +72,7 @@ class FinancePeriodSelector
           border:
           Border.all(
             color:
-            AppColors.primary
+            AppColors.owner
                 .withValues(
               alpha: 0.35,
             ),
@@ -83,7 +83,7 @@ class FinancePeriodSelector
           style:
           const TextStyle(
             color:
-            AppColors.primary,
+            AppColors.owner,
             fontSize: 11,
             fontWeight:
             FontWeight.w700,

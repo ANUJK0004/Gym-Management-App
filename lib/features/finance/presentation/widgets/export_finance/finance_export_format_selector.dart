@@ -84,7 +84,7 @@ class _FormatButton extends StatelessWidget {
 
     return Material(
       color: selected
-          ? AppColors.primary
+          ? AppColors.owner
           : AppColors.inputField,
       borderRadius: AppRadius.radiusSM,
       child: InkWell(

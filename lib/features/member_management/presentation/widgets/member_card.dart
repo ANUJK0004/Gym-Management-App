@@ -129,7 +129,7 @@ class MemberCard extends StatelessWidget {
                         .labelMedium
                         .copyWith(
                       color: isActive
-                          ? AppColors.primary
+                          ? AppColors.owner
                           : isExpired
                           ? Colors.redAccent
                           : AppColors
@@ -292,8 +292,8 @@ class _InitialAvatar
       height: 42,
       alignment: Alignment.center,
       decoration:
-      const BoxDecoration(
-        color: Color(0xFF294725),
+      BoxDecoration(
+        color: AppColors.owner.withValues(alpha: 0.15),
         shape: BoxShape.circle,
       ),
       child: Text(
@@ -301,7 +301,7 @@ class _InitialAvatar
         style: AppTextStyles
             .labelMedium
             .copyWith(
-          color: AppColors.primary,
+          color: AppColors.owner,
           fontWeight:
           FontWeight.w800,
         ),

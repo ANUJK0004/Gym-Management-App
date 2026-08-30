@@ -259,7 +259,7 @@ class _AddMemberSheetState
             return const Center(
               child:
               CircularProgressIndicator(
-                color: AppColors.primary,
+                color: AppColors.owner,
               ),
             );
           },
@@ -484,11 +484,11 @@ class _AddMemberSheetState
                 style:
                 ElevatedButton.styleFrom(
                   backgroundColor:
-                  AppColors.primary,
+                  AppColors.owner,
                   foregroundColor:
                   Colors.black,
                   disabledBackgroundColor:
-                  AppColors.primary
+                  AppColors.owner
                       .withValues(
                     alpha: 0.45,
                   ),
@@ -573,7 +573,7 @@ class _AddMemberSheetState
                 'Retry',
                 style: TextStyle(
                   color:
-                  AppColors.primary,
+                  AppColors.owner,
                 ),
               ),
             ),

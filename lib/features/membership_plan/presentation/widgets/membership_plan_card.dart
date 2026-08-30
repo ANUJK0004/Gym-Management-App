@@ -71,7 +71,7 @@ class MembershipPlanCard
                 decoration:
                 BoxDecoration(
                   color: plan.isActive
-                      ? AppColors.primary
+                      ? AppColors.owner
                       .withValues(alpha: 0.12)
                       : Colors.grey
                       .withValues(alpha: 0.12),
@@ -87,7 +87,7 @@ class MembershipPlanCard
                       .labelMedium
                       .copyWith(
                     color: plan.isActive
-                        ? AppColors.primary
+                        ? AppColors.owner
                         : AppColors
                         .textSecondary,
                     fontWeight:
@@ -244,7 +244,7 @@ class _PlanInfo
         Icon(
           icon,
           size: 18,
-          color: AppColors.primary,
+          color: AppColors.owner,
         ),
 
         const SizedBox(

@@ -9,31 +9,60 @@ class TrainerProfileRepositoryImpl implements TrainerProfileRepository {
   final TrainerProfileRemoteDataSource _remoteDataSource;
 
   @override
-  Future<TrainerProfile> getProfile({required String trainerId}) {
+  Stream<TrainerProfile> watchProfile({String? trainerId}) {
+    return _remoteDataSource.watchProfile(trainerId: trainerId);
+  }
+
+  @override
+  Future<TrainerProfile> getProfile({String? trainerId}) {
     return _remoteDataSource.getProfile(trainerId: trainerId);
   }
 
   @override
   Future<TrainerProfile> updateProfile(TrainerProfile profile) {
-    final model = TrainerProfileModel(
-      id: profile.id,
-      name: profile.name,
-      title: profile.title,
-      email: profile.email,
-      initials: profile.initials,
-      photoUrl: profile.photoUrl,
-      isVerified: profile.isVerified,
-      rating: profile.rating,
-      reviewCount: profile.reviewCount,
-      clientCount: profile.clientCount,
-      experienceYears: profile.experienceYears,
-      sessionCount: profile.sessionCount,
-      specializations: profile.specializations,
-      certifications: profile.certifications,
-      monthlyMetrics: profile.monthlyMetrics,
-      availability: profile.availability,
-      accountSettings: profile.accountSettings,
-    );
+    final model = profile is TrainerProfileModel
+        ? profile
+        : TrainerProfileModel(
+            id: profile.id,
+            name: profile.name,
+            title: profile.title,
+            email: profile.email,
+            initials: profile.initials,
+            photoUrl: profile.photoUrl,
+            isVerified: profile.isVerified,
+            rating: profile.rating,
+            reviewCount: profile.reviewCount,
+            clientCount: profile.clientCount,
+            experienceYears: profile.experienceYears,
+            sessionCount: profile.sessionCount,
+            specializations: profile.specializations,
+            certifications: profile.certifications,
+            monthlyMetrics: profile.monthlyMetrics,
+            availability: profile.availability,
+            accountSettings: profile.accountSettings,
+          );
     return _remoteDataSource.updateProfile(model);
+  }
+
+  @override
+  Future<void> updateAvailability({
+    required String trainerId,
+    required TrainerAvailability availability,
+  }) {
+    return _remoteDataSource.updateAvailability(
+      trainerId: trainerId,
+      availability: availability,
+    );
+  }
+
+  @override
+  Future<void> updateAccountSettings({
+    required String trainerId,
+    required TrainerAccountSettings settings,
+  }) {
+    return _remoteDataSource.updateAccountSettings(
+      trainerId: trainerId,
+      settings: settings,
+    );
   }
 }

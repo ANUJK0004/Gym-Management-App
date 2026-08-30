@@ -13,6 +13,8 @@ class PrimaryButton extends StatelessWidget {
     this.icon,
     this.isLoading = false,
     this.isExpanded = true,
+    this.backgroundColor,
+    this.foregroundColor,
   });
 
   final String text;
@@ -20,19 +22,24 @@ class PrimaryButton extends StatelessWidget {
   final IconData? icon;
   final bool isLoading;
   final bool isExpanded;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   @override
   Widget build(BuildContext context) {
+    final bg = backgroundColor ?? AppColors.primary;
+    final fg = foregroundColor ?? AppColors.textInverse;
+
     final button = AnimatedContainer(
       duration: AppAnimation.fast,
       height: AppDimensions.buttonHeight,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.textInverse,
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
-          disabledForegroundColor: AppColors.textInverse.withValues(alpha: 0.6),
+          backgroundColor: bg,
+          foregroundColor: fg,
+          disabledBackgroundColor: bg.withValues(alpha: 0.4),
+          disabledForegroundColor: fg.withValues(alpha: 0.6),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: AppRadius.radiusLG,

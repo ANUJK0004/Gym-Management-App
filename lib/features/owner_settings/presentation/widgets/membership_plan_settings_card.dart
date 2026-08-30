@@ -38,7 +38,7 @@ class MembershipPlanSettingsCard extends StatelessWidget {
                       ? Icons.add_circle_outline_rounded
                       : Icons.workspace_premium_rounded,
                   color: isAddNew
-                      ? AppColors.primary
+                      ? AppColors.owner
                       : isActive
                           ? Colors.amber
                           : AppColors.textDisabled,
@@ -57,7 +57,7 @@ class MembershipPlanSettingsCard extends StatelessWidget {
                               style: AppTextStyles.bodyMedium.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: isAddNew
-                                    ? AppColors.primary
+                                    ? AppColors.owner
                                     : AppColors.textPrimary,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -102,7 +102,7 @@ class MembershipPlanSettingsCard extends StatelessWidget {
                   Text(
                     price,
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.owner,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

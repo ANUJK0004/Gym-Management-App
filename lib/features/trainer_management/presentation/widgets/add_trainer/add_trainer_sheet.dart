@@ -296,11 +296,11 @@ class _AddTrainerSheetState
                     style:
                     ElevatedButton.styleFrom(
                       backgroundColor:
-                      AppColors.primary,
+                      AppColors.owner,
                       foregroundColor:
                       Colors.black,
                       disabledBackgroundColor:
-                      AppColors.primary
+                      AppColors.owner
                           .withValues(
                         alpha: 0.45,
                       ),
@@ -428,7 +428,7 @@ class _AddTrainerSheetState
           borderSide:
           const BorderSide(
             color:
-            AppColors.primary,
+            AppColors.owner,
             width: 1,
           ),
         ),
@@ -503,7 +503,7 @@ class _AddTrainerSheetState
             colorScheme:
             const ColorScheme.dark(
               primary:
-              AppColors.primary,
+              AppColors.owner,
               surface:
               AppColors.surface,
             ),
@@ -666,7 +666,7 @@ class _SpecializationChip
       ) {
     return Material(
       color: selected
-          ? AppColors.primary
+          ? AppColors.owner
           : AppColors.background,
       borderRadius:
       BorderRadius.circular(9),
@@ -685,7 +685,7 @@ class _SpecializationChip
             BorderRadius.circular(9),
             border: Border.all(
               color: selected
-                  ? AppColors.primary
+                  ? AppColors.owner
                   : AppColors.border,
               width: 0.5,
             ),

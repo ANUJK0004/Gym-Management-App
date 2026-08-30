@@ -69,7 +69,7 @@ class TrainerSearchBar extends StatelessWidget {
           BorderRadius.circular(10),
           borderSide:
           const BorderSide(
-            color: AppColors.primary,
+            color: AppColors.owner,
             width: 1,
           ),
         ),

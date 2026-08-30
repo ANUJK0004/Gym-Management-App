@@ -110,7 +110,7 @@ class _FinanceExportSuccessSheetState
               decoration:
               BoxDecoration(
                 color:
-                AppColors.primary
+                AppColors.owner
                     .withValues(
                   alpha: 0.18,
                 ),
@@ -124,7 +124,7 @@ class _FinanceExportSuccessSheetState
                 Icons.check_rounded,
                 size: 42,
                 color:
-                AppColors.primary,
+                AppColors.owner,
               ),
             ),
 
@@ -170,14 +170,14 @@ class _FinanceExportSuccessSheetState
               ),
               decoration:
               BoxDecoration(
-                color: AppColors.primary
+                color: AppColors.owner
                     .withValues(
                   alpha: 0.10,
                 ),
                 borderRadius:
                 AppRadius.radiusSM,
                 border: Border.all(
-                  color: AppColors.primary
+                  color: AppColors.owner
                       .withValues(
                     alpha: 0.35,
                   ),
@@ -195,7 +195,7 @@ class _FinanceExportSuccessSheetState
                         .download_rounded,
                     size: 15,
                     color:
-                    AppColors.primary,
+                    AppColors.owner,
                   ),
 
                   const SizedBox(
@@ -212,7 +212,7 @@ class _FinanceExportSuccessSheetState
                         .copyWith(
                       fontSize: 11,
                       color:
-                      AppColors.primary,
+                      AppColors.owner,
                     ),
                   ),
                 ],

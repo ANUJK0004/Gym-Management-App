@@ -86,17 +86,17 @@ class _OwnerNotificationSheetState
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.16),
+                      color: AppColors.owner.withValues(alpha: 0.16),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.4),
+                        color: AppColors.owner.withValues(alpha: 0.4),
                         width: 0.8,
                       ),
                     ),
                     child: Text(
                       '$unreadCount new',
                       style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.owner,
                         fontWeight: FontWeight.w700,
                         fontSize: 11,
                       ),
@@ -120,7 +120,7 @@ class _OwnerNotificationSheetState
                     child: Text(
                       'Mark all read',
                       style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.owner,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -315,7 +315,7 @@ class _CategoryChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: isSelected
-          ? AppColors.primary.withValues(alpha: 0.16)
+          ? AppColors.owner.withValues(alpha: 0.16)
           : AppColors.surface,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
@@ -329,7 +329,7 @@ class _CategoryChip extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.border,
+              color: isSelected ? AppColors.owner : AppColors.border,
               width: isSelected ? 1.0 : 0.5,
             ),
           ),
@@ -340,7 +340,7 @@ class _CategoryChip extends StatelessWidget {
                 label,
                 style: AppTextStyles.labelMedium.copyWith(
                   color: isSelected
-                      ? AppColors.primary
+                      ? AppColors.owner
                       : AppColors.textSecondary,
                   fontWeight:
                       isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -353,7 +353,7 @@ class _CategoryChip extends StatelessWidget {
                   '($count)',
                   style: TextStyle(
                     color: isSelected
-                        ? AppColors.primary
+                        ? AppColors.owner
                         : AppColors.textSecondary.withValues(alpha: 0.7),
                     fontSize: 11,
                     fontWeight:
@@ -403,7 +403,7 @@ class _NotificationTile extends StatelessWidget {
         ),
       ),
       child: Material(
-        color: item.isRead ? AppColors.surface : const Color(0xFF1B231B),
+        color: item.isRead ? AppColors.surface : const Color(0xFF241D14),
         borderRadius: AppRadius.radiusMD,
         child: InkWell(
           onTap: onTap,
@@ -418,7 +418,7 @@ class _NotificationTile extends StatelessWidget {
               border: Border.all(
                 color: item.isRead
                     ? AppColors.border
-                    : AppColors.primary.withValues(alpha: 0.35),
+                    : AppColors.owner.withValues(alpha: 0.35),
                 width: item.isRead ? 0.5 : 0.8,
               ),
             ),
@@ -465,7 +465,7 @@ class _NotificationTile extends StatelessWidget {
                               width: 8,
                               height: 8,
                               decoration: const BoxDecoration(
-                                color: AppColors.primary,
+                                color: AppColors.owner,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -521,7 +521,7 @@ class _NotificationTile extends StatelessWidget {
       case 'memberAssigned':
       case 'memberEnrollmentCreated':
       case 'memberInvitationSent':
-        return (Icons.person_add_alt_1_rounded, AppColors.primary);
+        return (Icons.person_add_alt_1_rounded, AppColors.owner);
 
       case 'memberRemoved':
         return (Icons.person_remove_rounded, AppColors.error);
@@ -536,7 +536,7 @@ class _NotificationTile extends StatelessWidget {
       case 'membershipPurchased':
       case 'membershipRenewed':
       case 'paymentReceived':
-        return (Icons.payments_rounded, AppColors.primary);
+        return (Icons.payments_rounded, AppColors.owner);
 
       case 'paymentRefunded':
         return (Icons.money_off_rounded, AppColors.warning);
@@ -562,7 +562,7 @@ class _NotificationTile extends StatelessWidget {
         return (Icons.edit_note_rounded, AppColors.textSecondary);
 
       default:
-        return (Icons.notifications_active_rounded, AppColors.primary);
+        return (Icons.notifications_active_rounded, AppColors.owner);
     }
   }
 
@@ -610,14 +610,14 @@ class _EmptyNotificationsView extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.12),
+                color: AppColors.owner.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
               child: const Icon(
                 Icons.notifications_off_rounded,
                 size: 32,
-                color: AppColors.primary,
+                color: AppColors.owner,
               ),
             ),
             const SizedBox(height: 16),

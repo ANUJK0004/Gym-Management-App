@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../domain/entities/trainer_profile.dart';
 
 class TrainerCertificationModel extends TrainerCertification {
@@ -9,17 +11,20 @@ class TrainerCertificationModel extends TrainerCertification {
     super.isVerified = true,
   });
 
-  factory TrainerCertificationModel.fromJson(Map<String, dynamic> json) {
+  factory TrainerCertificationModel.fromMap(Map<String, dynamic> map) {
     return TrainerCertificationModel(
-      id: json['id'] as String? ?? '',
-      title: json['title'] as String? ?? '',
-      obtainedYear: (json['obtainedYear'] as num?)?.toInt() ?? DateTime.now().year,
-      emoji: json['emoji'] as String? ?? '🏅',
-      isVerified: json['isVerified'] as bool? ?? true,
+      id: map['id'] as String? ?? '',
+      title: map['title'] as String? ?? '',
+      obtainedYear: (map['obtainedYear'] as num?)?.toInt() ?? DateTime.now().year,
+      emoji: map['emoji'] as String? ?? '🏅',
+      isVerified: map['isVerified'] as bool? ?? true,
     );
   }
 
-  Map<String, dynamic> toJson() {
+  factory TrainerCertificationModel.fromJson(Map<String, dynamic> json) =>
+      TrainerCertificationModel.fromMap(json);
+
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'title': title,
@@ -28,6 +33,8 @@ class TrainerCertificationModel extends TrainerCertification {
       'isVerified': isVerified,
     };
   }
+
+  Map<String, dynamic> toJson() => toMap();
 }
 
 class TrainerMonthlyMetricsModel extends TrainerMonthlyMetrics {
@@ -38,18 +45,21 @@ class TrainerMonthlyMetricsModel extends TrainerMonthlyMetrics {
     required super.newClientsCount,
   });
 
-  factory TrainerMonthlyMetricsModel.fromJson(Map<String, dynamic> json) {
+  factory TrainerMonthlyMetricsModel.fromMap(Map<String, dynamic> map) {
     return TrainerMonthlyMetricsModel(
-      sessionsCompleted: (json['sessionsCompleted'] as num?)?.toInt() ?? 0,
+      sessionsCompleted: (map['sessionsCompleted'] as num?)?.toInt() ?? 38,
       clientRetentionPercentage:
-          (json['clientRetentionPercentage'] as num?)?.toInt() ?? 0,
+          (map['clientRetentionPercentage'] as num?)?.toInt() ?? 96,
       avgSessionRating:
-          (json['avgSessionRating'] as num?)?.toDouble() ?? 0.0,
-      newClientsCount: (json['newClientsCount'] as num?)?.toInt() ?? 0,
+          (map['avgSessionRating'] as num?)?.toDouble() ?? 4.9,
+      newClientsCount: (map['newClientsCount'] as num?)?.toInt() ?? 2,
     );
   }
 
-  Map<String, dynamic> toJson() {
+  factory TrainerMonthlyMetricsModel.fromJson(Map<String, dynamic> json) =>
+      TrainerMonthlyMetricsModel.fromMap(json);
+
+  Map<String, dynamic> toMap() {
     return {
       'sessionsCompleted': sessionsCompleted,
       'clientRetentionPercentage': clientRetentionPercentage,
@@ -57,6 +67,8 @@ class TrainerMonthlyMetricsModel extends TrainerMonthlyMetrics {
       'newClientsCount': newClientsCount,
     };
   }
+
+  Map<String, dynamic> toJson() => toMap();
 }
 
 class TrainerAvailabilityModel extends TrainerAvailability {
@@ -66,21 +78,26 @@ class TrainerAvailabilityModel extends TrainerAvailability {
     required super.sessionDuration,
   });
 
-  factory TrainerAvailabilityModel.fromJson(Map<String, dynamic> json) {
+  factory TrainerAvailabilityModel.fromMap(Map<String, dynamic> map) {
     return TrainerAvailabilityModel(
-      workingHours: json['workingHours'] as String? ?? '8AM–6PM',
-      daysAvailable: json['daysAvailable'] as String? ?? 'Mon–Sat',
-      sessionDuration: json['sessionDuration'] as String? ?? '45–60 min',
+      workingHours: map['workingHours'] as String? ?? '8AM–6PM',
+      daysAvailable: map['daysAvailable'] as String? ?? 'Mon–Sat',
+      sessionDuration: map['sessionDuration'] as String? ?? '45–60 min',
     );
   }
 
-  Map<String, dynamic> toJson() {
+  factory TrainerAvailabilityModel.fromJson(Map<String, dynamic> json) =>
+      TrainerAvailabilityModel.fromMap(json);
+
+  Map<String, dynamic> toMap() {
     return {
       'workingHours': workingHours,
       'daysAvailable': daysAvailable,
       'sessionDuration': sessionDuration,
     };
   }
+
+  Map<String, dynamic> toJson() => toMap();
 }
 
 class TrainerAccountSettingsModel extends TrainerAccountSettings {
@@ -89,19 +106,24 @@ class TrainerAccountSettingsModel extends TrainerAccountSettings {
     super.clientMessagingEnabled = true,
   });
 
-  factory TrainerAccountSettingsModel.fromJson(Map<String, dynamic> json) {
+  factory TrainerAccountSettingsModel.fromMap(Map<String, dynamic> map) {
     return TrainerAccountSettingsModel(
-      notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
-      clientMessagingEnabled: json['clientMessagingEnabled'] as bool? ?? true,
+      notificationsEnabled: map['notificationsEnabled'] as bool? ?? true,
+      clientMessagingEnabled: map['clientMessagingEnabled'] as bool? ?? true,
     );
   }
 
-  Map<String, dynamic> toJson() {
+  factory TrainerAccountSettingsModel.fromJson(Map<String, dynamic> json) =>
+      TrainerAccountSettingsModel.fromMap(json);
+
+  Map<String, dynamic> toMap() {
     return {
       'notificationsEnabled': notificationsEnabled,
       'clientMessagingEnabled': clientMessagingEnabled,
     };
   }
+
+  Map<String, dynamic> toJson() => toMap();
 }
 
 class TrainerProfileModel extends TrainerProfile {
@@ -125,55 +147,186 @@ class TrainerProfileModel extends TrainerProfile {
     required super.accountSettings,
   });
 
-  factory TrainerProfileModel.fromJson(Map<String, dynamic> json) {
-    final certList = (json['certifications'] as List<dynamic>?)
-            ?.map((e) =>
-                TrainerCertificationModel.fromJson(e as Map<String, dynamic>))
-            .toList() ??
-        [];
+  static const List<String> defaultSpecializations = [
+    'Strength & Conditioning',
+    'HIIT',
+    'Weight Loss',
+    'Athletic Performance',
+    'Nutrition Coaching',
+  ];
 
-    final specList = (json['specializations'] as List<dynamic>?)
-            ?.map((e) => e.toString())
-            .toList() ??
-        [];
+  static const List<TrainerCertificationModel> defaultCertifications = [
+    TrainerCertificationModel(
+      id: 'cert_001',
+      title: 'NSCA Certified Personal Trainer',
+      obtainedYear: 2019,
+      emoji: '🏅',
+      isVerified: true,
+    ),
+    TrainerCertificationModel(
+      id: 'cert_002',
+      title: 'Precision Nutrition Level 1',
+      obtainedYear: 2020,
+      emoji: '🥗',
+      isVerified: true,
+    ),
+    TrainerCertificationModel(
+      id: 'cert_003',
+      title: 'TRX Suspension Training',
+      obtainedYear: 2021,
+      emoji: '🧬',
+      isVerified: true,
+    ),
+    TrainerCertificationModel(
+      id: 'cert_004',
+      title: 'First Aid & CPR Certified',
+      obtainedYear: 2023,
+      emoji: '🩺',
+      isVerified: true,
+    ),
+  ];
+
+  factory TrainerProfileModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data() ?? {};
+    return TrainerProfileModel.fromMap(data, id: doc.id);
+  }
+
+  factory TrainerProfileModel.fromMap(
+    Map<String, dynamic> data, {
+    String? id,
+  }) {
+    final effectiveId = id ?? (data['uid'] as String?) ?? (data['id'] as String?) ?? 'trainer_001';
+    final rawName = (data['displayName'] as String?) ?? (data['name'] as String?);
+    final effectiveName = (rawName != null && rawName.trim().isNotEmpty)
+        ? rawName.trim()
+        : 'Coach Mike Torres';
+
+    final effectiveInitials = extractInitials(effectiveName);
+
+    // Parse Specializations
+    List<String> specList = [];
+    if (data['specializations'] is List) {
+      specList = (data['specializations'] as List)
+          .map((e) => e.toString().trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+    } else if (data['specialization'] is String && (data['specialization'] as String).isNotEmpty) {
+      specList = (data['specialization'] as String)
+          .split(',')
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+    }
+    if (specList.isEmpty) {
+      specList = List.from(defaultSpecializations);
+    }
+
+    // Parse Certifications
+    List<TrainerCertificationModel> certList = [];
+    if (data['certifications'] is List) {
+      certList = (data['certifications'] as List)
+          .whereType<Map<String, dynamic>>()
+          .map(TrainerCertificationModel.fromMap)
+          .toList();
+    }
+    if (certList.isEmpty) {
+      certList = List.from(defaultCertifications);
+    }
+
+    // Parse Monthly Metrics
+    final monthlyMetrics = data['monthlyMetrics'] is Map<String, dynamic>
+        ? TrainerMonthlyMetricsModel.fromMap(data['monthlyMetrics'] as Map<String, dynamic>)
+        : const TrainerMonthlyMetricsModel(
+            sessionsCompleted: 38,
+            clientRetentionPercentage: 96,
+            avgSessionRating: 4.9,
+            newClientsCount: 2,
+          );
+
+    // Parse Availability
+    final availability = data['availability'] is Map<String, dynamic>
+        ? TrainerAvailabilityModel.fromMap(data['availability'] as Map<String, dynamic>)
+        : const TrainerAvailabilityModel(
+            workingHours: '8AM–6PM',
+            daysAvailable: 'Mon–Sat',
+            sessionDuration: '45–60 min',
+          );
+
+    // Parse Account Settings
+    final accountSettings = data['accountSettings'] is Map<String, dynamic>
+        ? TrainerAccountSettingsModel.fromMap(data['accountSettings'] as Map<String, dynamic>)
+        : const TrainerAccountSettingsModel();
 
     return TrainerProfileModel(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? 'Coach Mike Torres',
-      title: json['title'] as String? ?? 'Senior Personal Trainer',
-      email: json['email'] as String? ?? 'mike.torres@gymsync.com',
-      initials: json['initials'] as String? ?? 'MT',
-      photoUrl: json['photoUrl'] as String?,
-      isVerified: json['isVerified'] as bool? ?? true,
-      rating: (json['rating'] as num?)?.toDouble() ?? 4.9,
-      reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 128,
-      clientCount: (json['clientCount'] as num?)?.toInt() ?? 5,
-      experienceYears: (json['experienceYears'] as num?)?.toDouble() ?? 3.2,
-      sessionCount: (json['sessionCount'] as num?)?.toInt() ?? 142,
+      id: effectiveId,
+      name: effectiveName,
+      title: data['title'] as String? ?? 'Senior Personal Trainer',
+      email: data['email'] as String? ?? 'mike.torres@gymsync.com',
+      initials: effectiveInitials,
+      photoUrl: data['photoUrl'] as String?,
+      isVerified: data['isVerified'] as bool? ?? true,
+      rating: (data['rating'] as num?)?.toDouble() ?? 4.9,
+      reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 128,
+      clientCount: (data['clientCount'] as num?)?.toInt() ?? 5,
+      experienceYears: (data['experienceYears'] as num?)?.toDouble() ?? 3.2,
+      sessionCount: (data['sessionCount'] as num?)?.toInt() ?? 142,
       specializations: specList,
       certifications: certList,
-      monthlyMetrics: json['monthlyMetrics'] != null
-          ? TrainerMonthlyMetricsModel.fromJson(
-              json['monthlyMetrics'] as Map<String, dynamic>)
-          : const TrainerMonthlyMetricsModel(
-              sessionsCompleted: 38,
-              clientRetentionPercentage: 96,
-              avgSessionRating: 4.9,
-              newClientsCount: 2,
-            ),
-      availability: json['availability'] != null
-          ? TrainerAvailabilityModel.fromJson(
-              json['availability'] as Map<String, dynamic>)
-          : const TrainerAvailabilityModel(
-              workingHours: '8AM–6PM',
-              daysAvailable: 'Mon–Sat',
-              sessionDuration: '45–60 min',
-            ),
-      accountSettings: json['accountSettings'] != null
-          ? TrainerAccountSettingsModel.fromJson(
-              json['accountSettings'] as Map<String, dynamic>)
-          : const TrainerAccountSettingsModel(),
+      monthlyMetrics: monthlyMetrics,
+      availability: availability,
+      accountSettings: accountSettings,
     );
+  }
+
+  factory TrainerProfileModel.fromJson(Map<String, dynamic> json) =>
+      TrainerProfileModel.fromMap(json);
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'uid': id,
+      'displayName': name,
+      'name': name,
+      'title': title,
+      'email': email,
+      'initials': initials,
+      'photoUrl': photoUrl,
+      'role': 'trainer',
+      'isVerified': isVerified,
+      'rating': rating,
+      'reviewCount': reviewCount,
+      'clientCount': clientCount,
+      'experienceYears': experienceYears,
+      'sessionCount': sessionCount,
+      'specializations': specializations,
+      'specialization': specializations.isNotEmpty ? specializations.first : 'Personal Trainer',
+      'certifications': certifications
+          .map((c) => TrainerCertificationModel(
+                id: c.id,
+                title: c.title,
+                obtainedYear: c.obtainedYear,
+                emoji: c.emoji,
+                isVerified: c.isVerified,
+              ).toMap())
+          .toList(),
+      'monthlyMetrics': TrainerMonthlyMetricsModel(
+        sessionsCompleted: monthlyMetrics.sessionsCompleted,
+        clientRetentionPercentage: monthlyMetrics.clientRetentionPercentage,
+        avgSessionRating: monthlyMetrics.avgSessionRating,
+        newClientsCount: monthlyMetrics.newClientsCount,
+      ).toMap(),
+      'availability': TrainerAvailabilityModel(
+        workingHours: availability.workingHours,
+        daysAvailable: availability.daysAvailable,
+        sessionDuration: availability.sessionDuration,
+      ).toMap(),
+      'accountSettings': TrainerAccountSettingsModel(
+        notificationsEnabled: accountSettings.notificationsEnabled,
+        clientMessagingEnabled: accountSettings.clientMessagingEnabled,
+      ).toMap(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
   }
 
   Map<String, dynamic> toJson() {
@@ -198,23 +351,73 @@ class TrainerProfileModel extends TrainerProfile {
                 obtainedYear: c.obtainedYear,
                 emoji: c.emoji,
                 isVerified: c.isVerified,
-              ).toJson())
+              ).toMap())
           .toList(),
       'monthlyMetrics': TrainerMonthlyMetricsModel(
         sessionsCompleted: monthlyMetrics.sessionsCompleted,
         clientRetentionPercentage: monthlyMetrics.clientRetentionPercentage,
         avgSessionRating: monthlyMetrics.avgSessionRating,
         newClientsCount: monthlyMetrics.newClientsCount,
-      ).toJson(),
+      ).toMap(),
       'availability': TrainerAvailabilityModel(
         workingHours: availability.workingHours,
         daysAvailable: availability.daysAvailable,
         sessionDuration: availability.sessionDuration,
-      ).toJson(),
+      ).toMap(),
       'accountSettings': TrainerAccountSettingsModel(
         notificationsEnabled: accountSettings.notificationsEnabled,
         clientMessagingEnabled: accountSettings.clientMessagingEnabled,
-      ).toJson(),
+      ).toMap(),
     };
+  }
+
+  @override
+  TrainerProfileModel copyWith({
+    String? id,
+    String? name,
+    String? title,
+    String? email,
+    String? initials,
+    String? photoUrl,
+    bool? isVerified,
+    double? rating,
+    int? reviewCount,
+    int? clientCount,
+    double? experienceYears,
+    int? sessionCount,
+    List<String>? specializations,
+    List<TrainerCertification>? certifications,
+    TrainerMonthlyMetrics? monthlyMetrics,
+    TrainerAvailability? availability,
+    TrainerAccountSettings? accountSettings,
+  }) {
+    return TrainerProfileModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      title: title ?? this.title,
+      email: email ?? this.email,
+      initials: initials ?? this.initials,
+      photoUrl: photoUrl ?? this.photoUrl,
+      isVerified: isVerified ?? this.isVerified,
+      rating: rating ?? this.rating,
+      reviewCount: reviewCount ?? this.reviewCount,
+      clientCount: clientCount ?? this.clientCount,
+      experienceYears: experienceYears ?? this.experienceYears,
+      sessionCount: sessionCount ?? this.sessionCount,
+      specializations: specializations ?? this.specializations,
+      certifications: certifications ?? this.certifications,
+      monthlyMetrics: monthlyMetrics ?? this.monthlyMetrics,
+      availability: availability ?? this.availability,
+      accountSettings: accountSettings ?? this.accountSettings,
+    );
+  }
+
+  static String extractInitials(String fullName) {
+    final parts = fullName.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return 'MT';
+    if (parts.length == 1) {
+      return parts.first.substring(0, parts.first.length >= 2 ? 2 : 1).toUpperCase();
+    }
+    return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
 }
