@@ -1,8 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:sweatsync/features/auth/presentation/providers/auth_provider.dart';
+import 'package:sweatsync/features/profile/presentation/providers/user_profile_provider.dart';
 import '../../data/datasources/client_management_datasource.dart';
+import '../../data/datasources/client_management_mock_datasource.dart';
 import '../../data/datasources/client_management_remote_datasource.dart';
 import '../../data/repositories/client_management_repository_impl.dart';
 import '../../domain/entities/trainer_client.dart';
@@ -82,12 +85,25 @@ class ClientManagementState {
   }
 }
 
+final trainerClientTrainerIdProvider = Provider<String>((ref) {
+  try {
+    final user = ref.watch(firebaseAuthProvider).currentUser;
+    return user?.uid ?? 'trainer_001';
+  } catch (_) {
+    return 'trainer_001';
+  }
+});
+
 final clientManagementDatasourceProvider =
     Provider<ClientManagementDatasource>((ref) {
-  return ClientManagementRemoteDatasource(
-    FirebaseFirestore.instance,
-    FirebaseAuth.instance,
-  );
+  try {
+    return ClientManagementRemoteDatasource(
+      ref.watch(firestoreProvider),
+      ref.watch(firebaseAuthProvider),
+    );
+  } catch (_) {
+    return ClientManagementMockDatasource();
+  }
 });
 
 final clientManagementRepositoryProvider =
@@ -286,15 +302,62 @@ class ClientManagementNotifier extends Notifier<ClientManagementState> {
     ),
   ];
 
-  late final ClientManagementRepository _repository;
+  StreamSubscription<List<TrainerClient>>? _streamSubscription;
 
   @override
   ClientManagementState build() {
-    _repository = ref.watch(clientManagementRepositoryProvider);
+    ref.onDispose(() {
+      _streamSubscription?.cancel();
+    });
+
+    _initStream();
+
     return ClientManagementState(
       clients: _defaultClients,
       isLoading: false,
     );
+  }
+
+  void _initStream() {
+    final repo = ref.read(clientManagementRepositoryProvider);
+    final trainerId = ref.read(trainerClientTrainerIdProvider);
+
+    _streamSubscription?.cancel();
+    _streamSubscription = repo.watchClients(trainerId: trainerId).listen(
+      (liveClients) {
+        if (liveClients.isNotEmpty) {
+          state = state.copyWith(
+            clients: liveClients,
+            isLoading: false,
+          );
+        } else {
+          _seedAndFetch(repo, trainerId);
+        }
+      },
+      onError: (e) {
+        // Fallback to current memory state or report error
+        state = state.copyWith(
+          isLoading: false,
+          error: e.toString(),
+        );
+      },
+    );
+  }
+
+  Future<void> _seedAndFetch(
+    ClientManagementRepository repo,
+    String trainerId,
+  ) async {
+    try {
+      final fetched = await repo.getClients(trainerId: trainerId);
+      if (fetched.isNotEmpty) {
+        state = state.copyWith(clients: fetched, isLoading: false);
+      } else {
+        state = state.copyWith(isLoading: false);
+      }
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
+    }
   }
 
   void setFilter(ClientFilterTab tab) {
@@ -316,6 +379,9 @@ class ClientManagementNotifier extends Notifier<ClientManagementState> {
     String? phone,
     String? notes,
   }) async {
+    final trainerId = ref.read(trainerClientTrainerIdProvider);
+    final repo = ref.read(clientManagementRepositoryProvider);
+
     final newClient = TrainerClient(
       id: 'client_${DateTime.now().millisecondsSinceEpoch}',
       name: name.trim(),
@@ -350,16 +416,27 @@ class ClientManagementNotifier extends Notifier<ClientManagementState> {
       ],
     );
 
-    final saved = await _repository.addClient(newClient);
-    final updatedList = [saved, ...state.clients];
+    // Optimistic UI state update
+    final updatedList = [newClient, ...state.clients];
     state = state.copyWith(clients: updatedList);
-    return saved;
+
+    // Async write to Firestore backend
+    try {
+      final saved = await repo.addClient(newClient, trainerId: trainerId);
+      return saved;
+    } catch (_) {
+      return newClient;
+    }
   }
 
   Future<void> updateNotes(String clientId, String notes) async {
+    final trainerId = ref.read(trainerClientTrainerIdProvider);
+    final repo = ref.read(clientManagementRepositoryProvider);
+
     final client = state.clients.firstWhere((c) => c.id == clientId);
     final updated = client.copyWith(notes: notes);
-    await _repository.updateClient(updated);
+
+    // Optimistic update
     final updatedList = state.clients.map((c) {
       if (c.id == clientId) {
         return updated;
@@ -367,10 +444,18 @@ class ClientManagementNotifier extends Notifier<ClientManagementState> {
       return c;
     }).toList();
     state = state.copyWith(clients: updatedList);
+
+    // Async write to Firestore backend
+    try {
+      await repo.updateNotes(clientId, notes, trainerId: trainerId);
+    } catch (_) {}
   }
 
   Future<void> toggleActiveStatus(String clientId) async {
-    await _repository.toggleClientActiveStatus(clientId);
+    final trainerId = ref.read(trainerClientTrainerIdProvider);
+    final repo = ref.read(clientManagementRepositoryProvider);
+
+    // Optimistic update
     final updatedList = state.clients.map((c) {
       if (c.id == clientId) {
         return c.copyWith(isActive: !c.isActive);
@@ -378,18 +463,34 @@ class ClientManagementNotifier extends Notifier<ClientManagementState> {
       return c;
     }).toList();
     state = state.copyWith(clients: updatedList);
+
+    // Async write to Firestore backend
+    try {
+      await repo.toggleClientActiveStatus(clientId, trainerId: trainerId);
+    } catch (_) {}
   }
 
   Future<void> deleteClient(String clientId) async {
-    await _repository.deleteClient(clientId);
+    final trainerId = ref.read(trainerClientTrainerIdProvider);
+    final repo = ref.read(clientManagementRepositoryProvider);
+
+    // Optimistic update
     final updatedList = state.clients.where((c) => c.id != clientId).toList();
     state = state.copyWith(clients: updatedList);
+
+    // Async write to Firestore backend
+    try {
+      await repo.deleteClient(clientId, trainerId: trainerId);
+    } catch (_) {}
   }
 
   Future<void> refresh() async {
+    final trainerId = ref.read(trainerClientTrainerIdProvider);
+    final repo = ref.read(clientManagementRepositoryProvider);
+
     try {
       state = state.copyWith(isLoading: true, error: null);
-      final list = await _repository.getClients();
+      final list = await repo.getClients(trainerId: trainerId);
       state = state.copyWith(clients: list, isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

@@ -177,76 +177,95 @@ class TrainerClientsScreen extends ConsumerWidget {
               // 6. CLIENTS LIST VIEW
               // ------------------------------------------------
               Expanded(
-                child: state.isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Color(0xFF38BDF8)),
-                        ),
-                      )
-                    : state.filteredClients.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                child: RefreshIndicator(
+                  color: const Color(0xFF38BDF8),
+                  backgroundColor: const Color(0xFF161922),
+                  onRefresh: () =>
+                      ref.read(clientManagementProvider.notifier).refresh(),
+                  child: state.isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color(0xFF38BDF8),
+                            ),
+                          ),
+                        )
+                      : state.filteredClients.isEmpty
+                          ? ListView(
+                              physics: const AlwaysScrollableScrollPhysics(
+                                parent: BouncingScrollPhysics(),
+                              ),
                               children: [
-                                Container(
-                                  width: 60,
-                                  height: 60,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF161922),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: const Icon(
-                                    Icons.person_search_rounded,
-                                    color: Color(0xFF64748B),
-                                    size: 28,
-                                  ),
+                                SizedBox(
+                                  height: MediaQuery.of(context).size.height * 0.25,
                                 ),
-                                const SizedBox(height: 12),
-                                const Text(
-                                  'No clients found',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  state.searchQuery.isNotEmpty
-                                      ? 'No matching results for "${state.searchQuery}"'
-                                      : 'No clients in this category.',
-                                  style: const TextStyle(
-                                    color: Color(0xFF8E9DAE),
-                                    fontSize: 13,
+                                Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 60,
+                                        height: 60,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFF161922),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: const Icon(
+                                          Icons.person_search_rounded,
+                                          color: Color(0xFF64748B),
+                                          size: 28,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      const Text(
+                                        'No clients found',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        state.searchQuery.isNotEmpty
+                                            ? 'No matching results for "${state.searchQuery}"'
+                                            : 'No clients in this category.',
+                                        style: const TextStyle(
+                                          color: Color(0xFF8E9DAE),
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
-                            ),
-                          )
-                        : ListView.separated(
-                            physics: const BouncingScrollPhysics(),
-                            padding: const EdgeInsets.only(top: 2, bottom: 20),
-                            itemCount: state.filteredClients.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 12),
-                            itemBuilder: (context, index) {
-                              final client = state.filteredClients[index];
-                              return ClientCard(
-                                client: client,
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute<void>(
-                                      builder: (_) => ClientDetailsScreen(
-                                        client: client,
+                            )
+                          : ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(
+                                parent: BouncingScrollPhysics(),
+                              ),
+                              padding: const EdgeInsets.only(top: 2, bottom: 20),
+                              itemCount: state.filteredClients.length,
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                final client = state.filteredClients[index];
+                                return ClientCard(
+                                  client: client,
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute<void>(
+                                        builder: (_) => ClientDetailsScreen(
+                                          client: client,
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                ),
               ),
             ],
           ),

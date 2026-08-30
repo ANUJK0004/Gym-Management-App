@@ -1,9 +1,11 @@
 import '../models/trainer_client_model.dart';
 
 abstract class ClientManagementDatasource {
-  Future<List<TrainerClientModel>> getClients();
-  Future<TrainerClientModel> addClient(TrainerClientModel client);
-  Future<TrainerClientModel> updateClient(TrainerClientModel client);
-  Future<void> deleteClient(String clientId);
-  Future<void> toggleClientActiveStatus(String clientId);
+  Stream<List<TrainerClientModel>> watchClients({String? trainerId});
+  Future<List<TrainerClientModel>> getClients({String? trainerId});
+  Future<TrainerClientModel> addClient(TrainerClientModel client, {String? trainerId});
+  Future<TrainerClientModel> updateClient(TrainerClientModel client, {String? trainerId});
+  Future<void> updateNotes(String clientId, String notes, {String? trainerId});
+  Future<void> deleteClient(String clientId, {String? trainerId});
+  Future<void> toggleClientActiveStatus(String clientId, {String? trainerId});
 }

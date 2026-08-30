@@ -17,6 +17,7 @@ void main() {
 
       container = ProviderContainer(
         overrides: [
+          trainerClientTrainerIdProvider.overrideWithValue('trainer_001'),
           clientManagementRepositoryProvider.overrideWithValue(repository),
         ],
       );
@@ -92,6 +93,8 @@ void main() {
         trainingPlan: 'HIIT + Cardio',
       );
 
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
       expect(newClient.name, equals('Jane Doe'));
       final state = container.read(clientManagementProvider);
       expect(state.totalCount, equals(6));
@@ -103,6 +106,7 @@ void main() {
     test('Update notes updates state correctly', () async {
       final notifier = container.read(clientManagementProvider.notifier);
       await notifier.updateNotes('client_sarah_chen', 'Updated notes test.');
+      await Future<void>.delayed(const Duration(milliseconds: 20));
 
       final state = container.read(clientManagementProvider);
       final sarah = state.clients.firstWhere((c) => c.id == 'client_sarah_chen');
@@ -126,6 +130,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            trainerClientTrainerIdProvider.overrideWithValue('trainer_001'),
             clientManagementRepositoryProvider.overrideWithValue(repository),
           ],
           child: const MaterialApp(
@@ -181,6 +186,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            trainerClientTrainerIdProvider.overrideWithValue('trainer_001'),
             clientManagementRepositoryProvider.overrideWithValue(repository),
           ],
           child: const MaterialApp(
@@ -266,6 +272,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            trainerClientTrainerIdProvider.overrideWithValue('trainer_001'),
             clientManagementRepositoryProvider.overrideWithValue(repository),
           ],
           child: const MaterialApp(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:sweatsync/features/client_management/presentation/providers/client_management_provider.dart';
 import '../providers/trainer_schedule_provider.dart';
 
 class TrainerAddSessionSheet extends ConsumerStatefulWidget {
@@ -30,8 +31,8 @@ class TrainerAddSessionSheet extends ConsumerStatefulWidget {
 
 class _TrainerAddSessionSheetState
     extends ConsumerState<TrainerAddSessionSheet> {
-  // Available Options
-  final List<String> _clients = [
+  // Default fallback clients
+  static const List<String> _defaultClients = [
     'Sarah Chen',
     'Marcus King',
     'Emma Davis',
@@ -50,7 +51,10 @@ class _TrainerAddSessionSheetState
     'Circuit Training',
   ];
 
-  final List<String> _timeSlots = [
+  // Comprehensive master time slots from 6:00 AM to 10:30 PM
+  static const List<String> _masterTimeSlots = [
+    '6:00 AM',
+    '6:30 AM',
     '7:00 AM',
     '7:30 AM',
     '8:00 AM',
@@ -74,18 +78,43 @@ class _TrainerAddSessionSheetState
     '5:00 PM',
     '5:30 PM',
     '6:00 PM',
+    '6:30 PM',
+    '7:00 PM',
+    '7:30 PM',
+    '8:00 PM',
+    '8:30 PM',
+    '9:00 PM',
+    '9:30 PM',
+    '10:00 PM',
+    '10:30 PM',
   ];
 
   final List<int> _durations = [30, 45, 60, 75, 90];
 
-  // Selected State (initialized to defaults matching screenshot)
-  String _selectedClient = 'Lisa Park';
-  String _selectedSessionType = 'Assessment';
-  String _selectedTimeSlot = '9:30 AM';
-  int _selectedDuration = 75;
+  // Selected State
+  String _selectedClient = 'Sarah Chen';
+  String? _selectedClientId;
+  String? _selectedClientAvatar;
+  String _selectedSessionType = 'Strength Training';
+  String _selectedTimeSlot = '';
+  int _selectedDuration = 45;
   final TextEditingController _notesController = TextEditingController();
 
   final ScrollController _timeSlotScrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _initDefaultTimeSlot();
+  }
+
+  void _initDefaultTimeSlot() {
+    final effectiveDate = widget.targetDate ?? DateTime.now();
+    final available = _getFilteredTimeSlots(effectiveDate);
+    if (available.isNotEmpty) {
+      _selectedTimeSlot = available.first;
+    }
+  }
 
   @override
   void dispose() {
@@ -94,13 +123,81 @@ class _TrainerAddSessionSheetState
     super.dispose();
   }
 
+  static TimeOfDay? _parseTimeString(String slot) {
+    final parts = slot.trim().split(' ');
+    if (parts.length != 2) return null;
+    final timeParts = parts[0].split(':');
+    if (timeParts.length != 2) return null;
+    int hour = int.tryParse(timeParts[0]) ?? 0;
+    final minute = int.tryParse(timeParts[1]) ?? 0;
+    final isPm = parts[1].toUpperCase() == 'PM';
+    if (isPm && hour < 12) hour += 12;
+    if (!isPm && hour == 12) hour = 0;
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+  static bool _isSlotInFuture(DateTime targetDate, String slot) {
+    final now = DateTime.now();
+    final targetDay = DateTime(targetDate.year, targetDate.month, targetDate.day);
+    final today = DateTime(now.year, now.month, now.day);
+
+    if (targetDay.isAfter(today)) {
+      return true; // Future day -> slot is valid
+    } else if (targetDay.isBefore(today)) {
+      return false; // Past day -> slot invalid
+    } else {
+      // Today -> check time
+      final tod = _parseTimeString(slot);
+      if (tod == null) return false;
+      final slotDateTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        tod.hour,
+        tod.minute,
+      );
+      return slotDateTime.isAfter(now);
+    }
+  }
+
+  List<String> _getFilteredTimeSlots(DateTime targetDate) {
+    return _masterTimeSlots.where((slot) {
+      return _isSlotInFuture(targetDate, slot);
+    }).toList();
+  }
+
   void _onAddSession() {
+    final effectiveDate = widget.targetDate ?? DateTime.now();
+    final isPast = DateTime(effectiveDate.year, effectiveDate.month, effectiveDate.day)
+        .isBefore(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day));
+
+    if (isPast) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot schedule sessions for past dates.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
     if (_selectedClient.isEmpty ||
         _selectedSessionType.isEmpty ||
         _selectedTimeSlot.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please fill all required session fields'),
+          content: Text('Please select an available future time slot and client.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    // Double-check slot is strictly in future
+    if (!_isSlotInFuture(effectiveDate, _selectedTimeSlot)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Selected time slot has already passed. Please choose a future time.'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -109,13 +206,15 @@ class _TrainerAddSessionSheetState
 
     ref.read(trainerScheduleProvider.notifier).addSession(
           clientName: _selectedClient,
+          clientId: _selectedClientId,
+          clientAvatar: _selectedClientAvatar,
           workoutType: _selectedSessionType,
           timeSlot: _selectedTimeSlot,
           durationMinutes: _selectedDuration,
           notes: _notesController.text.trim().isNotEmpty
               ? _notesController.text.trim()
               : null,
-          date: widget.targetDate,
+          date: effectiveDate,
         );
 
     Navigator.pop(context);
@@ -150,6 +249,18 @@ class _TrainerAddSessionSheetState
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final effectiveDate = widget.targetDate ?? DateTime.now();
+    final availableSlots = _getFilteredTimeSlots(effectiveDate);
+
+    final clientState = ref.watch(clientManagementProvider);
+    final availableClients = clientState.clients.isNotEmpty
+        ? clientState.clients.map((c) => c.name).toList()
+        : _defaultClients;
+
+    // Ensure selected time slot is valid in available list
+    if (!availableSlots.contains(_selectedTimeSlot) && availableSlots.isNotEmpty) {
+      _selectedTimeSlot = availableSlots.first;
+    }
 
     return Container(
       constraints: BoxConstraints(
@@ -237,14 +348,19 @@ class _TrainerAddSessionSheetState
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: _clients.map((client) {
-                      final isSelected = _selectedClient == client;
+                    children: availableClients.map((clientName) {
+                      final isSelected = _selectedClient == clientName;
                       return _buildChoiceChip(
-                        label: client,
+                        label: clientName,
                         isSelected: isSelected,
                         onTap: () {
                           setState(() {
-                            _selectedClient = client;
+                            _selectedClient = clientName;
+                            final match = clientState.clients
+                                .where((c) => c.name == clientName)
+                                .firstOrNull;
+                            _selectedClientId = match?.id;
+                            _selectedClientAvatar = match?.avatarUrl;
                           });
                         },
                       );
@@ -275,72 +391,102 @@ class _TrainerAddSessionSheetState
 
                   const SizedBox(height: 18),
 
-                  // 3. TIME SLOT SECTION (WITH SCROLLBAR / GRID)
-                  _buildSectionHeader('TIME SLOT'),
+                  // 3. TIME SLOT SECTION (DYNAMIC FUTURE-ONLY SLOTS)
+                  _buildSectionHeader('TIME SLOT (PRESENT & FUTURE ONLY)'),
                   const SizedBox(height: 8),
-                  Container(
-                    height: 135,
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0F1218),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: const Color(0xFF262C3A),
-                        width: 0.8,
-                      ),
-                    ),
-                    child: Scrollbar(
-                      controller: _timeSlotScrollController,
-                      thumbVisibility: true,
-                      radius: const Radius.circular(4),
-                      child: GridView.builder(
-                        controller: _timeSlotScrollController,
-                        padding: const EdgeInsets.only(right: 12, top: 4, bottom: 4),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          crossAxisSpacing: 6,
-                          mainAxisSpacing: 6,
-                          childAspectRatio: 2.2,
+                  if (availableSlots.isEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E222D),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: const Color(0xFFEAB308).withValues(alpha: 0.4),
+                          width: 0.8,
                         ),
-                        itemCount: _timeSlots.length,
-                        itemBuilder: (context, index) {
-                          final slot = _timeSlots[index];
-                          final isSelected = _selectedTimeSlot == slot;
-
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedTimeSlot = slot;
-                              });
-                            },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 150),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? const Color(0xFF38BDF8)
-                                    : const Color(0xFF1E222D),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                slot,
-                                style: TextStyle(
-                                  color: isSelected
-                                      ? const Color(0xFF0B132B)
-                                      : const Color(0xFFCBD5E1),
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
-                                  fontSize: 11,
-                                ),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.info_outline_rounded,
+                              color: Color(0xFFEAB308), size: 20),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'No remaining time slots for today. Please schedule for upcoming days of this week.',
+                              style: TextStyle(
+                                color: Color(0xFFCBD5E1),
+                                fontSize: 12.5,
                               ),
                             ),
-                          );
-                        },
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    Container(
+                      height: 135,
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F1218),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: const Color(0xFF262C3A),
+                          width: 0.8,
+                        ),
+                      ),
+                      child: Scrollbar(
+                        controller: _timeSlotScrollController,
+                        thumbVisibility: true,
+                        radius: const Radius.circular(4),
+                        child: GridView.builder(
+                          controller: _timeSlotScrollController,
+                          padding: const EdgeInsets.only(right: 12, top: 4, bottom: 4),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            crossAxisSpacing: 6,
+                            mainAxisSpacing: 6,
+                            childAspectRatio: 2.2,
+                          ),
+                          itemCount: availableSlots.length,
+                          itemBuilder: (context, index) {
+                            final slot = availableSlots[index];
+                            final isSelected = _selectedTimeSlot == slot;
+
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedTimeSlot = slot;
+                                });
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 150),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? const Color(0xFF38BDF8)
+                                      : const Color(0xFF1E222D),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  slot,
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? const Color(0xFF0B132B)
+                                        : const Color(0xFFCBD5E1),
+                                    fontWeight: isSelected
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
 
                   const SizedBox(height: 18),
 
@@ -421,10 +567,12 @@ class _TrainerAddSessionSheetState
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: _onAddSession,
+                      onPressed: availableSlots.isNotEmpty ? _onAddSession : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF38BDF8),
+                        disabledBackgroundColor: const Color(0xFF1E222D),
                         foregroundColor: const Color(0xFF0B132B),
+                        disabledForegroundColor: const Color(0xFF64748B),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),

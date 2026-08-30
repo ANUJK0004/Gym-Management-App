@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../../domain/entities/trainer_client.dart';
 import '../models/trainer_client_model.dart';
 import 'client_management_datasource.dart';
@@ -5,9 +7,15 @@ import 'client_management_datasource.dart';
 class ClientManagementMockDatasource implements ClientManagementDatasource {
   ClientManagementMockDatasource() {
     _clients = List<TrainerClientModel>.from(_initialMockClients);
+    _streamController = StreamController<List<TrainerClientModel>>.broadcast(
+      onListen: () {
+        _streamController.add(List<TrainerClientModel>.unmodifiable(_clients));
+      },
+    );
   }
 
   late List<TrainerClientModel> _clients;
+  late final StreamController<List<TrainerClientModel>> _streamController;
 
   static final List<TrainerClientModel> _initialMockClients = [
     TrainerClientModel(
@@ -204,37 +212,90 @@ class ClientManagementMockDatasource implements ClientManagementDatasource {
   ];
 
   @override
-  Future<List<TrainerClientModel>> getClients() async {
-    await Future<void>.delayed(const Duration(milliseconds: 80));
+  Stream<List<TrainerClientModel>> watchClients({String? trainerId}) {
+    return _streamController.stream;
+  }
+
+  @override
+  Future<List<TrainerClientModel>> getClients({String? trainerId}) async {
     return List<TrainerClientModel>.unmodifiable(_clients);
   }
 
   @override
-  Future<TrainerClientModel> addClient(TrainerClientModel client) async {
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+  Future<TrainerClientModel> addClient(
+    TrainerClientModel client, {
+    String? trainerId,
+  }) async {
     _clients.insert(0, client);
+    _streamController.add(List<TrainerClientModel>.unmodifiable(_clients));
     return client;
   }
 
   @override
-  Future<TrainerClientModel> updateClient(TrainerClientModel client) async {
-    await Future<void>.delayed(const Duration(milliseconds: 80));
+  Future<TrainerClientModel> updateClient(
+    TrainerClientModel client, {
+    String? trainerId,
+  }) async {
     final index = _clients.indexWhere((c) => c.id == client.id);
     if (index != -1) {
       _clients[index] = client;
+      _streamController.add(List<TrainerClientModel>.unmodifiable(_clients));
     }
     return client;
   }
 
   @override
-  Future<void> deleteClient(String clientId) async {
-    await Future<void>.delayed(const Duration(milliseconds: 80));
-    _clients.removeWhere((c) => c.id == clientId);
+  Future<void> updateNotes(
+    String clientId,
+    String notes, {
+    String? trainerId,
+  }) async {
+    final index = _clients.indexWhere((c) => c.id == clientId);
+    if (index != -1) {
+      final current = _clients[index];
+      _clients[index] = TrainerClientModel(
+        id: current.id,
+        name: current.name,
+        initials: current.initials,
+        email: current.email,
+        age: current.age,
+        heightCm: current.heightCm,
+        weightKg: current.weightKg,
+        goal: current.goal,
+        trainingPlan: current.trainingPlan,
+        sessionsCount: current.sessionsCount,
+        progressPercentage: current.progressPercentage,
+        streakDays: current.streakDays,
+        nextSession: current.nextSession,
+        isActive: current.isActive,
+        avatarUrl: current.avatarUrl,
+        joinedDate: current.joinedDate,
+        phone: current.phone,
+        notes: notes,
+        attendanceRate: current.attendanceRate,
+        attendanceDelta: current.attendanceDelta,
+        avgIntensity: current.avgIntensity,
+        intensityDelta: current.intensityDelta,
+        weightChange: current.weightChange,
+        goalOnTrack: current.goalOnTrack,
+        weeklyActivity: current.weeklyActivity,
+        upcomingSessions: current.upcomingSessions,
+      );
+      _streamController.add(List<TrainerClientModel>.unmodifiable(_clients));
+    }
   }
 
   @override
-  Future<void> toggleClientActiveStatus(String clientId) async {
-    await Future<void>.delayed(const Duration(milliseconds: 80));
+  Future<void> deleteClient(String clientId, {String? trainerId}) async {
+    _clients.removeWhere((c) => c.id == clientId);
+    _streamController.add(List<TrainerClientModel>.unmodifiable(_clients));
+  }
+
+  @override
+  Future<void> toggleClientActiveStatus(
+    String clientId, {
+    String? trainerId,
+  }) async {
     final index = _clients.indexWhere((c) => c.id == clientId);
     if (index != -1) {
       final current = _clients[index];
@@ -266,6 +327,7 @@ class ClientManagementMockDatasource implements ClientManagementDatasource {
         weeklyActivity: current.weeklyActivity,
         upcomingSessions: current.upcomingSessions,
       );
+      _streamController.add(List<TrainerClientModel>.unmodifiable(_clients));
     }
   }
 }

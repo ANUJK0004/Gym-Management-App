@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../dashboard/trainer/presentation/providers/trainer_shell_provider.dart';
+import 'package:sweatsync/features/dashboard/trainer/presentation/providers/trainer_shell_provider.dart';
 import '../../domain/entities/trainer_schedule_session.dart';
 import '../providers/trainer_schedule_provider.dart';
 import '../widgets/trainer_add_session_sheet.dart';
@@ -49,6 +49,7 @@ class TrainerScheduleScreen extends ConsumerWidget {
 
     final selectedDateStr = _formatFullDate(scheduleState.selectedDate);
     final sessions = scheduleState.sessionsForSelectedDate;
+    final isPast = scheduleState.isSelectedDateInPast;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0D0F14),
@@ -127,10 +128,24 @@ class TrainerScheduleScreen extends ConsumerWidget {
 
                   // "+ Add Session" Button
                   Material(
-                    color: const Color(0xFF0C2438),
+                    color: isPast
+                        ? const Color(0xFF161922)
+                        : const Color(0xFF0C2438),
                     borderRadius: BorderRadius.circular(20),
                     child: InkWell(
                       onTap: () {
+                        if (isPast) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              backgroundColor: Color(0xFF161922),
+                              content: Text(
+                                'Cannot schedule sessions for past dates. Please select today or an upcoming day.',
+                                style: TextStyle(color: Color(0xFFEAB308)),
+                              ),
+                            ),
+                          );
+                          return;
+                        }
                         TrainerAddSessionSheet.show(
                           context,
                           targetDate: scheduleState.selectedDate,
@@ -143,26 +158,34 @@ class TrainerScheduleScreen extends ConsumerWidget {
                           vertical: 9,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF0C2438),
+                          color: isPast
+                              ? const Color(0xFF161922)
+                              : const Color(0xFF0C2438),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: const Color(0xFF1D4A6E),
+                            color: isPast
+                                ? const Color(0xFF262C3A)
+                                : const Color(0xFF1D4A6E),
                             width: 1,
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.add_rounded,
-                              color: Color(0xFF38BDF8),
+                              color: isPast
+                                  ? const Color(0xFF64748B)
+                                  : const Color(0xFF38BDF8),
                               size: 18,
                             ),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Text(
                               'Add Session',
                               style: TextStyle(
-                                color: Color(0xFF38BDF8),
+                                color: isPast
+                                    ? const Color(0xFF64748B)
+                                    : const Color(0xFF38BDF8),
                                 fontWeight: FontWeight.w700,
                                 fontSize: 13.5,
                               ),
@@ -178,14 +201,12 @@ class TrainerScheduleScreen extends ConsumerWidget {
               const SizedBox(height: 16),
 
               // ------------------------------------------------
-              // DATE STRIP & WEEK NAVIGATION SCRUBBER
+              // CURRENT WEEK DATE STRIP
               // ------------------------------------------------
               TrainerDateStrip(
                 selectedDate: scheduleState.selectedDate,
                 weekStartDate: scheduleState.weekStartDate,
                 onDateSelected: scheduleNotifier.selectDate,
-                onPreviousWeek: scheduleNotifier.previousWeek,
-                onNextWeek: scheduleNotifier.nextWeek,
               ),
 
               const SizedBox(height: 16),
@@ -214,43 +235,49 @@ class TrainerScheduleScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 14),
-                            const Text(
-                              'No sessions scheduled',
-                              style: TextStyle(
+                            Text(
+                              isPast
+                                  ? 'No sessions recorded'
+                                  : 'No sessions scheduled',
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                             const SizedBox(height: 6),
-                            const Text(
-                              'Take a rest or tap + Add Session to create one.',
-                              style: TextStyle(
+                            Text(
+                              isPast
+                                  ? 'No sessions were scheduled on this date.'
+                                  : 'Take a rest or tap + Add Session to schedule one.',
+                              style: const TextStyle(
                                 color: Color(0xFF8E9DAE),
                                 fontSize: 13,
                               ),
                             ),
-                            const SizedBox(height: 16),
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                TrainerAddSessionSheet.show(
-                                  context,
-                                  targetDate: scheduleState.selectedDate,
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF38BDF8),
-                                foregroundColor: const Color(0xFF0B132B),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
+                            if (!isPast) ...[
+                              const SizedBox(height: 16),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  TrainerAddSessionSheet.show(
+                                    context,
+                                    targetDate: scheduleState.selectedDate,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF38BDF8),
+                                  foregroundColor: const Color(0xFF0B132B),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.add, size: 18),
+                                label: const Text(
+                                  'Add Session',
+                                  style: TextStyle(fontWeight: FontWeight.w700),
                                 ),
                               ),
-                              icon: const Icon(Icons.add, size: 18),
-                              label: const Text(
-                                'Add Session',
-                                style: TextStyle(fontWeight: FontWeight.w700),
-                              ),
-                            ),
+                            ],
                           ],
                         ),
                       )
@@ -381,6 +408,33 @@ class TrainerScheduleScreen extends ConsumerWidget {
                 onTap: () {
                   notifier.toggleSessionCompleted(session.id);
                   Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: Colors.redAccent,
+                ),
+                title: const Text(
+                  'Delete Session',
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () {
+                  notifier.deleteSession(session.id);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: const Color(0xFF161922),
+                      content: Text(
+                        'Session for ${session.clientName} removed',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  );
                 },
               ),
             ],
